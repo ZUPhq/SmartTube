@@ -3,6 +3,14 @@
   'use strict';
   var reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
 
+  /* ---- nav scroll glass ---- */
+  var nav = document.querySelector('.nav');
+  if(nav){
+    var updateNav = function(){ nav.classList.toggle('scrolled', scrollY > 10); };
+    addEventListener('scroll', updateNav, {passive:true});
+    updateNav();
+  }
+
   /* ---- mobile nav ---- */
   var burger = document.getElementById('burger');
   var mmenu = document.getElementById('mmenu');
@@ -43,6 +51,7 @@
         el.style.transform = 'translateY(' + (p*parseFloat(el.dataset.par)).toFixed(1) + 'px)';
       });
       scaleEls.forEach(function(el){
+        if(innerWidth <= 833){ el.style.transform = ''; return; }
         var r = el.getBoundingClientRect();
         var p = (vh - r.top) / (vh*0.9 + r.height);
         p = Math.max(0, Math.min(1, p));
@@ -145,6 +154,25 @@
         document.querySelectorAll('.auth-pane').forEach(function(p){
           p.classList.toggle('on', p.dataset.pane === t.dataset.tab);
         });
+      });
+    });
+  }
+
+  /* ---- 3d card tilt (pointer:fine only) ---- */
+  if(!matchMedia('(pointer:coarse)').matches){
+    document.querySelectorAll('.ccard,.card,.inst-card,.review').forEach(function(card){
+      card.addEventListener('mouseenter',function(){
+        card.style.transition='box-shadow .3s';
+      });
+      card.addEventListener('mousemove',function(e){
+        var r=card.getBoundingClientRect();
+        var x=((e.clientX-r.left)/r.width-.5)*2;
+        var y=((e.clientY-r.top)/r.height-.5)*2;
+        card.style.transform='perspective(700px) rotateX('+(-y*7)+'deg) rotateY('+(x*7)+'deg) translateY(-4px) scale(1.015)';
+      });
+      card.addEventListener('mouseleave',function(){
+        card.style.transition='transform .5s cubic-bezier(.2,.7,.2,1),box-shadow .3s';
+        card.style.transform='';
       });
     });
   }
