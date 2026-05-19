@@ -15,10 +15,18 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1
 body::before{
   content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
   background:
-    radial-gradient(ellipse 900px 700px at 10% 20%,rgba(26,170,143,.32) 0%,transparent 68%),
-    radial-gradient(ellipse 700px 600px at 90% 75%,rgba(46,201,171,.26) 0%,transparent 65%),
-    radial-gradient(ellipse 650px 500px at 75% 5%,rgba(54,183,214,.22) 0%,transparent 62%),
-    radial-gradient(ellipse 800px 550px at 25% 92%,rgba(110,130,230,.18) 0%,transparent 60%);
+    radial-gradient(ellipse 900px 700px at 10% 20%,rgba(26,170,143,.11) 0%,transparent 68%),
+    radial-gradient(ellipse 700px 600px at 90% 75%,rgba(46,201,171,.08) 0%,transparent 65%),
+    radial-gradient(ellipse 650px 500px at 75% 5%,rgba(54,183,214,.07) 0%,transparent 62%),
+    radial-gradient(ellipse 800px 550px at 25% 92%,rgba(110,130,230,.06) 0%,transparent 60%);
+}
+@media(max-width:833px){
+  body::before{
+    background:
+      radial-gradient(ellipse 55vw 40vw at 0% 18%,rgba(26,170,143,.07) 0%,transparent 70%),
+      radial-gradient(ellipse 50vw 38vw at 100% 80%,rgba(46,201,171,.05) 0%,transparent 70%),
+      radial-gradient(ellipse 45vw 35vw at 80% 0%,rgba(54,183,214,.04) 0%,transparent 70%);
+  }
 }
 a{color:inherit;text-decoration:none}
 img,svg{display:block;max-width:100%}
