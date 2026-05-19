@@ -113,7 +113,7 @@ h1,h2,h3,h4{font-weight:600;letter-spacing:-.02em;line-height:1.08;color:var(--i
 .tile{position:relative;display:flex;flex-direction:column;align-items:center;
   text-align:center;padding:58px 24px;overflow:hidden;border-top:1px solid rgba(0,0,0,.06)}
 .tile.full{min-height:min(88vh,780px)}
-.tile.featured{min-height:min(98vh,900px);padding-bottom:0}
+.tile.featured{min-height:min(98vh,900px);padding-bottom:60px}
 .tile.half{min-height:600px}
 .tile.slim{min-height:360px;padding:66px 24px}
 .t-deep{background:rgba(245,245,247,.62)}
@@ -141,7 +141,7 @@ h1,h2,h3,h4{font-weight:600;letter-spacing:-.02em;line-height:1.08;color:var(--i
   line-height:.9;background:var(--g-mint);-webkit-background-clip:text;
   background-clip:text;color:transparent;padding:.05em 0}
 .feat-stage{position:relative;z-index:2;width:100%;display:flex;justify-content:center;
-  margin-top:30px;margin-bottom:-86px;perspective:1600px;will-change:transform}
+  margin-top:30px;margin-bottom:0;perspective:1600px;will-change:transform}
 .player{width:min(720px,93vw);will-change:transform}
 .player-inner{transform:rotateX(8deg);transform-origin:50% 0;border-radius:22px;overflow:hidden;
   background:rgba(14,18,28,.48);
@@ -207,7 +207,16 @@ h1,h2,h3,h4{font-weight:600;letter-spacing:-.02em;line-height:1.08;color:var(--i
 .tok.m1{background:#6FE8C9}.tok.m2{background:#39CFA8}.tok.m3{background:#A0F0DC}
 .tok.g{background:#3A4252}.tok.g2{background:#4A5468}
 
-/* visual: design blobs — removed, replaced by inline SVGs */
+/* visual: category viz window (dark glass wrapper for SVG visuals) */
+.vizwin{width:min(360px,86vw);border-radius:14px;overflow:hidden;
+  background:rgba(14,18,28,.45);
+  backdrop-filter:blur(48px) saturate(200%) brightness(.95);
+  -webkit-backdrop-filter:blur(48px) saturate(200%) brightness(.95);
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:0 28px 60px rgba(0,0,0,.24),0 4px 12px rgba(0,0,0,.1)}
+.vizwin-bar{display:flex;gap:7px;padding:12px 14px;background:#141A28;border-bottom:1px solid rgba(255,255,255,.08)}
+.vizwin-bar i{width:11px;height:11px;border-radius:50%;background:#3A4252}
+.vizwin-body{padding:20px 16px 22px;display:flex;justify-content:center;align-items:center}
 
 /* visual: equalizer */
 .eq{display:flex;align-items:flex-end;gap:9px;height:158px}
