@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Contul meu — smarttube</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a href="index.html" class="brand"><span class="pp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span><span class="s">smart</span><span class="t">tube</span></a>
+    <div class="nav-links">
+      <a href="cursuri.html">Cursuri</a>
+      <a href="cursuri.html#programare">Programare</a>
+      <a href="cursuri.html#design">Design</a>
+      <a href="cursuri.html#business">Business</a>
+      <a href="cursuri.html#video">Foto &amp; Video</a>
+      <a href="instructori.html">Instructori</a>
+      <a href="asistenta.html">Asistență</a>
+    </div>
+    <div class="nav-ic">
+      <a href="cursuri.html" aria-label="Caută"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5" stroke-linecap="round"/></svg></a>
+      <a href="cont.html" aria-label="Cont"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" stroke-linecap="round"/></svg></a>
+    </div>
+    <button class="burger" id="burger" aria-label="Meniu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mmenu" id="mmenu">
+  <a href="cursuri.html">Cursuri</a>
+  <a href="cursuri.html#programare">Programare</a>
+  <a href="cursuri.html#design">Design</a>
+  <a href="cursuri.html#business">Business</a>
+  <a href="cursuri.html#video">Foto &amp; Video</a>
+  <a href="instructori.html">Instructori</a>
+  <a href="asistenta.html">Asistență</a>
+  <a href="cont.html">Contul meu</a>
+  <a href="cursuri.html" class="mm-cta"><span class="btn btn-mint">Vezi cursurile</span></a>
+</div>
+
+<header class="phead" style="padding-bottom:0">
+  <span class="glow"></span>
+  <div class="phead-in reveal">
+    <p class="eyebrow">Contul tău smarttube</p>
+    <h1 class="h1">Bine ai revenit.</h1>
+    <p class="lead">Intră în cont sau creează unul nou — durează mai puțin de un minut.</p>
+  </div>
+</header>
+
+<section class="section tight">
+  <div class="container">
+    <div class="auth-wrap reveal">
+      <div class="auth-card">
+        <div class="auth-tabs">
+          <button class="auth-tab on" data-tab="login">Autentificare</button>
+          <button class="auth-tab" data-tab="register">Cont nou</button>
+        </div>
+
+        <form class="auth-pane on" data-pane="login" data-demo>
+          <div class="field"><label>Email</label><input type="email" placeholder="email@exemplu.ro" required /></div>
+          <div class="field"><label>Parolă</label><input type="password" placeholder="Parola ta" required /></div>
+          <button type="submit" class="btn btn-mint btn-block btn-lg">Intră în cont</button>
+          <p class="form-note auth-alt"></p>
+          <p class="auth-alt">Ai uitat parola? <a href="asistenta.html" class="link" style="font-size:13px">Resetează-o</a></p>
+        </form>
+
+        <form class="auth-pane" data-pane="register" data-demo>
+          <div class="field"><label>Nume complet</label><input type="text" placeholder="Numele tău" required /></div>
+          <div class="field"><label>Email</label><input type="email" placeholder="email@exemplu.ro" required /></div>
+          <div class="field"><label>Parolă</label><input type="password" placeholder="Alege o parolă" required /></div>
+          <button type="submit" class="btn btn-mint btn-block btn-lg">Creează cont</button>
+          <p class="form-note auth-alt"></p>
+          <p class="auth-alt">Creând un cont, ești de acord cu <a href="asistenta.html" class="link" style="font-size:13px">Termenii</a>.</p>
+        </form>
+      </div>
+      <p class="auth-alt" style="margin-top:18px">Vrei să predai pe smarttube? <a href="instructori.html#preda" class="link" style="font-size:13px">Devino instructor</a></p>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-in">
+    <div class="footer-fine">
+      <p>Prețurile cursurilor sunt stabilite de fiecare instructor și pot varia. Plată unică per curs — fără abonament.</p>
+      <p>Certificatul de absolvire este emis după finalizarea proiectului final al cursului. smarttube este un marketplace de cursuri online.</p>
+    </div>
+    <div class="footer-cols">
+      <div class="footer-col"><h4>Explorează</h4>
+        <a href="cursuri.html">Toate cursurile</a><a href="cursuri.html#programare">Programare</a>
+        <a href="cursuri.html#design">Design</a><a href="cursuri.html#business">Business</a></div>
+      <div class="footer-col"><h4>Pentru studenți</h4>
+        <a href="asistenta.html">Cum funcționează</a><a href="asistenta.html">Certificate</a>
+        <a href="asistenta.html">Garanție 14 zile</a><a href="asistenta.html">Întrebări frecvente</a></div>
+      <div class="footer-col"><h4>Pentru instructori</h4>
+        <a href="instructori.html#preda">Devino instructor</a><a href="instructori.html">Instructorii noștri</a>
+        <a href="asistenta.html">Resurse</a><a href="asistenta.html">Plăți</a></div>
+      <div class="footer-col"><h4>smarttube</h4>
+        <a href="asistenta.html">Despre noi</a><a href="asistenta.html">Contact</a>
+        <a href="asistenta.html">Blog</a><a href="cont.html">Contul meu</a></div>
+      <div class="footer-col"><h4>Asistență</h4>
+        <a href="asistenta.html">Centru de ajutor</a><a href="cont.html">Autentificare</a>
+        <a href="asistenta.html">Termeni</a><a href="asistenta.html">Confidențialitate</a></div>
+    </div>
+    <div class="footer-bottom">
+      <span>Copyright © 2026 smarttube SRL. Toate drepturile rezervate.</span>
+      <span class="legal"><a href="asistenta.html">România</a><a href="asistenta.html">Termeni</a><a href="asistenta.html">Confidențialitate</a><a href="asistenta.html">Cookie-uri</a></span>
+    </div>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Cursuri — smarttube</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-in">
+    <a href="index.html" class="brand"><span class="pp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span><span class="s">smart</span><span class="t">tube</span></a>
+    <div class="nav-links">
+      <a href="cursuri.html" class="active">Cursuri</a>
+      <a href="cursuri.html#programare">Programare</a>
+      <a href="cursuri.html#design">Design</a>
+      <a href="cursuri.html#business">Business</a>
+      <a href="cursuri.html#video">Foto &amp; Video</a>
+      <a href="instructori.html">Instructori</a>
+      <a href="asistenta.html">Asistență</a>
+    </div>
+    <div class="nav-ic">
+      <a href="cursuri.html" aria-label="Caută"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5" stroke-linecap="round"/></svg></a>
+      <a href="cont.html" aria-label="Cont"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" stroke-linecap="round"/></svg></a>
+    </div>
+    <button class="burger" id="burger" aria-label="Meniu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="mmenu" id="mmenu">
+  <a href="cursuri.html">Cursuri</a>
+  <a href="cursuri.html#programare">Programare</a>
+  <a href="cursuri.html#design">Design</a>
+  <a href="cursuri.html#business">Business</a>
+  <a href="cursuri.html#video">Foto &amp; Video</a>
+  <a href="instructori.html">Instructori</a>
+  <a href="asistenta.html">Asistență</a>
+  <a href="cont.html">Contul meu</a>
+  <a href="cursuri.html" class="mm-cta"><span class="btn btn-mint">Vezi cursurile</span></a>
+</div>
+
+<header class="phead">
+  <span class="glow"></span>
+  <div class="phead-in reveal">
+    <p class="eyebrow">Catalog</p>
+    <h1 class="h1">Toate cursurile</h1>
+    <p class="lead">Alege din peste 1.000 de cursuri, din orice domeniu. Plată unică, acces pe viață.</p>
+  </div>
+  <div class="search-wrap reveal" style="margin-top:26px">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5" stroke-linecap="round"/></svg>
+    <input type="text" id="catalogSearch" placeholder="Caută un curs sau un instructor…" />
+  </div>
+  <div class="filterbar reveal">
+    <button class="chip on" data-filter="all">Toate</button>
+    <button class="chip" data-filter="programare">Programare</button>
+    <button class="chip" data-filter="design">Design</button>
+    <button class="chip" data-filter="business">Business</button>
+    <button class="chip" data-filter="video">Foto &amp; Video</button>
+    <button class="chip" data-filter="muzica">Muzică</button>
+    <button class="chip" data-filter="dezvoltare">Dezvoltare</button>
+  </div>
+</header>
+
+<section class="section tight">
+  <div class="container wide">
+    <div class="catalog-grid" id="catalogGrid">
+
+      <a class="ccard" href="curs.html" data-cat="video" data-search="editare video premiere pro vlad marin foto">
+        <div class="cc-thumb g1"><span class="cc-tag">Foto &amp; Video</span><span class="cc-dur">5h 20m</span><span class="cc-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div>
+        <div class="cc-body"><div class="cc-cat">Foto &amp; Video</div><h3 class="cc-ttl">Editare video în Premiere Pro</h3>
+          <div class="cc-by"><span class="av">VM</span><span>Vlad Marin</span></div>
+          <div class="cc-foot"><span class="cc-rate"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.9 21l1.2-6.8-5-4.9 6.9-1z"/></svg>4,9 <em>(180)</em></span><span class="cc-price">149 lei</span></div></div>
+      </a>
+      <a class="ccard" href="curs.html" data-cat="programare" data-search="python programare zero proiect andrei pop">
+        <div class="cc-thumb g2"><span class="cc-tag">Programare</span><span class="cc-dur">8h 10m</span><span class="cc-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div>
+        <div class="cc-body"><div class="cc-cat">Programare &amp; IT</div><h3 class="cc-ttl">Python de la zero la primul proiect</h3>
+          <div class="cc-by"><span class="av">AP</span><span>Andrei Pop</span></div>
+          <div class="cc-foot"><span class="cc-rate"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.9 21l1.2-6.8-5-4.9 6.9-1z"/></svg>4,8 <em>(240)</em></span><span class="cc-price">199 lei</span></div></div>
+      </a>
+      <a class="ccard" href="curs.html" data-cat="design" data-search="ui ux design figma ioana dima">
+        <div class="cc-thumb g3"><span class="cc-tag">Design</span><span class="cc-dur">6h 05m</span><span class="cc-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div>
+        <div class="cc-body"><div class="cc-cat">Design &amp; UX</div><h3 class="cc-ttl">UI/UX Design cu Figma</h3>
+          <div class="cc-by"><span class="av">ID</span><span>Ioana Dima</span></div>
+          <div class="cc-foot"><span class="cc-rate"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.9 21l1.2-6.8-5-4.9 6.9-1z"/></svg>4,9 <em>(156)</em></span><span class="cc-price">179 lei</span></div></div>
+      </a>
+      <a class="ccard" href="curs.html" data-cat="business" data-search="marketing retele sociale radu stan business">
+        <div class="cc-thumb g1"><span class="cc-tag">Business</span><span class="cc-dur">4h 30m</span><span class="cc-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div>
+        <div class="cc-body"><div class="cc-cat">Business &amp; Marketing</div><h3 class="cc-ttl">Marketing pe rețele sociale</h3>
+          <div class="cc-by"><span class="av">RS</span><span>Radu Stan</span></div>
+          <div class="cc-foot"><span class="cc-rate"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.9 21l1.2-6.8-5-4.9 6.9-1z"/></svg>4,7 <em>(98)</em></span><span class="cc-price">129 lei</span></div></div>
+      </a>
+      <a class="ccard" href="curs.html" data-cat="video" data-search="fotografie incepatori mara crisan foto video">
+        <div class="cc-thumb g2"><span class="cc-tag">Foto &amp; Video</span><span class="cc-dur">3h 50m</span><span class="cc-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div>
+        <div class="cc-body"><div class="cc-cat">Foto &amp; Video</div><h3 class="cc-ttl">Fotografie pentru începători</h3>
+          <div class="cc-by"><span class="av">MC</span><span>Mara Crișan</span></div>
+          <div class="cc-foot"><span class="cc-rate"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.9 21l1.2-6.8-5-4.9 6.9-1z"/></svg>4,8 <em>(112)</em></span><span class="cc-price">159 lei</span></div></div>
+      </a>
+      <a class="ccard" href="curs.html" data-cat="muzica" data-search="productie muzicala ableton alex toma muzica">
+        <div class="cc-thumb g3"><span class="cc-tag">Muzică</span><span class="cc-dur">7h 15m</span><span class="cc-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div>
+        <div class="cc-body"><div class="cc-cat">Muzică &amp; Producție</div><h3 class="cc-ttl">Producție muzicală în Ableton</h3>
+          <div class="cc-by"><span class="av">AT</span><span>Alex Toma</span></div>
+          <div class="cc-foot"><span class="cc-rate"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.9 21l1.2-6.8-5-4.9 6.9-1z"/></svg>4,9 <em>(134)</em></span><span class="cc-price">189 lei</span></div></div>
+      </a>
+      <a class="ccard" href="curs.html" data-cat="programare" data-search="javascript react modern andrei pop programare">
+        <div class="cc-thumb g2"><span class="cc-tag">Programare</span><span class="cc-dur">9h 40m</span><span class="cc-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div>
+        <div class="cc-body"><div class="cc-cat">Programare &amp; IT</div><h3 class="cc-ttl">JavaScript modern &amp; React</h3>
+          <div class="cc-by"><span class="av">AP</span><span>Andrei Pop</span></div>
+          <div class="cc-foot"><span class="cc-rate"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.9 21l1.2-6.8-5-4.9 6.9-1z"/></svg>4,8 <em>(210)</em></span><span class="cc-price">219 lei</span></div></div>
+      </a>
+      <a class="ccard" href="curs.html" data-cat="design" data-search="branding identitate vizuala ioana dima design">
+        <div class="cc-thumb g3"><span class="cc-tag">Design</span><span class="cc-dur">5h 15m</span><span class="cc-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div>
+        <div class="cc-body"><div class="cc-cat">Design &amp; UX</div><h3 class="cc-ttl">Branding &amp; identitate vizuală</h3>
+          <div class="cc-by"><span class="av">ID</span><span>Ioana Dima</span></div>
+          <div class="cc-foot"><span class="cc-rate"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.9 21l1.2-6.8-5-4.9 6.9-1z"/></svg>4,9 <em>(88)</em></span><span class="cc-price">169 lei</span></div></div>
+      </a>
+      <a class="ccard" href="curs.html" data-cat="video" data-search="color grading cinematic vlad marin foto video">
+        <div class="cc-thumb g1"><span class="cc-tag">Foto &amp; Video</span><span class="cc-dur">4h 10m</span><span class="cc-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div>
+        <div class="cc-body"><div class="cc-cat">Foto &amp; Video</div><h3 class="cc-ttl">Color grading cinematic</h3>
+          <div class="cc-by"><span class="av">VM</span><span>Vlad Marin</span></div>
+          <div class="cc-foot"><span class="cc-rate"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.9 21l1.2-6.8-5-4.9 6.9-1z"/></svg>4,9 <em>(97)</em></span><span class="cc-price">179 lei</span></div></div>
+      </a>
+      <a class="ccard" href="curs.html" data-cat="business" data-search="vanzari negociere radu stan business">
+        <div class="cc-thumb g1"><span class="cc-tag">Business</span><span class="cc-dur">3h 20m</span><span class="cc-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div>
+        <div class="cc-body"><div class="cc-cat">Business &amp; Marketing</div><h3 class="cc-ttl">Vânzări &amp; negociere</h3>
+          <div class="cc-by"><span class="av">RS</span><span>Radu Stan</span></div>
+          <div class="cc-foot"><span class="cc-rate"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.9 21l1.2-6.8-5-4.9 6.9-1z"/></svg>4,7 <em>(76)</em></span><span class="cc-price">139 lei</span></div></div>
+      </a>
+      <a class="ccard" href="curs.html" data-cat="dezvoltare" data-search="obiceiuri productivitate focus elena voicu dezvoltare">
+        <div class="cc-thumb g3"><span class="cc-tag">Dezvoltare</span><span class="cc-dur">2h 55m</span><span class="cc-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div>
+        <div class="cc-body"><div class="cc-cat">Dezvoltare personală</div><h3 class="cc-ttl">Obiceiuri &amp; productivitate</h3>
+          <div class="cc-by"><span class="av">EV</span><span>Elena Voicu</span></div>
+          <div class="cc-foot"><span class="cc-rate"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.9 21l1.2-6.8-5-4.9 6.9-1z"/></svg>4,8 <em>(143)</em></span><span class="cc-price">99 lei</span></div></div>
+      </a>
+      <a class="ccard" href="curs.html" data-cat="muzica" data-search="mixaj mastering audio alex toma muzica">
+        <div class="cc-thumb g2"><span class="cc-tag">Muzică</span><span class="cc-dur">6h 30m</span><span class="cc-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div>
+        <div class="cc-body"><div class="cc-cat">Muzică &amp; Producție</div><h3 class="cc-ttl">Mixaj &amp; mastering audio</h3>
+          <div class="cc-by"><span class="av">AT</span><span>Alex Toma</span></div>
+          <div class="cc-foot"><span class="cc-rate"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.9 21l1.2-6.8-5-4.9 6.9-1z"/></svg>4,8 <em>(61)</em></span><span class="cc-price">169 lei</span></div></div>
+      </a>
+
+    </div>
+    <p class="empty" id="catalogEmpty">Niciun curs nu corespunde căutării. Încearcă alt termen.</p>
+  </div>
+</section>
+
+<section class="cta-band">
+  <span class="glow"></span>
+  <div class="cta-band-in reveal">
+    <p class="eyebrow">Nu găsești ce cauți?</p>
+    <h2 class="h2">Spune-ne ce vrei să înveți.</h2>
+    <p class="lead" style="margin:12px 0 24px">Adăugăm cursuri noi în fiecare săptămână, în funcție de ce cer studenții.</p>
+    <a href="asistenta.html" class="btn btn-mint btn-lg">Trimite o sugestie</a>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-in">
+    <div class="footer-fine">
+      <p>Prețurile cursurilor sunt stabilite de fiecare instructor și pot varia. Plată unică per curs — fără abonament.</p>
+      <p>Certificatul de absolvire este emis după finalizarea proiectului final al cursului. smarttube este un marketplace de cursuri online.</p>
+    </div>
+    <div class="footer-cols">
+      <div class="footer-col"><h4>Explorează</h4>
+        <a href="cursuri.html">Toate cursurile</a><a href="cursuri.html#programare">Programare</a>
+        <a href="cursuri.html#design">Design</a><a href="cursuri.html#business">Business</a></div>
+      <div class="footer-col"><h4>Pentru studenți</h4>
+        <a href="asistenta.html">Cum funcționează</a><a href="asistenta.html">Certificate</a>
+        <a href="asistenta.html">Garanție 14 zile</a><a href="asistenta.html">Întrebări frecvente</a></div>
+      <div class="footer-col"><h4>Pentru instructori</h4>
+        <a href="instructori.html#preda">Devino instructor</a><a href="instructori.html">Instructorii noștri</a>
+        <a href="asistenta.html">Resurse</a><a href="asistenta.html">Plăți</a></div>
+      <div class="footer-col"><h4>smarttube</h4>
+        <a href="asistenta.html">Despre noi</a><a href="asistenta.html">Contact</a>
+        <a href="asistenta.html">Blog</a><a href="cont.html">Contul meu</a></div>
+      <div class="footer-col"><h4>Asistență</h4>
+        <a href="asistenta.html">Centru de ajutor</a><a href="cont.html">Autentificare</a>
+        <a href="asistenta.html">Termeni</a><a href="asistenta.html">Confidențialitate</a></div>
+    </div>
+    <div class="footer-bottom">
+      <span>Copyright © 2026 smarttube SRL. Toate drepturile rezervate.</span>
+      <span class="legal"><a href="asistenta.html">România</a><a href="asistenta.html">Termeni</a><a href="asistenta.html">Confidențialitate</a><a href="asistenta.html">Cookie-uri</a></span>
+    </div>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

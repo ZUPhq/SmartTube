@@ -3,1195 +3,347 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>smarttube — Învață editare video de la editori care chiar trăiesc din asta</title>
+<title>smarttube — Cursuri online pentru oricine, despre orice</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link id="dynFont" href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital,wght@0,400;1,400&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
-<style>
-:root{
-  --bg:#F0F2F3;--surface:#E4E7E9;--surface-2:#E5E7E8;--surface-3:#D8E9EF;
-  --ink:#14181C;--ink-soft:#565C5C;--ink-mut:#828587;
-  --accent:#2BA4D6;--accent-ink:#216988;--accent-glow:rgba(43,164,214,.34);--on-accent:#FFFFFF;
-  --dark:#0C1A24;--dark-2:#1D2A33;--dark-ink:#F3F4F4;--dark-ink-soft:#979DA1;
-  --border:rgba(20,24,28,.14);--border-d:rgba(255,255,255,.12);
-  --av-1:#247A9E;--av-2:#0C1A24;--thumb-1:#154359;--thumb-2:#08121A;
-  --display:'DM Serif Display',Georgia,serif;--body:'Manrope',system-ui,sans-serif;--wt-d:400;
-  --av-grad:linear-gradient(140deg,var(--av-1),var(--av-2));
-  --ease:cubic-bezier(.2,.7,.2,1);--maxw:1120px;
-}
-*{margin:0;padding:0;box-sizing:border-box}
-html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:84px}
-body{background:var(--bg);color:var(--ink);font-family:var(--body);font-weight:400;line-height:1.6;
-  -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;overflow-x:hidden;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
-  transition:background-color .4s var(--ease),color .4s var(--ease)}
-::selection{background:var(--accent);color:var(--on-accent)}
-a{color:inherit;text-decoration:none}
-img,svg{max-width:100%}svg{display:block}
-button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
-.wrap{max-width:var(--maxw);margin:0 auto;padding:0 clamp(20px,4vw,30px)}
-h1,h2,h3,h4{font-family:var(--display);font-weight:var(--wt-d);line-height:1.05;letter-spacing:-.02em}
-em{font-style:italic}
-.kicker{font-family:var(--body);font-weight:700;font-size:.78rem;letter-spacing:.13em;text-transform:uppercase;
-  color:var(--accent-ink);display:inline-flex;align-items:center;gap:9px}
-.kicker .dot{width:7px;height:7px;border-radius:50%;background:currentColor}
-.kicker.light{color:var(--accent)}
-.mark{position:relative;z-index:0;white-space:nowrap;padding:0 .1em;color:var(--on-accent)}
-.mark::before{content:"";position:absolute;inset:-.06em -.04em;z-index:-1;background:var(--accent);
-  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 62' preserveAspectRatio='none'%3E%3Cpath d='M5,16 Q70,3 110,9 T196,11 Q201,32 193,50 Q120,60 66,53 T6,52 Q-1,32 5,16 Z' fill='%23000'/%3E%3C/svg%3E") center/100% 100% no-repeat;
-  mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 62' preserveAspectRatio='none'%3E%3Cpath d='M5,16 Q70,3 110,9 T196,11 Q201,32 193,50 Q120,60 66,53 T6,52 Q-1,32 5,16 Z' fill='%23000'/%3E%3C/svg%3E") center/100% 100% no-repeat}
-.uline{position:relative;display:inline-block}
-.uline svg{position:absolute;left:-2%;bottom:-.28em;width:104%;height:.38em;overflow:visible}
-.uline svg path{stroke:var(--accent-ink);stroke-width:4;fill:none;stroke-linecap:round}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;font-weight:700;font-size:1rem;
-  padding:15px 30px;border-radius:999px;transition:transform .3s var(--ease),box-shadow .3s,background .25s,color .25s,border-color .25s}
-.btn-pri{background:var(--ink);color:var(--bg)}
-.btn-pri:hover{box-shadow:0 12px 28px -12px var(--ink)}
-.btn-accent{background:var(--accent);color:var(--on-accent)}
-.btn-accent:hover{box-shadow:0 14px 34px -12px var(--accent-glow);transform:translateY(-1px)}
-.btn-out{background:transparent;color:var(--ink);border:1.6px solid var(--border)}
-.btn-out:hover{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.btn-out.light{color:var(--dark-ink);border-color:var(--border-d)}
-.btn-out.light:hover{background:var(--dark-ink);color:var(--dark);border-color:var(--dark-ink)}
-.btn-lg{padding:17px 36px;font-size:1.05rem}
-.link-arrow{font-weight:700;display:inline-flex;align-items:center;gap:7px;border-bottom:2px solid transparent;
-  transition:border-color .25s,gap .25s var(--ease)}
-.link-arrow:hover{border-color:currentColor;gap:11px}
-.brand{display:inline-flex;align-items:center;gap:10px}
-.brand-mark{width:30px;height:30px;border-radius:8px;flex:none;display:grid;place-items:center;background:var(--ink)}
-.brand-mark svg{width:13px;height:13px}
-.brand-mark.on-dark{background:var(--accent)}
-.wm{font-family:var(--body);font-weight:700;font-size:1.3rem;letter-spacing:-.045em}
-.wm .s{color:var(--ink)}.wm .t{color:var(--accent-ink)}
-.wm.light .s{color:var(--dark-ink)}.wm.light .t{color:var(--accent)}
-/* nav */
-.nav{position:fixed;top:0;left:0;right:0;z-index:900;transition:background .3s,border-color .3s}
-.nav.solid{background:var(--bg);border-bottom:1px solid var(--border)}
-.nav-in{display:flex;align-items:center;justify-content:space-between;height:72px}
-.nav-links{display:flex;gap:clamp(18px,2.4vw,32px);list-style:none}
-.nav-links a{font-size:.95rem;font-weight:600;color:var(--ink-soft);transition:color .2s}
-.nav-links a:hover{color:var(--ink)}
-.nav-right{display:flex;align-items:center;gap:clamp(12px,1.8vw,20px)}
-.nav-right .teach{font-size:.95rem;font-weight:700;color:var(--ink)}
-.nav-right .teach:hover{color:var(--accent-ink)}
-.nav .btn{padding:11px 22px;font-size:.92rem}
-.burger{display:none;width:42px;height:42px;border-radius:10px;border:1.6px solid var(--border);
-  flex-direction:column;gap:5px;align-items:center;justify-content:center}
-.burger span{width:17px;height:2px;background:var(--ink);border-radius:2px;transition:.3s var(--ease)}
-.burger.on span:nth-child(1){transform:translateY(7px) rotate(45deg)}
-.burger.on span:nth-child(2){opacity:0}
-.burger.on span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
-.mmenu{position:fixed;inset:72px 0 auto 0;z-index:899;background:var(--bg);border-bottom:1px solid var(--border);
-  padding:12px clamp(20px,4vw,30px) 24px;display:none;flex-direction:column}
-.mmenu.open{display:flex}
-.mmenu a{padding:14px 2px;font-size:1.08rem;font-weight:600;border-bottom:1px solid var(--border)}
-.mmenu .btn{margin-top:16px}
-/* reveal */
-.rv{opacity:0;transform:translateY(24px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
-.rv.in{opacity:1;transform:none}
-.rv[data-d="1"]{transition-delay:.09s}.rv[data-d="2"]{transition-delay:.18s}.rv[data-d="3"]{transition-delay:.27s}
-/* section scaffold — generous whitespace */
-section{position:relative}
-.sec-pad{padding:clamp(76px,12vw,140px) 0}
-.sec-head{margin-bottom:clamp(40px,6vw,64px)}
-.sec-head.center{text-align:center;max-width:640px;margin-inline:auto}
-.sec-head h2{font-size:clamp(2rem,4.6vw,3.5rem);margin:16px 0 14px}
-.sec-head p{color:var(--ink-mut);font-size:1.08rem;max-width:480px}
-.sec-head.center p{margin-inline:auto}
-.sec-head .row-between{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap}
-/* hero */
-.hero{padding:clamp(128px,18vw,176px) 0 clamp(70px,10vw,110px);position:relative}
-.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(30px,5vw,56px);align-items:center}
-.hero-pill{display:inline-flex;align-items:center;gap:9px;padding:7px 14px 7px 7px;background:var(--surface);
-  border:1px solid var(--border);border-radius:999px;font-size:.83rem;font-weight:600;color:var(--ink-soft);
-  margin-bottom:28px;white-space:nowrap;max-width:100%}
-.hero-pill .nw{background:var(--accent);color:var(--on-accent);font-weight:700;font-size:.71rem;
-  padding:3px 9px;border-radius:999px;letter-spacing:.03em;flex:none}
-.hero h1{font-size:clamp(2.6rem,6.4vw,5rem);letter-spacing:-.035em;margin-bottom:22px}
-.hero h1 .row{display:block}
-.hero-sub{font-size:clamp(1.04rem,1.4vw,1.22rem);color:var(--ink-soft);max-width:460px;margin-bottom:30px}
-.hero-cta{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
-.play-link{display:inline-flex;align-items:center;gap:11px;font-weight:700;font-size:1rem}
-.play-link .pc{width:44px;height:44px;border-radius:50%;border:1.6px solid var(--border);
-  display:grid;place-items:center;transition:.3s var(--ease);flex:none}
-.play-link:hover .pc{background:var(--ink);border-color:var(--ink)}
-.play-link:hover .pc svg{color:var(--bg)}
-.play-link .pc svg{width:13px;height:13px;margin-left:2px;color:var(--ink);transition:color .3s}
-.hero-trust{display:flex;align-items:center;gap:14px;margin-top:30px;flex-wrap:wrap}
-.avatars{display:flex}
-.avatars .av{width:36px;height:36px;border-radius:50%;border:2.5px solid var(--bg);margin-left:-12px;
-  display:grid;place-items:center;font-family:var(--display);font-weight:var(--wt-d);font-size:.78rem;
-  color:var(--dark-ink);background:var(--av-grad)}
-.avatars .av:first-child{margin-left:0}
-.hero-trust .tx{font-size:.88rem;color:var(--ink-mut);line-height:1.35}
-.hero-trust .tx b{color:var(--ink);font-weight:700}
-.hero-trust .stars{color:var(--accent-ink);letter-spacing:1px}
-.hero-assure{margin-top:18px;font-size:.86rem;color:var(--ink-mut);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.hero-assure b{color:var(--accent-ink);font-weight:700}
-.hero-assure .sep{opacity:.4}
-/* hero collage */
-.hero-stage{position:relative;width:100%;max-width:460px;margin-inline:auto;aspect-ratio:1/1.04}
-.doodle-arrow{position:absolute;width:104px;left:27%;top:60%;color:var(--ink);transform:rotate(8deg);pointer-events:none;z-index:1}
-.hcard{position:absolute;border-radius:18px;overflow:hidden;background:var(--surface);border:1px solid var(--border);
-  box-shadow:0 28px 56px -26px rgba(0,0,0,.34)}
-.hcard.back{width:74%;right:0;top:5%;transform:rotate(6deg);opacity:.92}
-.hcard.front{width:80%;left:0;top:15%;transform:rotate(-4deg);z-index:3;animation:bobA 7s ease-in-out infinite}
-@keyframes bobA{0%,100%{transform:rotate(-4deg) translateY(0)}50%{transform:rotate(-4deg) translateY(-12px)}}
-.thumb{position:relative;aspect-ratio:16/10;display:grid;place-items:center;
-  background:linear-gradient(150deg,var(--thumb-1),var(--thumb-2))}
-.thumb.g2{background:linear-gradient(215deg,var(--thumb-1),var(--thumb-2))}
-.thumb.g3{background:linear-gradient(165deg,var(--thumb-2),var(--thumb-1))}
-.thumb.g4{background:linear-gradient(135deg,var(--thumb-1),var(--thumb-2))}
-.thumb::after{content:"";position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 0%,transparent 55%,rgba(0,0,0,.42))}
-.thumb-grain{position:absolute;inset:0;opacity:.4;mix-blend-mode:overlay;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='90'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
-.tag,.dur{position:absolute;top:11px;z-index:4;font-size:.71rem;font-weight:700;padding:5px 10px;
-  border-radius:7px;background:rgba(8,9,12,.72);color:#fff;letter-spacing:.02em}
-.tag{left:11px}.dur{right:11px}
-.play-circ{width:60px;height:60px;border-radius:50%;z-index:3;position:relative;
-  background:rgba(255,255,255,.16);border:1.5px solid rgba(255,255,255,.55);display:grid;place-items:center}
-.play-circ svg{width:19px;height:19px;color:#fff;margin-left:3px}
-.play-circ.pulse::after{content:"";position:absolute;inset:-8px;border-radius:50%;
-  border:1.5px solid var(--accent);animation:ring 2.6s ease-out infinite}
-@keyframes ring{0%{transform:scale(.92);opacity:.8}100%{transform:scale(1.5);opacity:0}}
-.timeline{position:absolute;left:0;right:0;bottom:0;z-index:4;display:flex;align-items:center;gap:4px;
-  padding:8px 10px;background:linear-gradient(transparent,rgba(8,10,16,.82))}
-.timeline .clip{height:12px;border-radius:3px;background:rgba(255,255,255,.28)}
-.timeline .clip.m{background:var(--accent)}
-.timeline .head{width:2px;height:20px;background:var(--accent);position:relative;border-radius:2px;margin:0 1px}
-.timeline .head::before{content:"";position:absolute;top:-4px;left:50%;transform:translateX(-50%);
-  width:8px;height:8px;border-radius:2px;background:var(--accent)}
-.hcard-body{padding:13px 15px 15px}
-.hcard-body .lvl{font-size:.71rem;font-weight:700;color:var(--accent-ink);text-transform:uppercase;letter-spacing:.07em}
-.hcard-body h3{font-size:1.1rem;margin:5px 0 8px}
-.hcard-meta{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--border)}
-.hcard-meta .by{font-size:.83rem;color:var(--ink-mut)}
-.hcard-meta .pr{font-family:var(--display);font-weight:var(--wt-d);font-size:1.12rem}
-.sticker{position:absolute;z-index:6;background:var(--accent);color:var(--on-accent);font-weight:700;
-  font-size:.8rem;padding:9px 13px;border-radius:11px;display:flex;align-items:center;gap:7px;
-  transform:rotate(-9deg);right:0;top:1%;box-shadow:0 10px 22px -8px rgba(0,0,0,.4);animation:bobB 6s ease-in-out infinite}
-@keyframes bobB{0%,100%{transform:rotate(-9deg) translateY(0)}50%{transform:rotate(-9deg) translateY(-7px)}}
-.sticker svg{width:14px;height:14px}
-.chip-rate{position:absolute;z-index:6;left:0;bottom:9%;background:var(--bg);border:1px solid var(--border);
-  border-radius:13px;padding:9px 12px;display:flex;align-items:center;gap:9px;
-  box-shadow:0 12px 26px -12px rgba(0,0,0,.4);transform:rotate(3deg);animation:bobA 8s ease-in-out infinite}
-.chip-rate .big{font-family:var(--display);font-weight:var(--wt-d);font-size:1.22rem;line-height:1}
-.chip-rate .sm{font-size:.71rem;color:var(--ink-mut);line-height:1.2}
-.chip-rate .st{color:var(--accent-ink);font-size:.74rem;letter-spacing:.5px}
-/* story */
-.story{background:var(--dark);color:var(--dark-ink);overflow:hidden}
-.story .wrap{position:relative}
-.story-glow{position:absolute;width:400px;height:400px;border-radius:50%;background:var(--accent-glow);
-  filter:blur(80px);top:-150px;right:-110px;pointer-events:none}
-.story-grid{display:grid;grid-template-columns:.84fr 1.16fr;gap:clamp(32px,5vw,56px);align-items:center;position:relative}
-.story h2{font-size:clamp(1.95rem,3.8vw,3rem);color:var(--dark-ink);margin:16px 0 18px}
-.story h2 em{color:var(--accent)}
-.story p{color:var(--dark-ink-soft);font-size:1.05rem;margin-bottom:24px}
-.founders-line{display:flex;align-items:center;gap:13px}
-.founders-line .fa{width:46px;height:46px;border-radius:50%;border:2px solid var(--dark);display:grid;
-  place-items:center;font-family:var(--display);font-weight:var(--wt-d);color:var(--dark-ink);background:var(--av-grad)}
-.founders-line .fa:nth-child(2){margin-left:-16px}
-.founders-line .fn b{display:block;font-weight:700;color:var(--dark-ink);font-size:.94rem}
-.founders-line .fn span{color:var(--dark-ink-soft);font-size:.83rem}
-.video-frame{position:relative;border-radius:20px;overflow:hidden;aspect-ratio:16/9;
-  background:linear-gradient(155deg,var(--dark-2),var(--dark));border:1px solid var(--border-d);
-  display:grid;place-items:center;box-shadow:0 44px 80px -40px rgba(0,0,0,.8);cursor:pointer}
-.video-frame::after{content:"";position:absolute;inset:0;background:radial-gradient(90% 90% at 50% 40%,transparent 42%,rgba(0,0,0,.6))}
-.video-frame .thumb-grain{opacity:.3}
-.video-frame .play-circ{width:84px;height:84px;transition:transform .2s var(--ease)}
-.video-frame .play-circ svg{width:26px;height:26px}
-.tape{position:absolute;top:16px;left:-34px;z-index:5;transform:rotate(-22deg);background:var(--accent);
-  color:var(--on-accent);font-weight:700;font-size:.76rem;letter-spacing:.15em;text-transform:uppercase;padding:8px 40px}
-.video-founders{position:absolute;left:16px;bottom:14px;z-index:5;display:flex;align-items:center;gap:9px}
-.video-founders .fa{width:32px;height:32px;border-radius:50%;border:2px solid var(--dark);display:grid;
-  place-items:center;font-family:var(--display);font-weight:var(--wt-d);font-size:.74rem;color:var(--dark-ink);background:var(--av-grad)}
-.video-founders .fa:nth-child(2){margin-left:-13px}
-.video-founders span{font-size:.84rem;font-weight:600;color:var(--dark-ink)}
-.video-dur{position:absolute;right:14px;bottom:14px;z-index:5;font-size:.78rem;font-weight:700;
-  background:rgba(0,0,0,.55);padding:6px 9px;border-radius:7px;color:#fff}
-/* steps */
-.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(28px,4vw,40px)}
-.step{position:relative}
-.step .num{font-family:var(--display);font-weight:var(--wt-d);font-size:clamp(3.2rem,7vw,4.4rem);
-  color:var(--ink);line-height:.8;letter-spacing:-.04em}
-.step .num small{font-size:1.2rem;color:var(--accent-ink);vertical-align:super}
-.step .sicon{width:46px;height:46px;border-radius:11px;background:var(--surface);border:1px solid var(--border);
-  display:grid;place-items:center;margin:20px 0 15px;color:var(--ink)}
-.step .sicon svg{width:21px;height:21px}
-.step h3{font-size:1.34rem;margin-bottom:8px}
-.step p{color:var(--ink-mut);font-size:.97rem}
-.step-conn{position:absolute;top:26px;right:-30px;width:38px;color:var(--border);z-index:2}
-.step:last-child .step-conn{display:none}
-/* carousel */
-.car-track{display:flex;gap:22px;overflow-x:auto;scroll-snap-type:x mandatory;
-  padding:6px clamp(20px,4vw,30px) 22px;margin:0 calc(-1*clamp(20px,4vw,30px));
-  -ms-overflow-style:none;scrollbar-width:none}
-.car-track::-webkit-scrollbar{display:none}
-.car-nav{display:flex;gap:9px}
-.car-btn{width:46px;height:46px;border-radius:50%;border:1.6px solid var(--border);display:grid;
-  place-items:center;transition:.25s var(--ease);background:var(--bg)}
-.car-btn:hover{background:var(--ink);border-color:var(--ink);color:var(--bg)}
-.car-btn svg{width:16px;height:16px}
-/* instructors */
-.instructors{background:var(--surface-2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-.inst-card{flex:0 0 min(360px,84vw);scroll-snap-align:start;background:var(--bg);border:1px solid var(--border);
-  border-radius:20px;overflow:hidden;display:flex;flex-direction:column}
-.inst-photo{aspect-ratio:5/4;position:relative;display:grid;place-items:center;overflow:hidden;background:var(--av-grad)}
-.inst-photo .mono{font-family:var(--display);font-weight:var(--wt-d);font-size:4.4rem;color:var(--dark-ink);opacity:.95}
-.inst-photo .badge{position:absolute;bottom:12px;left:12px;background:var(--bg);border-radius:9px;padding:6px 11px;
-  font-size:.73rem;font-weight:700;display:flex;align-items:center;gap:6px}
-.inst-photo .badge svg{width:12px;height:12px;color:var(--accent-ink)}
-.inst-body{padding:22px;flex:1;display:flex;flex-direction:column}
-.inst-body h3{font-size:1.36rem}
-.inst-body .role{color:var(--accent-ink);font-weight:700;font-size:.89rem;margin:3px 0 11px}
-.inst-body .bio{color:var(--ink-mut);font-size:.92rem;margin-bottom:16px;flex:1}
-.inst-tags{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px}
-.inst-tags span{font-size:.75rem;font-weight:600;padding:4px 10px;border-radius:7px;background:var(--surface);
-  border:1px solid var(--border);color:var(--ink-soft)}
-.inst-stats{display:flex;gap:18px;padding-top:15px;border-top:1px solid var(--border)}
-.inst-stats div{font-size:.81rem;color:var(--ink-mut)}
-.inst-stats b{display:block;font-family:var(--display);font-weight:var(--wt-d);font-size:1.12rem;color:var(--ink)}
-.inst-card.join{border-style:dashed;background:transparent;align-items:center;justify-content:center;
-  text-align:center;padding:38px 26px}
-.inst-card.join .ji{width:58px;height:58px;border-radius:16px;background:var(--accent);display:grid;
-  place-items:center;margin-bottom:18px}
-.inst-card.join .ji svg{width:25px;height:25px;color:var(--on-accent)}
-.inst-card.join h3{font-size:1.42rem;margin-bottom:9px}
-.inst-card.join p{color:var(--ink-mut);font-size:.93rem;margin-bottom:20px}
-/* courses */
-.course-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(18px,2.4vw,24px)}
-.course{background:var(--bg);border:1px solid var(--border);border-radius:18px;overflow:hidden;
-  transition:transform .35s var(--ease),box-shadow .35s var(--ease);transform-style:preserve-3d}
-.course:hover{box-shadow:0 30px 52px -30px rgba(0,0,0,.4)}
-.course .c-body{padding:18px 18px 19px}
-.course .c-lvl{font-size:.71rem;font-weight:700;color:var(--accent-ink);text-transform:uppercase;letter-spacing:.07em}
-.course h3{font-size:1.18rem;margin:6px 0 12px;line-height:1.22}
-.course .c-by{display:flex;align-items:center;gap:9px;margin-bottom:13px}
-.course .c-by .ci{width:26px;height:26px;border-radius:50%;flex:none;display:grid;place-items:center;
-  font-family:var(--display);font-weight:var(--wt-d);font-size:.7rem;color:var(--dark-ink);background:var(--av-grad)}
-.course .c-by span{font-size:.85rem;color:var(--ink-mut)}
-.course .c-meta{font-size:.81rem;color:var(--ink-mut);display:flex;gap:14px;margin-bottom:14px}
-.course .c-meta i{font-style:normal;display:flex;align-items:center;gap:5px}
-.course .c-meta svg{width:13px;height:13px;opacity:.7}
-.course .c-foot{display:flex;align-items:center;justify-content:space-between;padding-top:14px;border-top:1px solid var(--border)}
-.course .c-rate{display:flex;align-items:center;gap:5px;font-size:.85rem;font-weight:700}
-.course .c-rate svg{width:14px;height:14px;color:var(--accent-ink)}
-.course .c-rate em{font-style:normal;color:var(--ink-mut);font-weight:400}
-.course .c-price{display:flex;align-items:baseline;gap:7px}
-.course .c-price .now{font-family:var(--display);font-weight:var(--wt-d);font-size:1.3rem}
-.course .c-price .was{font-size:.85rem;color:var(--ink-mut);text-decoration:line-through}
-/* reviews */
-.reviews{background:var(--surface-3);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-.rev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(18px,2.4vw,24px)}
-.rev-card{background:var(--bg);border:1px solid var(--border);border-radius:18px;padding:26px}
-.rev-card .rstars{color:var(--accent-ink);font-size:.92rem;letter-spacing:1.5px;margin-bottom:13px}
-.rev-card p{font-size:.98rem;color:var(--ink-soft);margin-bottom:18px;line-height:1.55}
-.rev-card .rwho{display:flex;align-items:center;gap:11px}
-.rev-card .rwho .ci{width:40px;height:40px;border-radius:50%;flex:none;display:grid;place-items:center;
-  font-family:var(--display);font-weight:var(--wt-d);font-size:.84rem;color:var(--dark-ink);background:var(--av-grad)}
-.rev-card .rwho b{font-size:.92rem;font-weight:700;display:block}
-.rev-card .rwho span{font-size:.79rem;color:var(--ink-mut)}
-/* teach */
-.teach-sec{background:var(--dark);color:var(--dark-ink);overflow:hidden}
-.teach-box{display:grid;grid-template-columns:1.12fr .88fr;gap:clamp(32px,5vw,54px);align-items:center;position:relative}
-.teach-glow{position:absolute;width:400px;height:400px;border-radius:50%;background:var(--accent-glow);
-  filter:blur(80px);bottom:-210px;left:-100px;pointer-events:none}
-.teach-sec h2{font-size:clamp(1.9rem,4vw,3rem);color:var(--dark-ink);margin:16px 0 16px;position:relative}
-.teach-sec .lead{color:var(--dark-ink-soft);font-size:1.04rem;margin-bottom:24px;position:relative}
-.teach-list{list-style:none;display:flex;flex-direction:column;gap:12px;margin-bottom:28px;position:relative}
-.teach-list li{display:flex;gap:12px;align-items:flex-start;font-size:.97rem;color:var(--dark-ink)}
-.teach-list .tk{width:24px;height:24px;border-radius:7px;flex:none;display:grid;place-items:center;
-  background:var(--accent);color:var(--on-accent)}
-.teach-list .tk svg{width:12px;height:12px}
-.earn-card{background:var(--dark-2);border:1px solid var(--border-d);border-radius:18px;padding:25px;position:relative;z-index:1}
-.earn-card .ec-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.earn-card .ec-top span{font-size:.83rem;color:var(--dark-ink-soft)}
-.earn-card .ec-top .live{display:flex;align-items:center;gap:6px;font-size:.74rem;font-weight:700;color:var(--accent)}
-.earn-card .ec-top .live::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--accent);animation:blink 1.6s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
-.earn-card .ec-amt{font-family:var(--display);font-weight:var(--wt-d);font-size:2.7rem;color:var(--dark-ink);letter-spacing:-.03em;line-height:1}
-.earn-card .ec-sub{font-size:.85rem;color:var(--dark-ink-soft);margin-bottom:18px}
-.earn-bars{display:flex;align-items:flex-end;gap:8px;height:78px}
-.earn-bars i{flex:1;background:var(--border-d);border-radius:5px 5px 0 0}
-.earn-bars i.hl{background:var(--accent)}
-.earn-row{display:flex;justify-content:space-between;margin-top:11px;font-size:.72rem;color:var(--dark-ink-soft)}
-/* faq */
-.faq-grid{display:grid;grid-template-columns:.7fr 1.3fr;gap:clamp(24px,5vw,52px);align-items:start}
-.faq-item{border-top:1px solid var(--border)}
-.faq-item:last-child{border-bottom:1px solid var(--border)}
-.faq-q{width:100%;display:flex;justify-content:space-between;align-items:center;gap:18px;padding:22px 4px;
-  text-align:left;font-family:var(--display);font-weight:var(--wt-d);font-size:1.12rem}
-.faq-ic{width:30px;height:30px;border-radius:50%;border:1.6px solid var(--border);flex:none;display:grid;
-  place-items:center;transition:.3s var(--ease)}
-.faq-ic svg{width:13px;height:13px;transition:transform .3s var(--ease)}
-.faq-item.open .faq-ic{background:var(--ink);border-color:var(--ink);color:var(--bg)}
-.faq-item.open .faq-ic svg{transform:rotate(45deg)}
-.faq-a{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s var(--ease)}
-.faq-item.open .faq-a{grid-template-rows:1fr}
-.faq-a>div{overflow:hidden}
-.faq-a p{padding:0 4px 24px;color:var(--ink-mut);font-size:.98rem;max-width:560px}
-/* final */
-.final{padding:0 0 clamp(76px,12vw,130px)}
-.final-box{position:relative;background:var(--accent);border-radius:32px;
-  padding:clamp(60px,10vw,100px) clamp(24px,5vw,40px);text-align:center;overflow:hidden}
-.final-box .kicker{color:var(--on-accent);opacity:.7;position:relative}
-.final-box h2{position:relative;color:var(--on-accent);font-size:clamp(2.2rem,5vw,4rem);margin:14px 0 16px}
-.final-box p{position:relative;color:var(--on-accent);opacity:.78;font-size:1.1rem;max-width:430px;margin:0 auto 32px}
-.final-box .hero-cta{position:relative;justify-content:center}
-.final-box .btn-out{color:var(--on-accent);border-color:var(--on-accent)}
-.final-box .btn-out:hover{background:var(--on-accent);color:var(--accent)}
-/* footer */
-footer{background:var(--dark);color:var(--dark-ink);padding:70px 0 38px}
-.foot-top{display:grid;grid-template-columns:1.7fr 1fr 1fr 1fr;gap:clamp(28px,4vw,40px);
-  padding-bottom:46px;border-bottom:1px solid var(--border-d)}
-.foot-brand p{color:var(--dark-ink-soft);font-size:.93rem;margin:15px 0 20px;max-width:280px}
-.foot-news{display:flex;gap:8px;max-width:300px}
-.foot-news input{flex:1;background:var(--dark-2);border:1px solid var(--border-d);border-radius:10px;
-  padding:11px 13px;color:var(--dark-ink);font-family:inherit;font-size:.89rem;min-width:0}
-.foot-news input::placeholder{color:var(--dark-ink-soft)}
-.foot-news button{background:var(--accent);color:var(--on-accent);border-radius:10px;padding:0 15px;font-weight:700;font-size:.87rem}
-.foot-col h4{font-family:var(--body);font-size:.79rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
-  color:var(--dark-ink-soft);margin-bottom:15px}
-.foot-col a{display:block;font-size:.93rem;color:var(--dark-ink);opacity:.82;padding:6px 0;transition:.2s}
-.foot-col a:hover{color:var(--accent);opacity:1}
-.foot-bot{display:flex;justify-content:space-between;align-items:center;padding-top:26px;flex-wrap:wrap;gap:14px}
-.foot-bot p{font-size:.85rem;color:var(--dark-ink-soft)}
-.foot-social{display:flex;gap:9px}
-.foot-social a{width:38px;height:38px;border-radius:10px;border:1px solid var(--border-d);display:grid;
-  place-items:center;color:var(--dark-ink);transition:.25s var(--ease)}
-.foot-social a:hover{color:var(--accent);border-color:var(--accent);transform:translateY(-2px)}
-.foot-social svg{width:16px;height:16px}
-/* dev studio */
-.dv-fab{position:fixed;right:18px;bottom:18px;z-index:99990;display:flex;align-items:center;gap:8px;
-  background:#15171d;color:#f3f3f5;border:1px solid #2c2f38;border-radius:999px;padding:11px 17px;
-  font-size:.86rem;font-weight:600;box-shadow:0 12px 30px -10px rgba(0,0,0,.6)}
-.dv-fab:hover{background:#1d1f27}
-.dv-fab .wd{width:14px;height:14px;border-radius:50%;background:conic-gradient(#ff5c5c,#f0a92e,#b6e62e,#4fe3c1,#4d9bf0,#f25c9b,#ff5c5c)}
-.dv-panel{position:fixed;top:0;right:0;bottom:0;width:min(394px,100vw);z-index:99991;background:#101116;
-  color:#e8e8ec;border-left:1px solid #2a2c34;display:flex;flex-direction:column;
-  transform:translateX(105%);transition:transform .4s var(--ease)}
-.dv-panel.open{transform:none}
-.dv-head{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid #24262e}
-.dv-head .dt{font-weight:700;font-size:1.02rem;color:#fff}
-.dv-head .dt span{display:block;font-weight:500;font-size:.74rem;color:#7f828e;letter-spacing:.04em}
-.dv-x{width:32px;height:32px;border-radius:8px;border:1px solid #2c2f38;color:#cfd0d6;font-size:1rem}
-.dv-x:hover{background:#1d1f27}
-.dv-tabs{display:flex;padding:10px 14px 0;gap:6px;border-bottom:1px solid #24262e}
-.dv-tab{flex:1;padding:9px 6px;font-size:.81rem;font-weight:600;color:#8b8e99;border-bottom:2px solid transparent;border-radius:6px 6px 0 0}
-.dv-tab.on{color:#fff;border-bottom-color:#5fe2be}
-.dv-tab:hover{color:#cfd0d6}
-.dv-body{flex:1;overflow-y:auto;padding:18px 20px}
-.dv-pane{display:none}.dv-pane.on{display:block}
-.dv-hint{font-size:.8rem;color:#80838f;margin-bottom:14px;line-height:1.5}
-.dv-pal-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.dv-pc{border:1px solid #26282f;border-radius:11px;padding:9px;cursor:pointer;background:#15171d;transition:.18s var(--ease)}
-.dv-pc:hover{border-color:#3b3e49;transform:translateY(-2px)}
-.dv-pc.on{border-color:#5fe2be;box-shadow:0 0 0 1px #5fe2be}
-.dv-pc .sw{display:flex;height:30px;border-radius:6px;overflow:hidden;margin-bottom:7px}
-.dv-pc .sw i{flex:1}
-.dv-pc .nm{font-size:.74rem;font-weight:600;color:#d4d5db;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.dv-cats{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px}
-.dv-cat{display:flex;align-items:center;gap:7px;padding:7px 11px;border-radius:9px;border:1px solid #2a2c34;
-  font-size:.79rem;font-weight:600;color:#a9abb4;background:#15171d}
-.dv-cat.on{border-color:#5fe2be;color:#fff}
-.dv-cat .cs{width:14px;height:14px;border-radius:4px;border:1px solid rgba(255,255,255,.18)}
-.dv-wheel-wrap{display:flex;justify-content:center;margin-bottom:18px}
-.dv-wheel{position:relative;width:200px;height:200px;border-radius:50%;cursor:pointer;touch-action:none;
-  background:conic-gradient(from 0deg,#ff0000,#ffff00,#00ff00,#00ffff,#0000ff,#ff00ff,#ff0000)}
-.dv-wheel-hole{position:absolute;inset:34px;border-radius:50%;background:#101116;box-shadow:inset 0 0 0 1px #2a2c34}
-.dv-thumb{position:absolute;width:22px;height:22px;border-radius:50%;border:3px solid #fff;
-  box-shadow:0 2px 8px rgba(0,0,0,.6);transform:translate(-50%,-50%);pointer-events:none}
-.dv-slabel{display:flex;justify-content:space-between;font-size:.77rem;color:#9a9ca6;font-weight:600;margin-bottom:6px}
-.dv-slabel span{color:#5fe2be}
-.dv-body input[type=range]{width:100%;margin-bottom:14px;accent-color:#5fe2be;height:6px}
-.dv-precise{display:flex;align-items:center;gap:10px;font-size:.8rem;color:#9a9ca6;padding-top:6px;border-top:1px solid #24262e}
-.dv-precise input[type=color]{width:46px;height:32px;border:1px solid #2c2f38;border-radius:8px;background:none;padding:2px;cursor:pointer}
-.dv-font-list{display:flex;flex-direction:column;gap:7px}
-.dv-fr{border:1px solid #26282f;border-radius:10px;padding:11px 13px;cursor:pointer;background:#15171d;transition:.18s var(--ease)}
-.dv-fr:hover{border-color:#3b3e49}
-.dv-fr.on{border-color:#5fe2be;box-shadow:0 0 0 1px #5fe2be}
-.dv-fr .frn{font-size:.86rem;font-weight:700;color:#fff;margin-bottom:2px}
-.dv-fr .frf{font-size:.74rem;color:#80838f}
-.dv-foot{display:flex;gap:8px;padding:14px 20px;border-top:1px solid #24262e}
-.dv-foot button{flex:1;padding:11px;border-radius:9px;font-size:.82rem;font-weight:600;border:1px solid #2c2f38;color:#cfd0d6;background:#15171d}
-.dv-foot button:hover{background:#1d1f27}
-.dv-foot button.pri{background:#5fe2be;color:#0c1410;border-color:#5fe2be}
-.dv-toast{position:fixed;bottom:74px;right:18px;z-index:99992;background:#15171d;color:#fff;border:1px solid #2c2f38;
-  border-radius:10px;padding:11px 16px;font-size:.84rem;font-weight:600;opacity:0;transform:translateY(8px);
-  transition:.3s var(--ease);pointer-events:none}
-.dv-toast.show{opacity:1;transform:none}
-/* sticky mobile CTA */
-.mcta{display:none}
-@media(max-width:680px){
-  .mcta{display:block;position:fixed;left:0;right:0;bottom:0;z-index:880;background:var(--bg);
-    border-top:1px solid var(--border);box-shadow:0 -12px 30px -18px rgba(0,0,0,.4);
-    padding:9px clamp(16px,4vw,20px) calc(9px + env(safe-area-inset-bottom));
-    transform:translateY(112%);transition:transform .35s var(--ease)}
-  .mcta.show{transform:none}
-  .mcta-in{display:flex;align-items:center;justify-content:space-between;gap:12px;max-width:520px;margin:0 auto}
-  .mcta-txt{line-height:1.15;min-width:0}
-  .mcta-txt span{display:block;font-size:.71rem;color:var(--ink-mut);font-weight:500}
-  .mcta-txt b{font-family:var(--display);font-weight:var(--wt-d);font-size:1.04rem;color:var(--ink)}
-  .mcta .btn{padding:13px 22px;font-size:.92rem;flex:none}
-}
-/* responsive */
-@media(max-width:1000px){
-  .hero-grid{grid-template-columns:1fr;gap:6px}
-  .doodle-arrow{display:none}
-  .story-grid,.teach-box{grid-template-columns:1fr}
-  .steps{grid-template-columns:1fr;gap:34px}
-  .step-conn{display:none}
-  .course-grid,.rev-grid{grid-template-columns:1fr 1fr}
-  .rev-grid>:last-child{display:none}
-  .faq-grid{grid-template-columns:1fr}
-  .foot-top{grid-template-columns:1fr 1fr}
-  .foot-brand{grid-column:1/-1}
-}
-@media(max-width:680px){
-  .nav-links,.nav-right .teach{display:none}
-  .burger{display:flex}
-  .nav-in{height:64px}
-  .mmenu{inset:64px 0 auto 0}
-  /* rhythm */
-  .sec-pad{padding:clamp(58px,14vw,82px) 0}
-  .sec-head{margin-bottom:30px}
-  .sec-head h2{font-size:clamp(1.7rem,7.4vw,2.2rem);letter-spacing:-.012em}
-  .sec-head p{font-size:1rem}
-  .sec-head .row-between{gap:16px}
-  /* hero */
-  .hero{padding:100px 0 52px}
-  .hero h1{font-size:clamp(2.1rem,9vw,2.95rem);letter-spacing:-.018em;line-height:1.13;margin-bottom:18px}
-  .hero-sub{font-size:1.04rem;margin-bottom:24px}
-  .hero-pill{margin-bottom:22px}
-  .hero-cta{gap:12px}
-  .hero-cta .btn-lg{width:100%;padding:16px 24px}
-  .hero-trust{margin-top:24px}
-  .hero-assure{margin-top:16px}
-  /* hero visual — one clean, straight card */
-  .hero-stage{aspect-ratio:auto;height:auto;max-width:380px;margin:32px auto 20px}
-  .hcard.back{display:none}
-  .hcard.front{position:relative;width:100%;left:auto;top:auto;transform:none;animation:none;
-    box-shadow:0 22px 46px -22px rgba(0,0,0,.42)}
-  .sticker{right:10px;top:-13px;transform:rotate(-6deg);animation:none;font-size:.74rem;padding:8px 12px}
-  .chip-rate{left:10px;bottom:-16px;transform:rotate(-3deg);animation:none}
-  /* story */
-  .story h2,.teach-sec h2{font-size:clamp(1.7rem,7vw,2.15rem)}
-  .video-frame .play-circ{width:66px;height:66px}
-  .video-frame .play-circ svg{width:22px;height:22px}
-  /* steps */
-  .steps{gap:30px}
-  .step .num{font-size:3.4rem}
-  .step h3{font-size:1.26rem}
-  /* grids */
-  .course-grid,.rev-grid{grid-template-columns:1fr}
-  .rev-grid>:last-child{display:block}
-  .faq-q{font-size:1.04rem;padding:20px 4px}
-  /* final */
-  .final{padding-bottom:46px}
-  .final-box{border-radius:24px}
-  .final-box h2{font-size:clamp(1.95rem,9vw,2.6rem)}
-  .final-box p{font-size:1rem}
-  /* footer */
-  .foot-top{grid-template-columns:1fr 1fr;gap:28px 22px}
-  .foot-brand{grid-column:1/-1}
-  .story-glow,.teach-glow{display:none}
-  body.mcta-on .dv-fab{bottom:84px}
-}
-@media(max-width:420px){
-  .wrap{padding:0 16px}
-  .hero h1{font-size:clamp(1.95rem,8.8vw,2.5rem)}
-  .sec-head h2{font-size:clamp(1.58rem,7.8vw,2rem)}
-  .hero-stage{max-width:300px}
-  .inst-card{flex-basis:88vw}
-  .step .num{font-size:3rem}
-}
-@media(prefers-reduced-motion:reduce){
-  *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
-  html{scroll-behavior:auto}
-  .rv{opacity:1;transform:none}
-}
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
-<nav class="nav" id="nav">
-  <div class="wrap nav-in">
-    <a href="#" class="brand" aria-label="smarttube">
-      <span class="brand-mark"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7L8 5z" fill="var(--bg)"/></svg></span>
-      <span class="wm"><span class="s">smart</span><span class="t">tube</span></span>
-    </a>
-    <ul class="nav-links">
-      <li><a href="#cursuri">Cursuri</a></li>
-      <li><a href="#cum">Cum funcționează</a></li>
-      <li><a href="#instructori">Instructori</a></li>
-      <li><a href="#recenzii">Recenzii</a></li>
-    </ul>
-    <div class="nav-right">
-      <a href="#preda" class="teach">Devino instructor</a>
-      <a href="#cursuri" class="btn btn-pri">Vezi cursurile</a>
-      <button class="burger" id="burger" aria-label="Meniu"><span></span><span></span><span></span></button>
+<nav class="nav">
+  <div class="nav-in">
+    <a href="index.html" class="brand"><span class="pp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span><span class="s">smart</span><span class="t">tube</span></a>
+    <div class="nav-links">
+      <a href="cursuri.html">Cursuri</a>
+      <a href="cursuri.html#programare">Programare</a>
+      <a href="cursuri.html#design">Design</a>
+      <a href="cursuri.html#business">Business</a>
+      <a href="cursuri.html#video">Foto &amp; Video</a>
+      <a href="instructori.html">Instructori</a>
+      <a href="asistenta.html">Asistență</a>
     </div>
+    <div class="nav-ic">
+      <a href="cursuri.html" aria-label="Caută"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5" stroke-linecap="round"/></svg></a>
+      <a href="cont.html" aria-label="Cont"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" stroke-linecap="round"/></svg></a>
+    </div>
+    <button class="burger" id="burger" aria-label="Meniu"><span></span><span></span><span></span></button>
   </div>
 </nav>
 <div class="mmenu" id="mmenu">
-  <a href="#cursuri">Cursuri</a><a href="#cum">Cum funcționează</a>
-  <a href="#instructori">Instructori</a><a href="#recenzii">Recenzii</a><a href="#preda">Devino instructor</a>
-  <a href="#cursuri" class="btn btn-pri">Vezi cursurile</a>
+  <a href="cursuri.html">Cursuri</a>
+  <a href="cursuri.html#programare">Programare</a>
+  <a href="cursuri.html#design">Design</a>
+  <a href="cursuri.html#business">Business</a>
+  <a href="cursuri.html#video">Foto &amp; Video</a>
+  <a href="instructori.html">Instructori</a>
+  <a href="asistenta.html">Asistență</a>
+  <a href="cont.html">Contul meu</a>
+  <a href="cursuri.html" class="mm-cta"><span class="btn btn-mint">Vezi cursurile</span></a>
 </div>
 
-<!-- HERO -->
-<header class="hero">
-  <div class="wrap">
-    <div class="hero-grid">
-      <div class="hero-text">
-        <span class="hero-pill"><span class="nw">NOU</span> Primele cursuri sunt live</span>
-        <h1>
-          <span class="row">Învață să editezi</span>
-          <span class="row">video ca un <span class="uline">profesionist<svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="M3 8C45 3 100 2 140 5s50 4 57 1"/></svg></span></span>
-        </h1>
-        <p class="hero-sub">Cursuri practice de montaj în Premiere Pro, predate pas cu pas de editori care lucrează zi de zi cu clienți reali.</p>
-        <div class="hero-cta">
-          <a href="#cursuri" class="btn btn-accent btn-lg magnet">Explorează cursurile</a>
-          <a href="#poveste" class="play-link">
-            <span class="pc"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7L8 5z"/></svg></span>
-            Vezi prezentarea
-          </a>
+<main>
+
+  <!-- flagship -->
+  <section class="tile full t-lift">
+    <div class="tile-copy reveal">
+      <h1 class="h-flag">Învață orice.</h1>
+      <p class="t-sub">Mii de cursuri online, predate de oameni care chiar se pricep.<br>Pentru oricine, despre orice.</p>
+      <div class="tile-cta">
+        <a href="cursuri.html" class="btn btn-mint">Vezi cursurile</a>
+        <a href="asistenta.html" class="link">Cum funcționează</a>
+      </div>
+    </div>
+    <div class="tile-visual reveal">
+      <div class="screen" data-scale>
+        <div class="sc-hero">
+          <span class="sc-tag">Curs · 5h 20m</span>
+          <span class="sc-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
         </div>
-        <div class="hero-trust">
-          <div class="avatars"><span class="av">VM</span><span class="av">AP</span><span class="av">DI</span><span class="av">RS</span></div>
-          <div class="tx"><span class="stars">★★★★★</span> <b>4,9 din 5</b><br>peste <b>1.000 de studenți</b> au început deja</div>
-        </div>
-        <div class="hero-assure">
-          <b>Plată unică</b><span class="sep">·</span><b>Acces pe viață</b><span class="sep">·</span><b>Garanție 14 zile</b>
+        <div class="sc-body">
+          <div class="sc-ttl"></div>
+          <div class="sc-meta"><i style="width:64px"></i><i style="width:44px"></i><i style="width:52px"></i></div>
+          <div class="sc-list">
+            <div class="sc-li act"><span class="n">1</span><span class="bar" style="max-width:72%"></span></div>
+            <div class="sc-li"><span class="n">2</span><span class="bar" style="max-width:88%"></span></div>
+            <div class="sc-li"><span class="n">3</span><span class="bar" style="max-width:60%"></span></div>
+          </div>
         </div>
       </div>
-      <div class="hero-stage">
-        <svg class="doodle-arrow" viewBox="0 0 120 80" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
-          <path d="M4 10c30 6 60 28 78 54"/><path d="M64 58l18 6 4-19"/>
+    </div>
+  </section>
+
+  <!-- featured -->
+  <section class="tile featured t-deep">
+    <span class="glow"></span>
+    <div class="tile-copy reveal">
+      <p class="eyebrow">Categoria lunii</p>
+      <p class="feat-small">Editare</p>
+      <h2 class="feat-giant" data-par="20">VIDEO</h2>
+      <p class="t-sub">De la primul cut la un look cinematic — montaj, sunet și color.</p>
+      <div class="tile-cta">
+        <a href="cursuri.html#video" class="btn btn-mint">Explorează</a>
+        <a href="instructori.html" class="link">Vezi instructorii</a>
+      </div>
+    </div>
+    <div class="feat-stage" data-par="-44">
+      <div class="player" data-scale>
+        <div class="player-inner">
+          <div class="pl-screen">
+            <span class="pl-tag">Lecția 4 · Color grading</span>
+            <span class="pl-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+          </div>
+          <div class="pl-bar">
+            <span class="pl-clip" style="width:15%"></span>
+            <span class="pl-clip hot" style="width:23%"></span>
+            <span class="pl-head"></span>
+            <span class="pl-clip" style="width:13%"></span>
+            <span class="pl-clip" style="width:19%"></span>
+            <span class="pl-clip hot" style="width:11%"></span>
+            <span class="pl-clip" style="width:16%"></span>
+            <span class="pl-clip" style="width:9%"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- popular courses carousel -->
+  <section class="car t-lift">
+    <div class="car-head reveal">
+      <div>
+        <h2>Cursuri populare acum</h2>
+        <p>Cele mai alese cursuri din toate categoriile, săptămâna aceasta.</p>
+      </div>
+      <div class="car-nav">
+        <button class="car-btn" data-car="-1" aria-label="Înapoi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
+        <button class="car-btn" data-car="1" aria-label="Înainte"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
+      </div>
+    </div>
+    <div class="car-track" id="carTrack">
+      <a class="ccard" href="curs.html">
+        <div class="cc-thumb g1"><span class="cc-tag">Foto &amp; Video</span><span class="cc-dur">5h 20m</span><span class="cc-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div>
+        <div class="cc-body"><div class="cc-cat">Foto &amp; Video</div>
+          <h3 class="cc-ttl">Editare video în Premiere Pro</h3>
+          <div class="cc-by"><span class="av">VM</span><span>Vlad Marin</span></div>
+          <div class="cc-foot"><span class="cc-rate"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.9 21l1.2-6.8-5-4.9 6.9-1z"/></svg>4,9 <em>(180)</em></span><span class="cc-price">149 lei</span></div>
+        </div>
+      </a>
+      <a class="ccard" href="curs.html">
+        <div class="cc-thumb g2"><span class="cc-tag">Programare</span><span class="cc-dur">8h 10m</span><span class="cc-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div>
+        <div class="cc-body"><div class="cc-cat">Programare &amp; IT</div>
+          <h3 class="cc-ttl">Python de la zero la primul proiect</h3>
+          <div class="cc-by"><span class="av">AP</span><span>Andrei Pop</span></div>
+          <div class="cc-foot"><span class="cc-rate"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.9 21l1.2-6.8-5-4.9 6.9-1z"/></svg>4,8 <em>(240)</em></span><span class="cc-price">199 lei</span></div>
+        </div>
+      </a>
+      <a class="ccard" href="curs.html">
+        <div class="cc-thumb g3"><span class="cc-tag">Design</span><span class="cc-dur">6h 05m</span><span class="cc-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div>
+        <div class="cc-body"><div class="cc-cat">Design &amp; UX</div>
+          <h3 class="cc-ttl">UI/UX Design cu Figma</h3>
+          <div class="cc-by"><span class="av">ID</span><span>Ioana Dima</span></div>
+          <div class="cc-foot"><span class="cc-rate"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.9 21l1.2-6.8-5-4.9 6.9-1z"/></svg>4,9 <em>(156)</em></span><span class="cc-price">179 lei</span></div>
+        </div>
+      </a>
+      <a class="ccard" href="curs.html">
+        <div class="cc-thumb g1"><span class="cc-tag">Business</span><span class="cc-dur">4h 30m</span><span class="cc-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div>
+        <div class="cc-body"><div class="cc-cat">Business &amp; Marketing</div>
+          <h3 class="cc-ttl">Marketing pe rețele sociale</h3>
+          <div class="cc-by"><span class="av">RS</span><span>Radu Stan</span></div>
+          <div class="cc-foot"><span class="cc-rate"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.9 21l1.2-6.8-5-4.9 6.9-1z"/></svg>4,7 <em>(98)</em></span><span class="cc-price">129 lei</span></div>
+        </div>
+      </a>
+      <a class="ccard" href="curs.html">
+        <div class="cc-thumb g2"><span class="cc-tag">Foto &amp; Video</span><span class="cc-dur">3h 50m</span><span class="cc-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div>
+        <div class="cc-body"><div class="cc-cat">Foto &amp; Video</div>
+          <h3 class="cc-ttl">Fotografie pentru începători</h3>
+          <div class="cc-by"><span class="av">MC</span><span>Mara Crișan</span></div>
+          <div class="cc-foot"><span class="cc-rate"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.9 21l1.2-6.8-5-4.9 6.9-1z"/></svg>4,8 <em>(112)</em></span><span class="cc-price">159 lei</span></div>
+        </div>
+      </a>
+      <a class="ccard" href="curs.html">
+        <div class="cc-thumb g3"><span class="cc-tag">Muzică</span><span class="cc-dur">7h 15m</span><span class="cc-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></div>
+        <div class="cc-body"><div class="cc-cat">Muzică &amp; Producție</div>
+          <h3 class="cc-ttl">Producție muzicală în Ableton</h3>
+          <div class="cc-by"><span class="av">AT</span><span>Alex Toma</span></div>
+          <div class="cc-foot"><span class="cc-rate"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.9 21l1.2-6.8-5-4.9 6.9-1z"/></svg>4,9 <em>(134)</em></span><span class="cc-price">189 lei</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- row A -->
+  <div class="tile-row">
+    <section class="tile half t-deep">
+      <div class="tile-copy reveal">
+        <p class="eyebrow">Cel mai cerut</p>
+        <h2 class="h-cat">Programare &amp; IT</h2>
+        <p class="t-sub">Scrie cod care contează — de la primul script la aplicații reale.</p>
+        <div class="tile-cta"><a href="cursuri.html#programare" class="link">Explorează</a></div>
+      </div>
+      <div class="tile-visual reveal">
+        <div class="codewin">
+          <div class="cw-bar"><i></i><i></i><i></i></div>
+          <div class="cw-body">
+            <div class="cwl"><span class="tok m2" style="width:46px"></span><span class="tok m1" style="width:78px"></span></div>
+            <div class="cwl ind"><span class="tok m3" style="width:60px"></span><span class="tok g" style="width:104px"></span></div>
+            <div class="cwl ind2"><span class="tok m1" style="width:40px"></span><span class="tok m3" style="width:66px"></span><span class="tok g" style="width:30px"></span></div>
+            <div class="cwl ind"><span class="tok m2" style="width:54px"></span><span class="tok g2" style="width:48px"></span></div>
+            <div class="cwl"><span class="tok g" style="width:34px"></span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="tile half t-lift">
+      <div class="tile-copy reveal">
+        <h2 class="h-cat">Design &amp; UX</h2>
+        <p class="t-sub">Gândește ca un designer și creează produse pe care lumea le iubește.</p>
+        <div class="tile-cta"><a href="cursuri.html#design" class="link">Explorează</a></div>
+      </div>
+      <div class="tile-visual reveal">
+        <div class="blobs"><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- row B -->
+  <div class="tile-row">
+    <section class="tile half t-lift">
+      <div class="tile-copy reveal">
+        <h2 class="h-cat">Business &amp; Marketing</h2>
+        <p class="t-sub">Transformă o idee în creștere reală — strategie, vânzări, branding.</p>
+        <div class="tile-cta"><a href="cursuri.html#business" class="link">Explorează</a></div>
+      </div>
+      <div class="tile-visual reveal">
+        <svg viewBox="0 0 280 180" width="280" style="max-width:86vw">
+          <defs><linearGradient id="ar" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#6FE8C9" stop-opacity=".34"/>
+            <stop offset="1" stop-color="#6FE8C9" stop-opacity="0"/></linearGradient></defs>
+          <line x1="14" y1="158" x2="266" y2="158" stroke="rgba(255,255,255,.14)" stroke-width="2"/>
+          <path d="M14 132 L74 110 L134 122 L194 70 L254 32 L254 158 L14 158 Z" fill="url(#ar)"/>
+          <path d="M14 132 L74 110 L134 122 L194 70 L254 32" fill="none"
+            stroke="#6FE8C9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="14" cy="132" r="5" fill="#6FE8C9"/>
+          <circle cx="134" cy="122" r="5" fill="#6FE8C9"/>
+          <circle cx="254" cy="32" r="6.5" fill="#6FE8C9"/>
         </svg>
-        <article class="hcard back">
-          <div class="thumb g3"><div class="thumb-grain"></div>
-            <span class="tag">After Effects</span>
-            <span class="play-circ"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7L8 5z"/></svg></span>
-            <div class="timeline"><span class="clip" style="width:22%"></span><span class="clip m" style="width:14%"></span><span class="head"></span><span class="clip" style="width:30%"></span><span class="clip m" style="width:18%"></span><span class="clip" style="width:10%"></span></div>
-          </div>
-        </article>
-        <article class="hcard front">
-          <div class="thumb g1"><div class="thumb-grain"></div>
-            <span class="tag">Premiere Pro</span><span class="dur">6 ore</span>
-            <span class="play-circ pulse"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7L8 5z"/></svg></span>
-            <div class="timeline"><span class="clip" style="width:18%"></span><span class="clip m" style="width:24%"></span><span class="head"></span><span class="clip" style="width:14%"></span><span class="clip" style="width:20%"></span><span class="clip m" style="width:12%"></span></div>
-          </div>
-          <div class="hcard-body">
-            <span class="lvl">Intermediar</span>
-            <h3>Montaj cinematic în Premiere Pro</h3>
-            <div class="hcard-meta"><span class="by">cu Andrei Pop</span><span class="pr">199 lei</span></div>
-          </div>
-        </article>
-        <span class="sticker">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          Acces pe viață
-        </span>
-        <span class="chip-rate">
-          <div><div class="st">★★★★★</div><div class="big">4,9</div></div>
-          <div class="sm">320 de<br>recenzii reale</div>
-        </span>
       </div>
-    </div>
+    </section>
+    <section class="tile half t-deep">
+      <div class="tile-copy reveal">
+        <h2 class="h-cat">Foto &amp; Video</h2>
+        <p class="t-sub">Prinde lumina perfectă — fotografie, montaj și povești în imagini.</p>
+        <div class="tile-cta"><a href="cursuri.html#video" class="link">Explorează</a></div>
+      </div>
+      <div class="tile-visual reveal">
+        <svg viewBox="0 0 240 184" width="240" style="max-width:86vw"
+          fill="none" stroke="#EEF1F5" stroke-width="3" stroke-linejoin="round">
+          <path d="M30 54h34l12-18h48l12 18h34a14 14 0 0 1 14 14v82a14 14 0 0 1-14 14H30a14 14 0 0 1-14-14V68a14 14 0 0 1 14-14z"/>
+          <circle cx="120" cy="106" r="34"/>
+          <circle cx="120" cy="106" r="17" stroke="#6FE8C9"/>
+          <circle cx="186" cy="74" r="4" fill="#EEF1F5" stroke="none"/>
+        </svg>
+      </div>
+    </section>
   </div>
-</header>
 
-<!-- STORY -->
-<section class="story sec-pad" id="poveste">
-  <div class="wrap">
-    <span class="story-glow"></span>
-    <div class="story-grid">
-      <div class="rv">
-        <span class="kicker light"><span class="dot"></span>Povestea smarttube</span>
-        <h2>Salut! Suntem <em>Vlad &amp; Andrei</em> — și am pornit asta pentru tine.</h2>
-        <p>Am editat ani la rând pentru agenții, branduri și creatori. Și am fost întrebați mereu același lucru: „cum ai făcut asta?". Apasă play și hai să ne cunoaștem în 2 minute.</p>
-        <div class="founders-line">
-          <span class="fa">VM</span><span class="fa">AP</span>
-          <div class="fn"><b>Vlad Marin &amp; Andrei Pop</b><span>Fondatori &amp; primii instructori</span></div>
-        </div>
+  <!-- row C -->
+  <div class="tile-row">
+    <section class="tile half t-deep">
+      <div class="tile-copy reveal">
+        <h2 class="h-cat">Muzică &amp; Producție</h2>
+        <p class="t-sub">De la prima notă la track-ul final — compoziție, mixaj, master.</p>
+        <div class="tile-cta"><a href="cursuri.html#muzica" class="link">Explorează</a></div>
       </div>
-      <div class="rv" data-d="1">
-        <div class="video-frame" id="founderVideo" role="button" tabindex="0" aria-label="Redă videoul de prezentare">
-          <div class="thumb-grain"></div>
-          <span class="tape">Apasă play</span>
-          <span class="play-circ pulse"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7L8 5z"/></svg></span>
-          <div class="video-founders"><span class="fa">VM</span><span class="fa">AP</span><span>Cine suntem &amp; de ce smarttube</span></div>
-          <span class="video-dur">2:14</span>
-        </div>
+      <div class="tile-visual reveal">
+        <div class="eq"><i style="height:48%"></i><i style="height:88%"></i><i style="height:62%"></i><i style="height:100%"></i><i style="height:54%"></i><i style="height:78%"></i><i style="height:40%"></i></div>
       </div>
-    </div>
+    </section>
+    <section class="tile half t-lift">
+      <div class="tile-copy reveal">
+        <h2 class="h-cat">Dezvoltare personală</h2>
+        <p class="t-sub">Investește în cea mai bună versiune a ta — focus, obiceiuri, productivitate.</p>
+        <div class="tile-cta"><a href="cursuri.html#dezvoltare" class="link">Explorează</a></div>
+      </div>
+      <div class="tile-visual reveal">
+        <svg viewBox="0 0 260 172" width="260" style="max-width:86vw">
+          <path d="M40 150 L96 64 L138 112 L176 58 L222 150 Z" fill="#1B2233"
+            stroke="#EEF1F5" stroke-width="3" stroke-linejoin="round"/>
+          <line x1="22" y1="150" x2="240" y2="150" stroke="rgba(255,255,255,.14)" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M62 150 q24 -34 52 -44 q24 -8 18 -34" fill="none" stroke="#6FE8C9"
+            stroke-width="3" stroke-linecap="round" stroke-dasharray="2 9"/>
+          <line x1="176" y1="58" x2="176" y2="30" stroke="#6FE8C9" stroke-width="3" stroke-linecap="round"/>
+          <path d="M176 30 L202 38 L176 47 Z" fill="#6FE8C9"/>
+        </svg>
+      </div>
+    </section>
   </div>
-</section>
 
-<!-- HOW IT WORKS -->
-<section class="sec-pad" id="cum">
-  <div class="wrap">
-    <div class="sec-head center rv">
-      <span class="kicker"><span class="dot"></span>Simplu de tot</span>
-      <h2>Trei pași până la primul tău <span class="mark">proiect editat</span></h2>
-      <p>Fără abonament, fără capcane. Alegi, înveți, primești certificatul.</p>
-    </div>
-    <div class="steps">
-      <div class="step rv">
-        <div class="num">01<small>.</small></div>
-        <div class="sicon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="19" cy="18" r="2.4" stroke="currentColor" stroke-width="2"/></svg></div>
-        <h3>Alege un curs</h3>
-        <p>Plătești o singură dată exact cursul care te interesează. Accesul rămâne al tău pe viață.</p>
-        <svg class="step-conn" viewBox="0 0 38 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 12h30M26 5l8 7-8 7"/></svg>
-      </div>
-      <div class="step rv" data-d="1">
-        <div class="num">02<small>.</small></div>
-        <div class="sicon"><svg viewBox="0 0 24 24" fill="none"><path d="M8 5v14l11-7L8 5z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></div>
-        <h3>Înveți în ritmul tău</h3>
-        <p>Lecții video on-demand și proiecte reale de montat. Pui pe pauză, reiei, revii oricând.</p>
-        <svg class="step-conn" viewBox="0 0 38 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M2 12h30M26 5l8 7-8 7"/></svg>
-      </div>
-      <div class="step rv" data-d="2">
-        <div class="num">03<small>.</small></div>
-        <div class="sicon"><svg viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <h3>Primești certificatul</h3>
-        <p>Termini proiectul final, primești un certificat verificabil și un portofoliu mai bun.</p>
+  <!-- promise -->
+  <section class="tile slim t-lift">
+    <div class="tile-copy reveal">
+      <h2 class="h-cat">Plată unică. Acces pe viață.</h2>
+      <p class="t-sub">Cumperi un curs o singură dată și rămâne al tău pentru totdeauna. Fără abonament, fără surprize.</p>
+      <div class="promise">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Acces pe viață</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Garanție 14 zile</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Certificat de absolvire</span>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- INSTRUCTORS -->
-<section class="instructors sec-pad" id="instructori">
-  <div class="wrap">
-    <div class="sec-head rv">
-      <div class="row-between">
-        <div>
-          <span class="kicker"><span class="dot"></span>Cine te învață</span>
-          <h2>Instructorii care<br>fac asta pe bune</h2>
-        </div>
-        <div class="car-nav">
-          <button class="car-btn" data-car="inst" data-dir="-1" aria-label="Înapoi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
-          <button class="car-btn" data-car="inst" data-dir="1" aria-label="Înainte"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>
-        </div>
+  <!-- instructor -->
+  <section class="tile full t-deep">
+    <span class="glow"></span>
+    <div class="tile-copy reveal">
+      <p class="eyebrow">Pentru experți &amp; creatori</p>
+      <h2 class="h-flag">Predă pe smarttube.</h2>
+      <p class="t-sub">Transformă ce știi într-un venit. Tu creezi cursul, noi aducem studenții.</p>
+      <div class="tile-cta">
+        <a href="instructori.html#preda" class="btn btn-mint">Devino instructor</a>
+        <a href="instructori.html" class="link">Vezi instructorii</a>
       </div>
     </div>
-  </div>
-  <div class="wrap">
-    <div class="car-track" id="inst">
-      <article class="inst-card rv">
-        <div class="inst-photo"><div class="thumb-grain"></div><span class="mono">VM</span>
-          <span class="badge"><svg viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4z" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Instructor verificat</span>
-        </div>
-        <div class="inst-body">
-          <h3>Vlad Marin</h3>
-          <div class="role">Editor video &amp; colorist</div>
-          <p class="bio">8 ani de montaj pentru branduri și agenții. Predă editarea ca pe o meserie, nu ca pe un hobby.</p>
-          <div class="inst-tags"><span>Premiere Pro</span><span>Color grading</span><span>Sound design</span></div>
-          <div class="inst-stats"><div><b>3</b>cursuri</div><div><b>640</b>studenți</div><div><b>4,9</b>★ rating</div></div>
-        </div>
-      </article>
-      <article class="inst-card rv" data-d="1">
-        <div class="inst-photo"><div class="thumb-grain"></div><span class="mono">AP</span>
-          <span class="badge"><svg viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4z" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Instructor verificat</span>
-        </div>
-        <div class="inst-body">
-          <h3>Andrei Pop</h3>
-          <div class="role">Editor &amp; creator YouTube</div>
-          <p class="bio">A montat sute de videoclipuri pentru creatori cu milioane de vizualizări. Specialist în ritm și retenție.</p>
-          <div class="inst-tags"><span>Editare YouTube</span><span>Storytelling</span><span>Montaj cinematic</span></div>
-          <div class="inst-stats"><div><b>3</b>cursuri</div><div><b>520</b>studenți</div><div><b>4,8</b>★ rating</div></div>
-        </div>
-      </article>
-      <article class="inst-card join rv" data-d="2">
-        <div class="ji"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
-        <h3>Locul tău aici?</h3>
-        <p>Ai experiență în editare, motion sau color? Construiește-ți cursul pe smarttube.</p>
-        <a href="#preda" class="btn btn-out">Devino instructor</a>
-      </article>
+    <div class="tile-visual reveal">
+      <div class="bcast">
+        <span class="ring r3"></span><span class="ring r2"></span><span class="ring r1"></span>
+        <span class="core"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- COURSES -->
-<section class="sec-pad" id="cursuri">
-  <div class="wrap">
-    <div class="sec-head rv">
-      <div class="row-between">
-        <div>
-          <span class="kicker"><span class="dot"></span>Recomandările noastre</span>
-          <h2>De aici începi</h2>
-        </div>
-        <a href="#" class="link-arrow">Vezi tot catalogul <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg></a>
-      </div>
-    </div>
-    <div class="course-grid">
-      <article class="course tilt rv">
-        <div class="thumb g1"><div class="thumb-grain"></div><span class="tag">Premiere Pro</span><span class="dur">5h 20m</span>
-          <span class="play-circ"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7L8 5z"/></svg></span>
-          <div class="timeline"><span class="clip" style="width:20%"></span><span class="clip m" style="width:16%"></span><span class="head"></span><span class="clip" style="width:26%"></span><span class="clip m" style="width:14%"></span><span class="clip" style="width:10%"></span></div></div>
-        <div class="c-body"><span class="c-lvl">Începător</span>
-          <h3>Premiere Pro de la zero la primul proiect</h3>
-          <div class="c-by"><span class="ci">VM</span><span>Vlad Marin</span></div>
-          <div class="c-meta"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 5v14l11-7z"/></svg>32 lecții</i><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2" stroke-linecap="round"/></svg>5h 20m</i></div>
-          <div class="c-foot"><span class="c-rate"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.9 21l1.2-6.8-5-4.9 6.9-1z"/></svg>4,9 <em>(180)</em></span><span class="c-price"><span class="was">199</span><span class="now">149 lei</span></span></div>
-        </div>
-      </article>
-      <article class="course tilt rv" data-d="1">
-        <div class="thumb g2"><div class="thumb-grain"></div><span class="tag">Premiere Pro</span><span class="dur">6h 00m</span>
-          <span class="play-circ"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7L8 5z"/></svg></span>
-          <div class="timeline"><span class="clip" style="width:14%"></span><span class="clip m" style="width:22%"></span><span class="head"></span><span class="clip" style="width:18%"></span><span class="clip" style="width:24%"></span><span class="clip m" style="width:10%"></span></div></div>
-        <div class="c-body"><span class="c-lvl">Intermediar</span>
-          <h3>Montaj cinematic în Premiere Pro</h3>
-          <div class="c-by"><span class="ci">AP</span><span>Andrei Pop</span></div>
-          <div class="c-meta"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 5v14l11-7z"/></svg>40 lecții</i><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2" stroke-linecap="round"/></svg>6h 00m</i></div>
-          <div class="c-foot"><span class="c-rate"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.9 21l1.2-6.8-5-4.9 6.9-1z"/></svg>4,9 <em>(142)</em></span><span class="c-price"><span class="now">199 lei</span></span></div>
-        </div>
-      </article>
-      <article class="course tilt rv" data-d="2">
-        <div class="thumb g4"><div class="thumb-grain"></div><span class="tag">Color</span><span class="dur">3h 45m</span>
-          <span class="play-circ"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7L8 5z"/></svg></span>
-          <div class="timeline"><span class="clip m" style="width:24%"></span><span class="clip" style="width:14%"></span><span class="head"></span><span class="clip" style="width:20%"></span><span class="clip m" style="width:16%"></span><span class="clip" style="width:12%"></span></div></div>
-        <div class="c-body"><span class="c-lvl">Intermediar</span>
-          <h3>Color grading: de la flat la film look</h3>
-          <div class="c-by"><span class="ci">VM</span><span>Vlad Marin</span></div>
-          <div class="c-meta"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 5v14l11-7z"/></svg>24 lecții</i><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2" stroke-linecap="round"/></svg>3h 45m</i></div>
-          <div class="c-foot"><span class="c-rate"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.9 21l1.2-6.8-5-4.9 6.9-1z"/></svg>4,8 <em>(96)</em></span><span class="c-price"><span class="now">179 lei</span></span></div>
-        </div>
-      </article>
-    </div>
-  </div>
-</section>
+</main>
 
-<!-- REVIEWS -->
-<section class="reviews sec-pad" id="recenzii">
-  <div class="wrap">
-    <div class="sec-head center rv">
-      <span class="kicker"><span class="dot"></span>Recenzii</span>
-      <h2>Studenți care au <span class="mark">trecut deja prin asta</span></h2>
+<footer class="footer">
+  <div class="footer-in">
+    <div class="footer-fine">
+      <p>Prețurile cursurilor sunt stabilite de fiecare instructor și pot varia. Plată unică per curs — fără abonament.</p>
+      <p>Certificatul de absolvire este emis după finalizarea proiectului final al cursului. smarttube este un marketplace de cursuri online.</p>
     </div>
-    <div class="rev-grid">
-      <div class="rev-card rv"><div class="rstars">★★★★★</div><p>„Am editat primul meu proiect plătit la două săptămâni după curs. Vlad explică totul ca pentru un prieten — nu te pierde."</p><div class="rwho"><span class="ci">DI</span><div><b>Diana Ilie</b><span>Premiere Pro de la zero</span></div></div></div>
-      <div class="rev-card rv" data-d="1"><div class="rstars">★★★★★</div><p>„Diferența dintre tutorialele random și smarttube e structura. În sfârșit știu de ce fac fiecare tăietură."</p><div class="rwho"><span class="ci">RS</span><div><b>Radu Stan</b><span>Montaj cinematic</span></div></div></div>
-      <div class="rev-card rv" data-d="2"><div class="rstars">★★★★★</div><p>„Color gradingul mi se părea magie neagră. Acum îmi fac singur look-ul cinematic. Merită fiecare leu."</p><div class="rwho"><span class="ci">MC</span><div><b>Mara Crișan</b><span>Color grading</span></div></div></div>
+    <div class="footer-cols">
+      <div class="footer-col"><h4>Explorează</h4>
+        <a href="cursuri.html">Toate cursurile</a><a href="cursuri.html#programare">Programare</a>
+        <a href="cursuri.html#design">Design</a><a href="cursuri.html#business">Business</a></div>
+      <div class="footer-col"><h4>Pentru studenți</h4>
+        <a href="asistenta.html">Cum funcționează</a><a href="asistenta.html">Certificate</a>
+        <a href="asistenta.html">Garanție 14 zile</a><a href="asistenta.html">Întrebări frecvente</a></div>
+      <div class="footer-col"><h4>Pentru instructori</h4>
+        <a href="instructori.html#preda">Devino instructor</a><a href="instructori.html">Instructorii noștri</a>
+        <a href="asistenta.html">Resurse</a><a href="asistenta.html">Plăți</a></div>
+      <div class="footer-col"><h4>smarttube</h4>
+        <a href="asistenta.html">Despre noi</a><a href="asistenta.html">Contact</a>
+        <a href="asistenta.html">Blog</a><a href="cont.html">Contul meu</a></div>
+      <div class="footer-col"><h4>Asistență</h4>
+        <a href="asistenta.html">Centru de ajutor</a><a href="cont.html">Autentificare</a>
+        <a href="asistenta.html">Termeni</a><a href="asistenta.html">Confidențialitate</a></div>
     </div>
-  </div>
-</section>
-
-<!-- TEACH -->
-<section class="teach-sec sec-pad" id="preda">
-  <div class="wrap">
-    <span class="teach-glow"></span>
-    <div class="teach-box">
-      <div class="rv">
-        <span class="kicker light"><span class="dot"></span>Pentru instructori</span>
-        <h2>Ai ceva de predat?<br>Fă din asta <span class="mark">venit</span>.</h2>
-        <p class="lead">Căutăm următorii instructori smarttube. Tu îți construiești cursul — noi ne ocupăm de platformă, plăți și studenți.</p>
-        <ul class="teach-list">
-          <li><span class="tk"><svg viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Tu stabilești prețul fiecărui curs</li>
-          <li><span class="tk"><svg viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Plăți lunare, transparente, fără bătăi de cap</li>
-          <li><span class="tk"><svg viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Te ajutăm cu structura și filmarea lecțiilor</li>
-        </ul>
-        <a href="#" class="btn btn-accent btn-lg magnet">Aplică să devii instructor</a>
-      </div>
-      <div class="rv" data-d="1">
-        <div class="earn-card">
-          <div class="ec-top"><span>Încasări instructor · luna aceasta</span><span class="live">live</span></div>
-          <div class="ec-amt">8.420 lei</div>
-          <div class="ec-sub">din 7 cursuri vândute · 42 de studenți noi</div>
-          <div class="earn-bars"><i style="height:38%"></i><i style="height:54%"></i><i style="height:46%"></i><i style="height:70%"></i><i style="height:60%"></i><i class="hl" style="height:92%"></i><i style="height:78%"></i></div>
-          <div class="earn-row"><span>Lun</span><span>Mar</span><span>Mie</span><span>Joi</span><span>Vin</span><span>Sâm</span><span>Dum</span></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FAQ -->
-<section class="sec-pad">
-  <div class="wrap">
-    <div class="faq-grid">
-      <div class="sec-head rv" style="margin-bottom:0">
-        <span class="kicker"><span class="dot"></span>Întrebări frecvente</span>
-        <h2>Bine de<br>știut</h2>
-        <p style="margin-top:14px">N-ai găsit răspunsul? Scrie-ne, îți răspundem repede.</p>
-      </div>
-      <div class="rv" data-d="1">
-        <div class="faq-item"><button class="faq-q">Trebuie să plătesc un abonament lunar?<span class="faq-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></button>
-          <div class="faq-a"><div><p>Nu. smarttube funcționează cu plată per curs — cumperi o singură dată exact cursurile care te interesează, iar accesul îți rămâne pe viață. Fără reînnoiri, fără surprize.</p></div></div></div>
-        <div class="faq-item"><button class="faq-q">Primesc un certificat la final?<span class="faq-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></button>
-          <div class="faq-a"><div><p>Da. După ce termini lecțiile și predai proiectul final, primești un certificat de absolvire verificabil, pe care îl poți adăuga în portofoliu sau pe LinkedIn.</p></div></div></div>
-        <div class="faq-item"><button class="faq-q">De ce echipament și program am nevoie?<span class="faq-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></button>
-          <div class="faq-a"><div><p>Un laptop sau PC care rulează Adobe Premiere Pro. Atât. Filmările pentru exerciții ți le punem noi la dispoziție, iar fluxul de lucru ți-l explicăm de la zero.</p></div></div></div>
-        <div class="faq-item"><button class="faq-q">Pentru ce nivel sunt cursurile?<span class="faq-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></button>
-          <div class="faq-a"><div><p>De la zero la avansat. Fiecare curs are nivelul marcat clar (Începător, Intermediar, Avansat), așa că știi exact de unde să pornești.</p></div></div></div>
-        <div class="faq-item"><button class="faq-q">Dacă nu sunt mulțumit de curs?<span class="faq-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></button>
-          <div class="faq-a"><div><p>Ai 14 zile la dispoziție. Dacă simți că nu e pentru tine, îți returnăm banii integral, fără întrebări complicate.</p></div></div></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FINAL -->
-<section class="final">
-  <div class="wrap">
-    <div class="final-box rv">
-      <span class="kicker"><span class="dot"></span>E rândul tău</span>
-      <h2>Gata să apeși play?</h2>
-      <p>Alege primul tău curs și fă prima tăietură chiar azi. Cu garanție de 14 zile, nu riști nimic.</p>
-      <div class="hero-cta">
-        <a href="#cursuri" class="btn btn-pri btn-lg magnet">Explorează catalogul</a>
-        <a href="#poveste" class="btn btn-out">Vezi prezentarea</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer>
-  <div class="wrap">
-    <div class="foot-top">
-      <div class="foot-brand">
-        <a href="#" class="brand">
-          <span class="brand-mark on-dark"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7L8 5z" fill="var(--dark)"/></svg></span>
-          <span class="wm light"><span class="s">smart</span><span class="t">tube</span></span>
-        </a>
-        <p>Marketplace-ul unde înveți editare video de la oameni care chiar trăiesc din asta.</p>
-        <div class="foot-news">
-          <input type="email" placeholder="Adresa ta de email" aria-label="Email" />
-          <button>Abonează-te</button>
-        </div>
-      </div>
-      <div class="foot-col"><h4>Cursuri</h4><a href="#">Premiere Pro</a><a href="#">Color grading</a><a href="#">Sound design</a><a href="#">Tot catalogul</a></div>
-      <div class="foot-col"><h4>Platforma</h4><a href="#cum">Cum funcționează</a><a href="#preda">Devino instructor</a><a href="#">Certificate</a></div>
-      <div class="foot-col"><h4>smarttube</h4><a href="#poveste">Despre noi</a><a href="#recenzii">Recenzii</a><a href="#">Contact</a></div>
-    </div>
-    <div class="foot-bot">
-      <p>© 2026 smarttube. Toate drepturile rezervate. · Termeni · Confidențialitate</p>
-      <div class="foot-social">
-        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1.3" fill="currentColor"/></svg></a>
-        <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="none"><rect x="2" y="5" width="20" height="14" rx="4" stroke="currentColor" stroke-width="2"/><path d="M10 9l5 3-5 3V9z" fill="currentColor"/></svg></a>
-        <a href="#" aria-label="TikTok"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 3c.3 2.5 1.9 4.4 4.5 4.7v3.2c-1.7 0-3.3-.5-4.6-1.4v6.6c0 3.5-2.8 6.3-6.3 6.3S3.3 19.6 3.3 16.1s2.8-6.3 6.3-6.3c.4 0 .8 0 1.1.1v3.3c-.3-.1-.7-.2-1.1-.2a3 3 0 100 6 3 3 0 003-3V3H16z"/></svg></a>
-      </div>
+    <div class="footer-bottom">
+      <span>Copyright © 2026 smarttube SRL. Toate drepturile rezervate.</span>
+      <span class="legal"><a href="asistenta.html">România</a><a href="asistenta.html">Termeni</a><a href="asistenta.html">Confidențialitate</a><a href="asistenta.html">Cookie-uri</a></span>
     </div>
   </div>
 </footer>
 
-<!-- STICKY MOBILE CTA -->
-<div class="mcta" id="mcta">
-  <div class="mcta-in">
-    <div class="mcta-txt"><span>Cursuri de editare video</span><b>De la 149 lei</b></div>
-    <a href="#cursuri" class="btn btn-accent">Vezi cursurile</a>
-  </div>
-</div>
-
-<!-- DEV STUDIO -->
-<button class="dv-fab" id="dvFab"><span class="wd"></span>Teme</button>
-<aside class="dv-panel" id="dvPanel" aria-hidden="true">
-  <div class="dv-head">
-    <div class="dt">Studio de teme<span>mod dezvoltator</span></div>
-    <button class="dv-x" id="dvClose" aria-label="Închide">✕</button>
-  </div>
-  <div class="dv-tabs">
-    <button class="dv-tab on" data-tab="pal">Palete</button>
-    <button class="dv-tab" data-tab="col">Roata culorilor</button>
-    <button class="dv-tab" data-tab="fnt">Fonturi</button>
-  </div>
-  <div class="dv-body">
-    <section class="dv-pane on" data-pane="pal">
-      <p class="dv-hint">54 de palete inspirate din cele trending. Apasă una ca s-o aplici live pe tot site-ul.</p>
-      <div class="dv-pal-grid" id="dvPalGrid"></div>
-    </section>
-    <section class="dv-pane" data-pane="col">
-      <p class="dv-hint">Alege o categorie, apoi rotește roata sau folosește selectorul precis. Restul culorilor se recalculează automat.</p>
-      <div class="dv-cats" id="dvCats"></div>
-      <div class="dv-wheel-wrap"><div class="dv-wheel" id="dvWheel"><div class="dv-wheel-hole"></div><div class="dv-thumb" id="dvThumb"></div></div></div>
-      <label class="dv-slabel">Saturație <span id="dvSatV">0</span></label>
-      <input type="range" id="dvSat" min="0" max="100" value="50" />
-      <label class="dv-slabel">Luminozitate <span id="dvLitV">0</span></label>
-      <input type="range" id="dvLit" min="0" max="100" value="50" />
-      <div class="dv-precise"><span>Sau exact:</span><input type="color" id="dvColor" /></div>
-    </section>
-    <section class="dv-pane" data-pane="fnt">
-      <p class="dv-hint">30 de combinații de fonturi, toate gratuite (Google Fonts). Previzualizarea e chiar pagina.</p>
-      <div class="dv-font-list" id="dvFontList"></div>
-    </section>
-  </div>
-  <div class="dv-foot">
-    <button id="dvReset">↺ Resetează</button>
-    <button id="dvCopy" class="pri">⧉ Copiază CSS</button>
-  </div>
-</aside>
-<div class="dv-toast" id="dvToast"></div>
-
-<script>
-/* ===== site interactions ===== */
-const rm=matchMedia('(prefers-reduced-motion:reduce)').matches;
-const nav=document.getElementById('nav');
-const navState=()=>nav.classList.toggle('solid',scrollY>16);
-navState();addEventListener('scroll',navState,{passive:true});
-const burger=document.getElementById('burger'),mmenu=document.getElementById('mmenu');
-burger.addEventListener('click',()=>{const o=mmenu.classList.toggle('open');burger.classList.toggle('on',o);});
-mmenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{mmenu.classList.remove('open');burger.classList.remove('on');}));
-const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});},{threshold:.12,rootMargin:'0px 0px -7% 0px'});
-document.querySelectorAll('.rv').forEach(el=>io.observe(el));
-document.querySelectorAll('.car-btn').forEach(btn=>{
-  btn.addEventListener('click',()=>{const t=document.getElementById(btn.dataset.car);const c=t.querySelector('.inst-card');
-    t.scrollBy({left:(c?c.offsetWidth+22:340)*(+btn.dataset.dir),behavior:'smooth'});});
-});
-if(!rm){
-  document.querySelectorAll('.tilt').forEach(card=>{let raf;
-    card.addEventListener('mousemove',e=>{const r=card.getBoundingClientRect();
-      const px=(e.clientX-r.left)/r.width-.5,py=(e.clientY-r.top)/r.height-.5;
-      if(raf)return;raf=requestAnimationFrame(()=>{card.style.transform=`perspective(900px) rotateY(${px*7}deg) rotateX(${-py*7}deg) translateY(-4px)`;raf=0;});});
-    card.addEventListener('mouseleave',()=>{card.style.transform='';});
-  });
-  document.querySelectorAll('.magnet').forEach(b=>{
-    b.addEventListener('mousemove',e=>{const r=b.getBoundingClientRect();
-      b.style.transform=`translate(${(e.clientX-r.left-r.width/2)*.18}px,${(e.clientY-r.top-r.height/2)*.28}px)`;});
-    b.addEventListener('mouseleave',()=>{b.style.transform='';});
-  });
-}
-document.querySelectorAll('.faq-q').forEach(q=>{
-  q.addEventListener('click',()=>{const item=q.parentElement,open=item.classList.contains('open');
-    document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));if(!open)item.classList.add('open');});
-});
-const fv=document.getElementById('founderVideo');
-const playVid=()=>{const pc=fv.querySelector('.play-circ');pc.style.transform='scale(.86)';setTimeout(()=>pc.style.transform='',180);};
-fv.addEventListener('click',playVid);
-fv.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();playVid();}});
-
-/* sticky mobile CTA */
-const mcta=document.getElementById('mcta');
-const heroEl=document.querySelector('.hero');
-const finalEl=document.querySelector('.final');
-function mctaState(){
-  if(innerWidth>680){mcta.classList.remove('show');document.body.classList.remove('mcta-on');return;}
-  const past=scrollY>heroEl.offsetHeight-60;
-  const nearEnd=finalEl.getBoundingClientRect().top<innerHeight*0.85;
-  const show=past&&!nearEnd;
-  mcta.classList.toggle('show',show);
-  document.body.classList.toggle('mcta-on',show);
-}
-mctaState();addEventListener('scroll',mctaState,{passive:true});addEventListener('resize',mctaState);
-
-/* ===== theme engine ===== */
-const clamp=(n,a,b)=>Math.min(b,Math.max(a,n));
-function h2r(h){h=h.replace('#','');if(h.length===3)h=h.split('').map(c=>c+c).join('');return[parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)];}
-function r2h(r,g,b){return'#'+[r,g,b].map(x=>clamp(Math.round(x),0,255).toString(16).padStart(2,'0')).join('');}
-function mix(c1,c2,t){const a=h2r(c1),b=h2r(c2);return r2h(a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t,a[2]+(b[2]-a[2])*t);}
-function rgba(c,a){const r=h2r(c);return`rgba(${r[0]},${r[1]},${r[2]},${a})`;}
-function lum(c){const r=h2r(c).map(v=>{v/=255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4);});return .2126*r[0]+.7152*r[1]+.0722*r[2];}
-function hex2hsl(hex){let[r,g,b]=h2r(hex).map(v=>v/255);const mx=Math.max(r,g,b),mn=Math.min(r,g,b);let h=0,s=0,l=(mx+mn)/2;
-  if(mx!==mn){const d=mx-mn;s=l>.5?d/(2-mx-mn):d/(mx+mn);
-    if(mx===r)h=(g-b)/d+(g<b?6:0);else if(mx===g)h=(b-r)/d+2;else h=(r-g)/d+4;h*=60;}
-  return[h,s*100,l*100];}
-function hsl2hex(h,s,l){h/=360;s/=100;l/=100;let r,g,b;
-  if(s===0){r=g=b=l;}else{const hue=(p,q,t)=>{if(t<0)t+=1;if(t>1)t-=1;if(t<1/6)return p+(q-p)*6*t;if(t<1/2)return q;if(t<2/3)return p+(q-p)*(2/3-t)*6;return p;};
-  const q=l<.5?l*(1+s):l+s-l*s,p=2*l-q;r=hue(p,q,h+1/3);g=hue(p,q,h);b=hue(p,q,h-1/3);}
-  return r2h(r*255,g*255,b*255);}
-
-const PAL=[
- {n:'Editorial Cald',bg:'#F3EFE5',sf:'#EAE4D6',ink:'#1B1A17',ac:'#5FE2BE',dk:'#0F1714'},
- {n:'Cremă & Cărămidă',bg:'#F4F1E8',sf:'#ECE7D9',ink:'#16140F',ac:'#E3553B',dk:'#1A1410'},
- {n:'Hârtie & Cobalt',bg:'#F2F0EA',sf:'#E7E4DA',ink:'#14161D',ac:'#2F5BEA',dk:'#0E1530'},
- {n:'Nisip & Pădure',bg:'#EFEBE0',sf:'#E4DECF',ink:'#1A1C16',ac:'#2E7D54',dk:'#122019'},
- {n:'In & Prună',bg:'#F3EFE9',sf:'#E9E2D7',ink:'#1C1620',ac:'#7A3E8E',dk:'#1C1224'},
- {n:'Ovăz & Rugină',bg:'#F0EADD',sf:'#E5DCC8',ink:'#211B12',ac:'#C2592A',dk:'#1E140C'},
- {n:'Os & Teal',bg:'#F1EFE9',sf:'#E5E2D8',ink:'#15191A',ac:'#0E9C9C',dk:'#0C1C1E'},
- {n:'Migdal & Coral',bg:'#F6F0E8',sf:'#EDE3D6',ink:'#1E1813',ac:'#FF6B5B',dk:'#221512'},
- {n:'Ceață & Indigo',bg:'#EEF0F2',sf:'#E2E5E9',ink:'#15171F',ac:'#4A4FE0',dk:'#11132A'},
- {n:'Abur & Lime',bg:'#EFF1EC',sf:'#E3E7DD',ink:'#181A14',ac:'#7BB539',dk:'#141A10'},
- {n:'Greige & Chihlimbar',bg:'#ECE9E2',sf:'#E0DCD0',ink:'#1B1813',ac:'#E8A317',dk:'#1E1709'},
- {n:'Porțelan & Cer',bg:'#F0F2F3',sf:'#E4E7E9',ink:'#14181C',ac:'#2BA4D6',dk:'#0C1A24'},
- {n:'Fildeș & Măslin',bg:'#F4F1E6',sf:'#EBE6D5',ink:'#1A1A12',ac:'#6E7B2E',dk:'#16170E'},
- {n:'Blush & Cărbune',bg:'#F4ECEC',sf:'#E9DEDE',ink:'#1A1517',ac:'#D14D6A',dk:'#1C1417'},
- {n:'Grâu & Bleumarin',bg:'#F1EBDC',sf:'#E6DCC5',ink:'#14161E',ac:'#1F3A6E',dk:'#0E1424'},
- {n:'Piatră & Șofran',bg:'#EDEAE3',sf:'#E1DDD2',ink:'#1C1A14',ac:'#EE9B2D',dk:'#1A150C'},
- {n:'Nor & Magenta',bg:'#F1F0F2',sf:'#E5E3E8',ink:'#17151B',ac:'#D6336C',dk:'#1E1018'},
- {n:'Prundiș & Pin',bg:'#ECEDE8',sf:'#E0E2DA',ink:'#161A16',ac:'#2F6B3E',dk:'#101A12'},
- {n:'Latte & Mure',bg:'#F0EBE4',sf:'#E5DDD0',ink:'#1C1518',ac:'#9B2D5E',dk:'#1C1016'},
- {n:'Cretă & Mandarin',bg:'#F3F1EC',sf:'#E8E4DA',ink:'#1A1813',ac:'#F26A1B',dk:'#1E1409'},
- {n:'Pâclă & Violet',bg:'#EFEDF2',sf:'#E3E0EA',ink:'#16141C',ac:'#6D4AED',dk:'#150F2A'},
- {n:'In & Stacojiu',bg:'#F2EDDF',sf:'#E8E0CB',ink:'#1E160F',ac:'#C8102E',dk:'#1E0F0C'},
- {n:'Spumă & Ardezie',bg:'#EAF0EC',sf:'#DDE6E0',ink:'#15191A',ac:'#18A66E',dk:'#0F1C1A'},
- {n:'Chit & Regal',bg:'#EDEAE4',sf:'#E1DDD3',ink:'#14151C',ac:'#3949D8',dk:'#0E1128'},
- {n:'Biscuit & Teal',bg:'#F5EEE2',sf:'#ECE0CD',ink:'#1A1812',ac:'#109C8E',dk:'#0E1B19'},
- {n:'Zăpadă & Lămâie',bg:'#F4F4F0',sf:'#E9E9E2',ink:'#121210',ac:'#E4D11A',dk:'#131310'},
- {n:'Cenușă & Coral',bg:'#EDEDEC',sf:'#E2E2E0',ink:'#18181A',ac:'#FF5C5C',dk:'#16161A'},
- {n:'Gri Rece & Mentă',bg:'#EEF0EF',sf:'#E2E5E3',ink:'#14171A',ac:'#34C99B',dk:'#0E1A18'},
- {n:'Argint & Electric',bg:'#F0F1F2',sf:'#E5E6E8',ink:'#131418',ac:'#0066FF',dk:'#0A1024'},
- {n:'Porumbel & Prună',bg:'#ECEBEE',sf:'#E0DFE3',ink:'#16151A',ac:'#8E3BC4',dk:'#170F22'},
- {n:'Cremă Mentă',bg:'#E9F2EC',sf:'#DCE9E1',ink:'#15201A',ac:'#16A36B',dk:'#0E1C16'},
- {n:'Piersică & Espresso',bg:'#F8EDE3',sf:'#F0DECB',ink:'#2A1A12',ac:'#E76F3C',dk:'#241510'},
- {n:'Pudră & Bleumarin',bg:'#E8EEF4',sf:'#DBE5EE',ink:'#131A26',ac:'#2E5FD0',dk:'#0C1426'},
- {n:'Liliac & Vânătă',bg:'#EFEAF2',sf:'#E2DAE9',ink:'#1C1322',ac:'#8A4FD0',dk:'#1A0F26'},
- {n:'Unt & Pădure',bg:'#F5F0DC',sf:'#ECE3C2',ink:'#1B1D12',ac:'#2E7D4F',dk:'#131C14'},
- {n:'Cuarț Roz & Vin',bg:'#F4E9EA',sf:'#EBD8DB',ink:'#221318',ac:'#B23A5C',dk:'#200F15'},
- {n:'Cer Pal & Portocală',bg:'#E8EFF2',sf:'#DBE6EB',ink:'#14191D',ac:'#F2761B',dk:'#0E1822'},
- {n:'Salvie & Cărbune',bg:'#E9EDE5',sf:'#DCE3D6',ink:'#181A15',ac:'#5E8C3E',dk:'#14180F'},
- {n:'Cremă & Roz Aprins',bg:'#F4F0E8',sf:'#EBE3D2',ink:'#1A1614',ac:'#FF2D78',dk:'#1C1014'},
- {n:'Hârtie & Acid',bg:'#F1F1EA',sf:'#E6E6DA',ink:'#15160F',ac:'#C6F035',dk:'#14160C'},
- {n:'Os & Albastru Electric',bg:'#F0EEE8',sf:'#E5E2D8',ink:'#131520',ac:'#1E5BFF',dk:'#0C1230'},
- {n:'Fildeș & Volt',bg:'#F4F1E7',sf:'#EBE5D4',ink:'#1C1710',ac:'#FF5400',dk:'#1E1108'},
- {n:'In & Ultraviolet',bg:'#F0EDF0',sf:'#E4DFE6',ink:'#15121C',ac:'#5B2EE6',dk:'#130C28'},
- {n:'Lut & Salvie',bg:'#ECE5DA',sf:'#E0D6C4',ink:'#211C14',ac:'#7C8B5A',dk:'#1B1810'},
- {n:'Ciupercă & Cărămidă',bg:'#EBE6DF',sf:'#DFD8CC',ink:'#1F1813',ac:'#A8442E',dk:'#1C120E'},
- {n:'Deșert & Teal',bg:'#F0E8D9',sf:'#E6DABF',ink:'#1F1A11',ac:'#1C8E84',dk:'#0F1A18'},
- {n:'Trufă & Auriu',bg:'#E9E4DA',sf:'#DDD5C5',ink:'#1C1810',ac:'#BE8A2A',dk:'#19150C'},
- {n:'Miez de Noapte & Mentă',bg:'#0E1116',sf:'#161A22',ink:'#ECEEF0',ac:'#4FE3C1',dk:'#080A0E',mode:'d'},
- {n:'Cărbune & Chihlimbar',bg:'#15130F',sf:'#1E1B15',ink:'#F1EDE3',ac:'#F0A92E',dk:'#0C0B08',mode:'d'},
- {n:'Cerneală & Coral',bg:'#121316',sf:'#1B1C21',ink:'#EDECEA',ac:'#FF6B5B',dk:'#0B0C0E',mode:'d'},
- {n:'Bleumarin Profund & Cer',bg:'#0C1018',sf:'#141A26',ink:'#E8ECF2',ac:'#4D9BF0',dk:'#070A10',mode:'d'},
- {n:'Espresso & Cremă',bg:'#161210',sf:'#201A16',ink:'#F0E8DE',ac:'#D9B98C',dk:'#0D0A08',mode:'d'},
- {n:'Ardezie & Lime',bg:'#111316',sf:'#1A1D21',ink:'#E9ECEC',ac:'#B6E62E',dk:'#0A0B0D',mode:'d'},
- {n:'Prună Întunecată & Roz',bg:'#161018',sf:'#201824',ink:'#EDE7EE',ac:'#F25C9B',dk:'#0D080F',mode:'d'}
-];
-const TOK=['--bg','--surface','--surface-2','--surface-3','--ink','--ink-soft','--ink-mut','--accent','--accent-ink','--accent-glow','--on-accent','--dark','--dark-2','--dark-ink','--dark-ink-soft','--border','--border-d','--av-1','--av-2','--thumb-1','--thumb-2'];
-let current={bg:'#F3EFE5',sf:'#EAE4D6',ink:'#1B1A17',ac:'#5FE2BE',dk:'#0F1714',mode:''};
-function applyPalette(p){
-  current={bg:p.bg,sf:p.sf,ink:p.ink,ac:p.ac,dk:p.dk,mode:p.mode||''};
-  const s=document.documentElement.style,set=(k,v)=>s.setProperty(k,v);
-  set('--bg',p.bg);set('--surface',p.sf);set('--ink',p.ink);set('--accent',p.ac);set('--dark',p.dk);
-  set('--surface-2',mix(p.bg,p.ink,.05));
-  set('--surface-3',mix(p.bg,p.ac,.12));
-  set('--ink-soft',mix(p.ink,p.bg,.30));
-  set('--ink-mut',mix(p.ink,p.bg,.50));
-  set('--accent-ink',mix(p.ac,p.ink,.42));
-  set('--accent-glow',rgba(p.ac,.34));
-  set('--on-accent',lum(p.ac)>.56?'#15140F':'#FFFFFF');
-  set('--dark-2',mix(p.dk,'#ffffff',.07));
-  set('--dark-ink',mix('#ffffff',p.dk,.05));
-  set('--dark-ink-soft',mix(mix('#ffffff',p.dk,.05),p.dk,.40));
-  set('--border',rgba(p.ink,.14));
-  set('--border-d','rgba(255,255,255,0.12)');
-  set('--av-1',mix(p.ac,p.ink,.30));
-  set('--av-2',p.dk);
-  set('--thumb-1',mix(p.dk,p.ac,.30));
-  set('--thumb-2',mix(p.dk,'#000000',.30));
-}
-const FONTS=[
- {n:'Editorial Cald',d:'Fraunces',b:'Hanken Grotesk',dw:600,di:1,dws:'400;500;600;700'},
- {n:'Clasic Înalt',d:'Playfair Display',b:'DM Sans',dw:600,di:1,dws:'400;500;600;700'},
- {n:'Modern cu Caracter',d:'Bricolage Grotesque',b:'Work Sans',dw:700,di:0,dws:'400;500;600;700'},
- {n:'Jurnal',d:'Newsreader',b:'Public Sans',dw:600,di:1,dws:'400;500;600;700'},
- {n:'Geometric Bold',d:'Syne',b:'Inter',dw:700,di:0,dws:'400;500;600;700'},
- {n:'Tech Curat',d:'Space Grotesk',b:'Space Grotesk',dw:600,di:0,dws:'400;500;600;700'},
- {n:'Minimal Tech',d:'Sora',b:'Sora',dw:600,di:0,dws:'400;500;600;700'},
- {n:'Literar',d:'Spectral',b:'Mulish',dw:600,di:1,dws:'400;500;600;700'},
- {n:'Editorial Soft',d:'Lora',b:'Source Sans 3',dw:600,di:1,dws:'400;500;600;700'},
- {n:'Elegant Display',d:'DM Serif Display',b:'Manrope',dw:400,di:1,dws:'400'},
- {n:'Rafinat',d:'Instrument Serif',b:'Figtree',dw:400,di:1,dws:'400'},
- {n:'Cald de Citit',d:'Crimson Pro',b:'Outfit',dw:600,di:1,dws:'400;500;600;700'},
- {n:'Industrial',d:'Big Shoulders Display',b:'Archivo',dw:700,di:0,dws:'400;500;600;700'},
- {n:'Slab',d:'Zilla Slab',b:'Inter',dw:600,di:1,dws:'400;500;600;700'},
- {n:'Lux',d:'Cormorant',b:'Jost',dw:600,di:1,dws:'400;500;600;700'},
- {n:'Slab Cald',d:'Bitter',b:'Karla',dw:600,di:1,dws:'400;500;600;700'},
- {n:'Sans Variabil',d:'Epilogue',b:'Epilogue',dw:600,di:0,dws:'400;500;600;700'},
- {n:'Nordic',d:'Schibsted Grotesk',b:'Schibsted Grotesk',dw:600,di:0,dws:'400;500;600;700'},
- {n:'Roman',d:'Marcellus',b:'Mulish',dw:400,di:0,dws:'400'},
- {n:'Garamond',d:'EB Garamond',b:'Mukta',dw:600,di:1,dws:'400;500;600;700'},
- {n:'Geometric',d:'Plus Jakarta Sans',b:'Plus Jakarta Sans',dw:700,di:0,dws:'400;500;600;700'},
- {n:'Serif Prietenos',d:'Young Serif',b:'Work Sans',dw:400,di:0,dws:'400'},
- {n:'Display Rotund',d:'Unbounded',b:'DM Sans',dw:600,di:0,dws:'400;500;600;700'},
- {n:'Editorial Pro',d:'Source Serif 4',b:'Source Sans 3',dw:600,di:1,dws:'400;500;600;700'},
- {n:'Serif Afiș',d:'Gloock',b:'Albert Sans',dw:400,di:0,dws:'400'},
- {n:'Carte',d:'Vollkorn',b:'Figtree',dw:600,di:1,dws:'400;500;600;700'},
- {n:'Grotesk Pur',d:'Familjen Grotesk',b:'Familjen Grotesk',dw:600,di:0,dws:'400;500;600;700'},
- {n:'Corporate Clean',d:'Red Hat Display',b:'Red Hat Text',dw:700,di:0,dws:'400;500;600;700'},
- {n:'Display Înalt',d:'Darker Grotesque',b:'Hanken Grotesk',dw:700,di:0,dws:'400;500;600;700'},
- {n:'Modern Round',d:'Outfit',b:'Outfit',dw:600,di:0,dws:'400;500;600;700'}
-];
-function axis(ws,it){const a=ws.split(';');return it?'ital,wght@'+a.map(w=>'0,'+w).join(';')+';'+a.map(w=>'1,'+w).join(';'):'wght@'+a.join(';');}
-function fontURL(f){const e=s=>s.replace(/ /g,'+');
-  if(f.d===f.b)return'https://fonts.googleapis.com/css2?family='+e(f.d)+':'+axis('400;500;600;700',0)+'&display=swap';
-  return'https://fonts.googleapis.com/css2?family='+e(f.d)+':'+axis(f.dws,f.di)+'&family='+e(f.b)+':wght@400;500;600;700&display=swap';}
-function applyFont(f){
-  document.getElementById('dynFont').href=fontURL(f);
-  const s=document.documentElement.style;
-  s.setProperty('--display',`'${f.d}',Georgia,serif`);
-  s.setProperty('--body',`'${f.b}',system-ui,sans-serif`);
-  s.setProperty('--wt-d',f.dw);
-}
-
-/* ===== dev panel ===== */
-const $=id=>document.getElementById(id);
-const panel=$('dvPanel'),toast=$('dvToast');let toastT;
-function showToast(m){toast.textContent=m;toast.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>toast.classList.remove('show'),1900);}
-$('dvFab').addEventListener('click',()=>{panel.classList.add('open');panel.setAttribute('aria-hidden','false');});
-$('dvClose').addEventListener('click',()=>{panel.classList.remove('open');panel.setAttribute('aria-hidden','true');});
-document.querySelectorAll('.dv-tab').forEach(t=>t.addEventListener('click',()=>{
-  document.querySelectorAll('.dv-tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');
-  document.querySelectorAll('.dv-pane').forEach(p=>p.classList.toggle('on',p.dataset.pane===t.dataset.tab));}));
-const palGrid=$('dvPalGrid');
-PAL.forEach((p,i)=>{
-  const c=document.createElement('div');c.className='dv-pc'+(i===11?' on':'');
-  c.innerHTML=`<div class="sw"><i style="background:${p.bg}"></i><i style="background:${p.sf}"></i><i style="background:${p.ink}"></i><i style="background:${p.ac}"></i><i style="background:${p.dk}"></i></div><div class="nm">${p.n}</div>`;
-  c.addEventListener('click',()=>{applyPalette(p);document.querySelectorAll('.dv-pc').forEach((x,j)=>x.classList.toggle('on',j===i));refreshCats();});
-  palGrid.appendChild(c);
-});
-const CATS=[['bg','Fundal'],['sf','Carduri'],['ink','Text'],['ac','Accent'],['dk','Întunecat']];
-let activeCat='ac';
-const catsBox=$('dvCats');
-CATS.forEach(([k,label])=>{
-  const c=document.createElement('button');c.className='dv-cat'+(k==='ac'?' on':'');c.dataset.k=k;
-  c.innerHTML=`<span class="cs" data-cs="${k}"></span>${label}`;
-  c.addEventListener('click',()=>{activeCat=k;document.querySelectorAll('.dv-cat').forEach(x=>x.classList.toggle('on',x.dataset.k===k));loadCatToWheel();});
-  catsBox.appendChild(c);
-});
-function refreshCats(){CATS.forEach(([k])=>{const el=catsBox.querySelector(`[data-cs="${k}"]`);if(el)el.style.background=current[k];});loadCatToWheel();}
-const wheel=$('dvWheel'),thumb=$('dvThumb'),satEl=$('dvSat'),litEl=$('dvLit'),colEl=$('dvColor');
-let curHue=160,curSat=60,curLit=55;
-function placeThumb(){const R=42,rad=curHue*Math.PI/180;
-  thumb.style.left=(50+R*Math.sin(rad))+'%';thumb.style.top=(50-R*Math.cos(rad))+'%';
-  thumb.style.background=hsl2hex(curHue,100,50);}
-function loadCatToWheel(){const[h,s,l]=hex2hsl(current[activeCat]);
-  curHue=h;curSat=Math.round(s);curLit=Math.round(l);
-  satEl.value=curSat;litEl.value=curLit;$('dvSatV').textContent=curSat+'%';$('dvLitV').textContent=curLit+'%';
-  colEl.value=current[activeCat];placeThumb();}
-function commitWheel(){const hex=hsl2hex(curHue,curSat,curLit);current[activeCat]=hex;
-  applyPalette({bg:current.bg,sf:current.sf,ink:current.ink,ac:current.ac,dk:current.dk,mode:current.mode});
-  const cs=catsBox.querySelector(`[data-cs="${activeCat}"]`);if(cs)cs.style.background=hex;colEl.value=hex;}
-function wheelPick(e){const r=wheel.getBoundingClientRect();
-  const dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2);
-  curHue=(Math.atan2(dx,-dy)*180/Math.PI+360)%360;placeThumb();commitWheel();}
-let wheelDrag=false;
-wheel.addEventListener('pointerdown',e=>{wheelDrag=true;wheel.setPointerCapture(e.pointerId);wheelPick(e);});
-wheel.addEventListener('pointermove',e=>{if(wheelDrag)wheelPick(e);});
-wheel.addEventListener('pointerup',()=>wheelDrag=false);
-wheel.addEventListener('pointercancel',()=>wheelDrag=false);
-satEl.addEventListener('input',()=>{curSat=+satEl.value;$('dvSatV').textContent=curSat+'%';commitWheel();});
-litEl.addEventListener('input',()=>{curLit=+litEl.value;$('dvLitV').textContent=curLit+'%';commitWheel();});
-colEl.addEventListener('input',()=>{const[h,s,l]=hex2hsl(colEl.value);
-  curHue=h;curSat=Math.round(s);curLit=Math.round(l);
-  satEl.value=curSat;litEl.value=curLit;$('dvSatV').textContent=curSat+'%';$('dvLitV').textContent=curLit+'%';placeThumb();
-  current[activeCat]=colEl.value;
-  applyPalette({bg:current.bg,sf:current.sf,ink:current.ink,ac:current.ac,dk:current.dk,mode:current.mode});
-  const cs=catsBox.querySelector(`[data-cs="${activeCat}"]`);if(cs)cs.style.background=colEl.value;});
-const fontList=$('dvFontList');
-FONTS.forEach((f,i)=>{
-  const r=document.createElement('div');r.className='dv-fr'+(i===9?' on':'');
-  r.innerHTML=`<div class="frn">${f.n}</div><div class="frf">${f.d} · ${f.b}</div>`;
-  r.addEventListener('click',()=>{applyFont(f);document.querySelectorAll('.dv-fr').forEach((x,j)=>x.classList.toggle('on',j===i));showToast('Font aplicat: '+f.n);});
-  fontList.appendChild(r);
-});
-$('dvReset').addEventListener('click',()=>{
-  applyPalette(PAL[11]);applyFont(FONTS[9]);
-  document.querySelectorAll('.dv-pc').forEach((x,j)=>x.classList.toggle('on',j===11));
-  document.querySelectorAll('.dv-fr').forEach((x,j)=>x.classList.toggle('on',j===9));
-  refreshCats();showToast('Resetat la tema implicită');
-});
-$('dvCopy').addEventListener('click',()=>{
-  const cs=getComputedStyle(document.documentElement);
-  let out=':root{\n';TOK.forEach(t=>out+='  '+t+': '+cs.getPropertyValue(t).trim()+';\n');
-  out+='  --display: '+cs.getPropertyValue('--display').trim()+';\n';
-  out+='  --body: '+cs.getPropertyValue('--body').trim()+';\n';
-  out+='  --wt-d: '+cs.getPropertyValue('--wt-d').trim()+';\n}';
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(out).then(()=>showToast('CSS copiat în clipboard'),()=>showToast('Nu am putut copia'));
-  }else showToast('Clipboard indisponibil');
-});
-applyPalette(PAL[11]);applyFont(FONTS[9]);refreshCats();
-</script>
+<script src="app.js"></script>
 </body>
 </html>
