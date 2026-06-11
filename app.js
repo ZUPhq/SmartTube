@@ -12,19 +12,19 @@
     else document.documentElement.removeAttribute('data-theme');
   };
   applyTheme(getTheme());
-  var themeBtn = document.getElementById('themeBtn');
+  var themeBtns = [].slice.call(document.querySelectorAll('.theme-toggle'));
   var syncThemeLabel = function(t){
-    if(themeBtn) themeBtn.setAttribute('aria-label', t === 'light' ? 'Comută pe temă întunecată' : 'Comută pe temă luminoasă');
+    themeBtns.forEach(function(b){ b.setAttribute('aria-label', t === 'light' ? 'Comută pe temă întunecată' : 'Comută pe temă luminoasă'); });
   };
   syncThemeLabel(getTheme());
-  if(themeBtn){
-    themeBtn.addEventListener('click', function(){
+  themeBtns.forEach(function(b){
+    b.addEventListener('click', function(){
       var t = getTheme() === 'light' ? 'dark' : 'light';
       try{ localStorage.setItem('theme', t); }catch(e){}
       applyTheme(t);
       syncThemeLabel(t);
     });
-  }
+  });
 
   /* ---- nav scroll glass ---- */
   var nav = document.querySelector('.nav');
@@ -163,11 +163,13 @@
         el.style.transform = 'translateY(' + (p*parseFloat(el.dataset.par)).toFixed(1) + 'px)';
       });
       scaleEls.forEach(function(el){
-        if(innerWidth <= 833){ el.style.transform = ''; return; }
+        if(el.id === 'heroVid' && innerWidth > 833){ el.style.transform = ''; return; }  // desktop hero uses its own scrub
         var r = el.getBoundingClientRect();
         var p = (vh - r.top) / (vh*0.9 + r.height);
         p = Math.max(0, Math.min(1, p));
-        el.style.transform = 'scale(' + Math.min(1.1, 0.9 + p*0.2).toFixed(3) + ')';
+        var mob = innerWidth <= 833;
+        var lo = mob ? 0.94 : 0.9, hi = mob ? 1.06 : 1.1;
+        el.style.transform = 'scale(' + (lo + p*(hi-lo)).toFixed(3) + ')';
       });
       ticking = false;
     };
@@ -223,8 +225,9 @@
       document.body.appendChild(heroVid);          // escape the sticky stage's stacking context → true fullscreen
       document.body.style.top = -hLockY + 'px';
       document.body.classList.add('hero-locked');
-      try{                                          // autoplay: try with sound, fall back to muted if blocked
+      try{                                          // fullscreen: play with sound (mute fallback), no loop so it can end
         heroVideo.controls = true;
+        heroVideo.loop = false;
         heroVideo.muted = false;
         var pr = heroVideo.play();
         if(pr && pr.catch) pr.catch(function(){ try{ heroVideo.muted = true; heroVideo.play(); }catch(e){} });
@@ -251,7 +254,7 @@
         heroVid.classList.remove('is-open', 'is-playing', 'is-closing');
         heroVid.style.transform = '';
         heroVid.style.borderRadius = '';
-        try{ heroVideo.controls = false; heroVideo.currentTime = 0; heroVideo.muted = false; heroVideo.load(); }catch(e){}
+        try{ heroVideo.controls = false; heroVideo.loop = true; heroVideo.currentTime = 0; heroVideo.load(); }catch(e){}
         if(heroVidHome) heroVidHome.insertBefore(heroVid, heroVidNext);   // put it back in the hero
       }, 480);
     };
