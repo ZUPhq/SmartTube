@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Cursuri — smarttube</title>
+<title>Dashboard instructor — smarttube</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -63,40 +63,69 @@
   </div>
 </div>
 
-<header class="phead">
+<header class="phead" style="padding-bottom:0">
   <span class="glow"></span>
   <div class="phead-in reveal">
-    <p class="eyebrow">Catalog</p>
-    <h1 class="h1">Toate cursurile</h1>
-    <p class="lead">Alege din peste 1.000 de cursuri, din orice domeniu. Plată unică, acces pe viață.</p>
-  </div>
-  <div class="filterbar reveal">
-    <button class="chip on" data-filter="all">Toate</button>
-    <button class="chip" data-filter="programare">Programare</button>
-    <button class="chip" data-filter="design">Design</button>
-    <button class="chip" data-filter="business">Business</button>
-    <button class="chip" data-filter="video">Foto &amp; Video</button>
-    <button class="chip" data-filter="muzica">Muzică</button>
-    <button class="chip" data-filter="dezvoltare">Dezvoltare</button>
+    <p class="eyebrow">Pentru instructori</p>
+    <h1 class="h1">Dashboard</h1>
+    <p class="lead">Vânzări, accesări și promovare — totul despre cursurile tale, într-un singur loc.</p>
   </div>
 </header>
 
-<section class="section tight">
-  <div class="container wide">
-    <div class="catalog-grid" id="catalogGrid">
-      <p class="empty" style="display:block">Se încarcă cursurile…</p>
+<!-- gate: nelogat sau fără mod instructor -->
+<section class="section tight" id="dashGate" style="display:none">
+  <div class="container">
+    <div class="auth-wrap">
+      <div class="auth-card" id="gateCard" style="text-align:center"></div>
     </div>
-    <p class="empty" id="catalogEmpty">Niciun curs nu corespunde căutării. Încearcă alt termen.</p>
   </div>
 </section>
 
-<section class="cta-band">
-  <span class="glow"></span>
-  <div class="cta-band-in reveal">
-    <p class="eyebrow">Nu găsești ce cauți?</p>
-    <h2 class="h2">Spune-ne ce vrei să înveți.</h2>
-    <p class="lead" style="margin:12px 0 24px">Adăugăm cursuri noi în fiecare săptămână, în funcție de ce cer studenții.</p>
-    <a href="asistenta.html" class="btn btn-mint btn-lg">Trimite o sugestie</a>
+<!-- dashboard -->
+<section class="section tight" id="dashView" style="display:none">
+  <div class="container wide">
+    <div class="hub-head">
+      <h2 class="h3">Privire de ansamblu</h2>
+      <a href="curs-nou.html" class="btn btn-mint">+ Curs nou</a>
+    </div>
+
+    <div class="stat-grid" style="margin-top:18px">
+      <div class="stat-card"><span class="lab">Venituri totale</span><b id="stRevenue">—</b><span class="sub">din toate vânzările</span></div>
+      <div class="stat-card"><span class="lab">Vânzări</span><b id="stSales">—</b><span class="sub">cursuri vândute</span></div>
+      <div class="stat-card"><span class="lab">Accesări</span><b id="stViews">—</b><span class="sub">vizite pe paginile cursurilor</span></div>
+      <div class="stat-card"><span class="lab">Rată de conversie</span><b id="stConv">—</b><span class="sub">din vizite în vânzări</span></div>
+    </div>
+
+    <div class="dash-cols">
+      <div class="card">
+        <h3>Vânzări — ultimele 30 de zile</h3>
+        <div class="bar-chart" id="salesChart"></div>
+        <div class="chart-x"><span id="chartFrom"></span><span id="chartTo"></span></div>
+      </div>
+      <div class="card">
+        <h3>De unde vin clienții</h3>
+        <p style="font-size:13px;margin-top:2px">Sursele vizitelor pe paginile cursurilor tale.</p>
+        <div id="srcBars"></div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="hub-head">
+        <h3>Cursurile tale</h3>
+        <button class="btn btn-ghost" id="genDemo" type="button" style="display:none">Generează date demo</button>
+      </div>
+      <div class="dash-table-wrap" id="dashTableWrap">
+        <table class="dash-table">
+          <thead><tr><th>Curs</th><th>Status</th><th class="num">Preț</th><th class="num">Accesări</th><th class="num">Vânzări</th><th class="num">Venit</th><th></th></tr></thead>
+          <tbody id="dashRows"></tbody>
+        </table>
+      </div>
+      <div class="hub-empty" id="dashEmpty" style="display:none">
+        <p>Nu ai încă niciun curs publicat. Creează primul tău curs cu wizardul — durează câteva minute.</p>
+        <a href="curs-nou.html" class="btn btn-mint">Creează primul curs</a>
+      </div>
+      <p class="side-note" style="margin:14px 0 0" id="promoHint">Sfat: folosește „Link promovare" ca să distribui cursul pe rețelele tale — vizitele venite de acolo apar ca „Link extern".</p>
+    </div>
   </div>
 </section>
 
@@ -133,5 +162,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="db.js"></script>
 <script src="app.js"></script>
+<script src="dashboard.js"></script>
 </body>
 </html>

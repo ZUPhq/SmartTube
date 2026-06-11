@@ -1,0 +1,289 @@
+/* ===== smarttube — wizard.js: publicare curs în 4 pași ===== */
+(function(){
+  'use strict';
+  var view = document.getElementById('wizView');
+  if(!view || typeof window.DB === 'undefined') return;
+
+  var gate = document.getElementById('wizGate');
+  var gateCard = document.getElementById('wizGateCard');
+  var editId = new URLSearchParams(location.search).get('id');
+
+  /* ---- acces: doar instructori ---- */
+  DB.getProfile().then(function(p){
+    if(!p){
+      var back = 'curs-nou.html' + (editId ? '?id=' + editId : '');
+      location.replace('cont.html?redirect=' + encodeURIComponent(back));
+      return;
+    }
+    if(!p.is_instructor){
+      gate.style.display = '';
+      gateCard.innerHTML = '<h3 class="h3" style="margin-bottom:10px">Activează modul instructor</h3>' +
+        '<p style="color:var(--ink-2);font-size:15px;margin-bottom:20px">Ca să publici cursuri, activează mai întâi modul instructor pe contul tău.</p>' +
+        '<button class="btn btn-mint btn-block btn-lg" id="wizActivate" type="button">Devino instructor</button>';
+      var b = document.getElementById('wizActivate');
+      b.addEventListener('click', function(){
+        b.disabled = true; b.textContent = 'Se activează…';
+        DB.becomeInstructor().then(function(){ location.reload(); })
+          .catch(function(){ b.disabled = false; b.textContent = 'Devino instructor'; });
+      });
+      return;
+    }
+    view.style.display = '';
+    init(p);
+  });
+
+  function init(profile){
+    var step = 1;
+    var note = document.getElementById('wNote');
+    var nextBtn = document.getElementById('wNext');
+    var backBtn = document.getElementById('wBack');
+    var draftBtn = document.getElementById('wDraft');
+    var modBox = document.getElementById('wModules');
+    var learnBox = document.getElementById('wLearn');
+
+    var xBtn = '<button type="button" class="wx" aria-label="Șterge">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>';
+    var camIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2.5" y="6" width="13" height="12" rx="2.5"/><path d="M15.5 10.5l6-3.5v10l-6-3.5z" stroke-linejoin="round"/></svg>';
+    var MAX_VIDEO = 50 * 1024 * 1024;          // limita bucketului (plan gratuit)
+    var pendingDeletes = [];                   // videouri de șters din Storage după salvare
+
+    /* ---- curriculum: module + lecții (cu video opțional) ---- */
+    var addLesson = function(modEl, title, dur, videoPath){
+      var row = document.createElement('div');
+      row.className = 'wlesson';
+      row.innerHTML = '<input type="text" class="wl-title" maxlength="90" placeholder="Titlul lecției" />' +
+        '<input type="number" class="wl-dur" min="1" max="600" placeholder="min" title="Durata în minute" />' +
+        '<button type="button" class="wvid" title="Video pentru lecție (mp4/webm/mov, max 50MB)">' + camIcon + '<span>Video</span></button>' +
+        '<button type="button" class="wx wvx" aria-label="Șterge videoul" title="Șterge videoul" style="display:none">' +
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>' +
+        '<input type="file" class="wl-file" accept="video/mp4,video/webm,video/quicktime" hidden />' + xBtn;
+      row._videoPath = videoPath || null;
+      row._videoFile = null;
+      row.querySelector('.wl-title').value = title || '';
+      row.querySelector('.wl-dur').value = dur || '';
+      var vbtn = row.querySelector('.wvid');
+      var vlabel = vbtn.querySelector('span');
+      var vclear = row.querySelector('.wvx');
+      var vfile = row.querySelector('.wl-file');
+      var syncVid = function(){
+        var has = !!(row._videoFile || row._videoPath);
+        vbtn.classList.toggle('on', has);
+        vlabel.textContent = row._videoFile
+          ? row._videoFile.name
+          : (row._videoPath ? 'Video ✓' : 'Video');
+        vclear.style.display = has ? '' : 'none';
+      };
+      vbtn.addEventListener('click', function(){ vfile.click(); });
+      vfile.addEventListener('change', function(){
+        var f = vfile.files[0];
+        if(!f) return;
+        if(['video/mp4','video/webm','video/quicktime'].indexOf(f.type) === -1){
+          err('Format video neacceptat — folosește mp4, webm sau mov.');
+          vfile.value = '';
+          return;
+        }
+        if(f.size > MAX_VIDEO){
+          err('Videoul „' + f.name + '" depășește 50MB. Comprimă-l sau taie-l în lecții mai scurte.');
+          vfile.value = '';
+          return;
+        }
+        note.textContent = '';
+        row._videoFile = f;
+        syncVid();
+      });
+      vclear.addEventListener('click', function(){
+        if(row._videoFile){ row._videoFile = null; vfile.value = ''; }
+        else if(row._videoPath){ pendingDeletes.push(row._videoPath); row._videoPath = null; }
+        syncVid();
+      });
+      row.querySelector('.wx:not(.wvx)').addEventListener('click', function(){
+        if(row._videoPath) pendingDeletes.push(row._videoPath);
+        row.remove();
+      });
+      syncVid();
+      modEl.querySelector('.wlessons').appendChild(row);
+    };
+    var addModule = function(title, lessons){
+      var el = document.createElement('div');
+      el.className = 'wmod';
+      el.innerHTML = '<div class="wmod-head">' +
+        '<input type="text" class="wm-title" maxlength="90" placeholder="Titlul modulului (ex: Introducere)" />' + xBtn +
+        '</div><div class="wlessons"></div>' +
+        '<button type="button" class="wadd wadd-lesson">+ Adaugă lecție</button>';
+      el.querySelector('.wm-title').value = title || '';
+      el.querySelector('.wmod-head .wx').addEventListener('click', function(){
+        [].slice.call(el.querySelectorAll('.wlesson')).forEach(function(r){
+          if(r._videoPath) pendingDeletes.push(r._videoPath);
+        });
+        el.remove();
+      });
+      el.querySelector('.wadd-lesson').addEventListener('click', function(){ addLesson(el); });
+      modBox.appendChild(el);
+      (lessons && lessons.length ? lessons : [{}]).forEach(function(l){
+        addLesson(el, l.title, l.duration_min, l.video_path);
+      });
+      return el;
+    };
+    document.getElementById('wAddModule').addEventListener('click', function(){ addModule(); });
+
+    /* ---- „ce vei învăța" ---- */
+    var addLearn = function(text){
+      var row = document.createElement('div');
+      row.className = 'wlesson';
+      row.innerHTML = '<input type="text" class="wlearn-in" maxlength="120" placeholder="ex: Să configurezi un proiect de la zero" />' + xBtn;
+      row.querySelector('.wlearn-in').value = text || '';
+      row.querySelector('.wx').addEventListener('click', function(){ row.remove(); });
+      learnBox.appendChild(row);
+    };
+    document.getElementById('wAddLearn').addEventListener('click', function(){ addLearn(); });
+
+    /* ---- precompletare (mod editare) sau schelet gol ---- */
+    if(editId){
+      document.getElementById('wHeading').textContent = 'Editează cursul';
+      document.title = 'Editează cursul — smarttube';
+      DB.getCourse(editId).then(function(c){
+        if(!c || c.instructor_id !== profile.id){ location.replace('dashboard.html'); return; }
+        document.getElementById('wTitleIn').value = c.title;
+        document.getElementById('wSubtitle').value = c.subtitle;
+        document.getElementById('wCategory').value = c.category;
+        document.getElementById('wLevel').value = c.level;
+        document.getElementById('wDesc').value = c.description;
+        document.getElementById('wPrice').value = Math.round(c.price);
+        var thumb = document.querySelector('input[name="wThumb"][value="' + c.thumb_style + '"]');
+        if(thumb) thumb.checked = true;
+        (c.what_you_learn || []).forEach(addLearn);
+        if(!(c.what_you_learn || []).length) addLearn();
+        (c.course_modules || []).forEach(function(m){ addModule(m.title, m.lessons || []); });
+        if(!(c.course_modules || []).length) addModule();
+      });
+    }else{
+      addModule();
+      addLearn(); addLearn(); addLearn();
+    }
+
+    /* ---- citire & validare ---- */
+    var readModules = function(){
+      return [].slice.call(modBox.querySelectorAll('.wmod')).map(function(el){
+        return {
+          title:el.querySelector('.wm-title').value.trim(),
+          lessons:[].slice.call(el.querySelectorAll('.wlesson')).map(function(r){
+            return {
+              title:r.querySelector('.wl-title').value.trim(),
+              duration_min:Math.max(1, parseInt(r.querySelector('.wl-dur').value, 10) || 5),
+              video_path:r._videoPath || null,
+              file:r._videoFile || null
+            };
+          }).filter(function(l){ return l.title; })
+        };
+      }).filter(function(m){ return m.title && m.lessons.length; });
+    };
+    var readLearn = function(){
+      return [].slice.call(learnBox.querySelectorAll('.wlearn-in'))
+        .map(function(i){ return i.value.trim(); }).filter(Boolean);
+    };
+    var err = function(msg){ note.style.color = '#e66'; note.textContent = msg; };
+    var validate = function(s){
+      note.textContent = '';
+      if(s === 1 && !document.getElementById('wTitleIn').value.trim()){ err('Dă-i cursului un titlu.'); return false; }
+      if(s === 2 && !readModules().length){ err('Adaugă cel puțin un modul cu o lecție (cu titlu).'); return false; }
+      if(s === 3){
+        if(!document.getElementById('wDesc').value.trim()){ err('Scrie o descriere scurtă a cursului.'); return false; }
+        if(!readLearn().length){ err('Adaugă cel puțin un punct la „Ce vei învăța".'); return false; }
+      }
+      if(s === 4){
+        var pr = parseFloat(document.getElementById('wPrice').value);
+        if(isNaN(pr) || pr < 0){ err('Setează un preț (poate fi și 0 pentru curs gratuit).'); return false; }
+      }
+      return true;
+    };
+
+    /* ---- navigare pași ---- */
+    var show = function(s){
+      step = s;
+      document.querySelectorAll('.wstep').forEach(function(el){
+        var n = parseInt(el.dataset.step, 10);
+        el.classList.toggle('on', n === s);
+        el.classList.toggle('done', n < s);
+      });
+      document.querySelectorAll('.wpane').forEach(function(el){
+        el.classList.toggle('on', parseInt(el.dataset.pane, 10) === s);
+      });
+      backBtn.style.visibility = s === 1 ? 'hidden' : 'visible';
+      draftBtn.style.display = s === 4 ? '' : 'none';
+      nextBtn.textContent = s === 4 ? 'Publică acum' : 'Continuă';
+      note.textContent = '';
+      if(s === 4) recap();
+    };
+    var recap = function(){
+      var mods = readModules();
+      var lessons = 0, mins = 0;
+      mods.forEach(function(m){ m.lessons.forEach(function(l){ lessons++; mins += l.duration_min; }); });
+      var cat = document.getElementById('wCategory');
+      document.getElementById('wRecap').innerHTML =
+        '<div class="hub-line"><span>Curs</span><b>' + DB.esc(document.getElementById('wTitleIn').value.trim()) + '</b></div>' +
+        '<div class="hub-line"><span>Categorie</span><b>' + DB.esc(cat.options[cat.selectedIndex].text) + '</b></div>' +
+        '<div class="hub-line"><span>Curriculum</span><b>' + mods.length + ' module · ' + lessons + ' lecții · ' + DB.fmtDur(mins) + '</b></div>' +
+        '<div class="hub-line"><span>Instructor</span><b>' + DB.esc(profile.name) + '</b></div>';
+    };
+    backBtn.addEventListener('click', function(){ if(step > 1) show(step - 1); });
+    nextBtn.addEventListener('click', function(){
+      if(!validate(step)) return;
+      if(step < 4){ show(step + 1); return; }
+      save('published');
+    });
+    draftBtn.addEventListener('click', function(){
+      if(!validate(4)) return;
+      save('draft');
+    });
+
+    /* ---- salvare ---- */
+    var save = function(status){
+      var mods = readModules();
+      var mins = 0;
+      mods.forEach(function(m){ m.lessons.forEach(function(l){ mins += l.duration_min; }); });
+      var fields = {
+        title:document.getElementById('wTitleIn').value.trim(),
+        subtitle:document.getElementById('wSubtitle').value.trim(),
+        description:document.getElementById('wDesc').value.trim(),
+        category:document.getElementById('wCategory').value,
+        level:document.getElementById('wLevel').value,
+        what_you_learn:readLearn(),
+        thumb_style:document.querySelector('input[name="wThumb"]:checked').value,
+        price:Math.max(0, parseFloat(document.getElementById('wPrice').value) || 0),
+        total_minutes:mins,
+        status:status
+      };
+      nextBtn.disabled = true; draftBtn.disabled = true;
+      note.style.color = 'var(--ink-2)';
+      note.textContent = status === 'published' ? 'Se publică…' : 'Se salvează…';
+      DB.saveCourse(editId, fields).then(function(course){
+        /* upload videouri noi, pe rând (au nevoie de id-ul cursului) */
+        var ups = [];
+        mods.forEach(function(m){
+          m.lessons.forEach(function(l){ if(l.file) ups.push(l); });
+        });
+        var uploadNext = function(i){
+          if(i >= ups.length) return Promise.resolve();
+          note.textContent = 'Se încarcă videourile… ' + (i + 1) + ' din ' + ups.length;
+          var l = ups[i];
+          return DB.uploadLessonVideo(course.id, l.file).then(function(path){
+            if(l.video_path) pendingDeletes.push(l.video_path);   // video înlocuit
+            l.video_path = path;
+            l.file = null;
+            return uploadNext(i + 1);
+          });
+        };
+        return uploadNext(0).then(function(){
+          note.textContent = 'Se salvează curriculum-ul…';
+          return DB.saveCurriculum(course.id, mods);
+        });
+      }).then(function(){
+        pendingDeletes.forEach(function(p){ DB.removeVideo(p); });
+        location.href = 'dashboard.html';
+      }).catch(function(e){
+        nextBtn.disabled = false; draftBtn.disabled = false;
+        err('Nu am putut salva cursul. Reîncearcă.' + (e && e.message ? ' (' + e.message + ')' : ''));
+      });
+    };
+  }
+})();

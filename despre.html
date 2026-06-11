@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Cursuri — smarttube</title>
+<title>Despre noi — smarttube</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -66,37 +66,96 @@
 <header class="phead">
   <span class="glow"></span>
   <div class="phead-in reveal">
-    <p class="eyebrow">Catalog</p>
-    <h1 class="h1">Toate cursurile</h1>
-    <p class="lead">Alege din peste 1.000 de cursuri, din orice domeniu. Plată unică, acces pe viață.</p>
-  </div>
-  <div class="filterbar reveal">
-    <button class="chip on" data-filter="all">Toate</button>
-    <button class="chip" data-filter="programare">Programare</button>
-    <button class="chip" data-filter="design">Design</button>
-    <button class="chip" data-filter="business">Business</button>
-    <button class="chip" data-filter="video">Foto &amp; Video</button>
-    <button class="chip" data-filter="muzica">Muzică</button>
-    <button class="chip" data-filter="dezvoltare">Dezvoltare</button>
+    <p class="eyebrow">Despre noi</p>
+    <h1 class="h1">Oricine poate învăța de la oameni care chiar se pricep.</h1>
+    <p class="lead">smarttube e un marketplace românesc de cursuri online: practicieni care predau ce fac zilnic, studenți care plătesc o singură dată și păstrează cursul pe viață.</p>
   </div>
 </header>
 
+<!-- povestea -->
 <section class="section tight">
-  <div class="container wide">
-    <div class="catalog-grid" id="catalogGrid">
-      <p class="empty" style="display:block">Se încarcă cursurile…</p>
+  <div class="container">
+    <div class="grid-2 about-story">
+      <div class="reveal">
+        <p class="eyebrow">Povestea</p>
+        <h2 class="h2" style="margin-top:8px">De ce există smarttube</h2>
+        <p class="lead" style="margin-top:14px">Am pornit de la o frustrare simplă: internetul e plin de tutoriale, dar aproape nimic nu te duce de la zero la un rezultat real — un proiect livrat, o piesă terminată, un client plătitor.</p>
+        <p class="lead" style="margin-top:12px">Așa că am construit un loc în care doar practicienii predau, fiecare curs se termină cu un proiect concret, iar accesul nu expiră niciodată. Fără abonamente, fără conținut umplutură.</p>
+      </div>
+      <div class="reveal">
+        <div class="card" style="height:100%">
+          <h3>smarttube în cifre</h3>
+          <div class="inst-stats" style="margin-top:18px;border-top:1px solid var(--line)">
+            <div><b id="statCourses">—</b><span>cursuri publicate</span></div>
+            <div><b>6</b><span>domenii</span></div>
+            <div><b>14 zile</b><span>garanție</span></div>
+          </div>
+          <div class="inst-stats">
+            <div><b>1×</b><span>plată unică</span></div>
+            <div><b>∞</b><span>acces pe viață</span></div>
+            <div><b>100%</b><span>practicieni</span></div>
+          </div>
+        </div>
+      </div>
     </div>
-    <p class="empty" id="catalogEmpty">Niciun curs nu corespunde căutării. Încearcă alt termen.</p>
   </div>
 </section>
 
-<section class="cta-band">
-  <span class="glow"></span>
-  <div class="cta-band-in reveal">
-    <p class="eyebrow">Nu găsești ce cauți?</p>
-    <h2 class="h2">Spune-ne ce vrei să înveți.</h2>
-    <p class="lead" style="margin:12px 0 24px">Adăugăm cursuri noi în fiecare săptămână, în funcție de ce cer studenții.</p>
-    <a href="asistenta.html" class="btn btn-mint btn-lg">Trimite o sugestie</a>
+<!-- valori -->
+<section class="section tight" style="background:var(--bg-2)">
+  <div class="container wide">
+    <div class="center reveal" style="margin-bottom:30px">
+      <p class="eyebrow">Valorile noastre</p>
+      <h2 class="h2">În ce credem</h2>
+    </div>
+    <div class="grid-3">
+      <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14.5 3.5l6 6L9 21H3v-6z" stroke-linejoin="round"/><path d="M12 6l6 6"/></svg></div>
+        <h3>Practic înainte de teorie</h3><p>Fiecare curs se termină cu un proiect real. Înveți făcând, nu doar privind.</p></div>
+      <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2" stroke-linecap="round"/></svg></div>
+        <h3>Al tău pentru totdeauna</h3><p>Plătești o dată, păstrezi pe viață. Fără abonamente care te grăbesc din spate.</p></div>
+      <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 3-6 6.5-6s6.5 2.4 6.5 6" stroke-linecap="round"/><path d="M17 4.5a3.5 3.5 0 0 1 0 7M21.5 20c0-3-2-5.3-4.5-5.8" stroke-linecap="round"/></svg></div>
+        <h3>Oameni care fac</h3><p>Instructorii noștri lucrează zilnic în domeniile pe care le predau. Zero teorie de catedră.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- echipa -->
+<section class="section tight">
+  <div class="container wide">
+    <div class="center reveal" style="margin-bottom:30px">
+      <p class="eyebrow">Echipa</p>
+      <h2 class="h2">Cine construiește smarttube</h2>
+      <p class="lead" style="margin-top:10px">O echipă mică din România, obsedată de cursuri care chiar te duc undeva.</p>
+    </div>
+    <div class="grid-3">
+      <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M10.5 9.2l4 2.8-4 2.8z" fill="currentColor" stroke="none"/></svg></div>
+        <h3>Produs &amp; platformă</h3><p>Construim experiența de învățare: player, certificate, plăți și tot ce e între ele.</p></div>
+      <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z" stroke-linejoin="round"/></svg></div>
+        <h3>Cursuri &amp; instructori</h3><p>Verificăm fiecare curs înainte de publicare și ajutăm instructorii să predea mai bine.</p></div>
+      <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 11.5a7.5 7.5 0 0 1-10.9 6.7L4 20l1.8-5.1A7.5 7.5 0 1 1 21 11.5z" stroke-linejoin="round"/></svg></div>
+        <h3>Suport studenți</h3><p>Răspundem în maxim o zi lucrătoare și ne ocupăm de rambursări fără discuții.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- contact -->
+<section class="section tight" id="contact" style="background:var(--bg-2)">
+  <div class="container">
+    <div class="auth-wrap reveal" style="max-width:520px">
+      <div class="center" style="margin-bottom:24px">
+        <p class="eyebrow">Contact</p>
+        <h2 class="h2">Scrie-ne.</h2>
+        <p class="lead" style="margin-top:10px">Întrebări, idei, parteneriate — îți răspundem în maxim o zi lucrătoare.</p>
+      </div>
+      <form class="auth-card" id="contactForm">
+        <div class="field"><label>Nume</label><input type="text" name="name" placeholder="Numele tău" required /></div>
+        <div class="field"><label>Email</label><input type="email" name="email" placeholder="email@exemplu.ro" required /></div>
+        <div class="field"><label>Mesaj</label><textarea name="message" maxlength="2000" placeholder="Cu ce te putem ajuta?" required></textarea></div>
+        <button type="submit" class="btn btn-mint btn-block btn-lg">Trimite mesajul</button>
+        <p class="form-note auth-alt"></p>
+      </form>
+      <p class="auth-alt" style="margin-top:18px">Cauți răspunsuri rapide? <a href="asistenta.html#faq" class="link" style="font-size:13px">Vezi întrebările frecvente</a></p>
+    </div>
   </div>
 </section>
 
@@ -133,5 +192,11 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="db.js"></script>
 <script src="app.js"></script>
+<script>
+  /* cifră live: numărul de cursuri publicate */
+  if(window.DB) DB.publishedCourses().then(function(cs){
+    document.getElementById('statCourses').textContent = cs.length;
+  }).catch(function(){});
+</script>
 </body>
 </html>

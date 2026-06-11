@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Editare video în Premiere Pro — smarttube</title>
+<title>Curs — smarttube</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -46,9 +46,9 @@
     </a>
     <a class="mm-item" href="asistenta.html">
       <span class="mm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a7.5 7.5 0 0 1-10.9 6.7L4 20l1.8-5.1A7.5 7.5 0 1 1 21 11.5z"/></svg></span>
-      <span class="mm-label">Contact / Asistență</span>
+      <span class="mm-label">Asistență</span>
     </a>
-    <a class="mm-item" href="asistenta.html">
+    <a class="mm-item" href="despre.html">
       <span class="mm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.6h.01"/></svg></span>
       <span class="mm-label">Despre noi</span>
     </a>
@@ -63,16 +63,15 @@
   </div>
 </div>
 
-<section class="section tight" style="padding-top:clamp(54px,8vw,86px)">
+<section class="section tight" id="coursePage" style="padding-top:clamp(54px,8vw,86px)">
   <div class="container wide">
-    <p class="eyebrow reveal"><a href="cursuri.html#video" style="color:inherit">Foto &amp; Video</a> · Începător</p>
-    <h1 class="h1 reveal" style="max-width:780px;margin-top:8px">Editare video în Premiere Pro</h1>
-    <p class="lead reveal" style="max-width:640px;margin-top:14px">Învață montajul video de la zero — de la primul cut la un proiect cinematic gata de livrat către clienți.</p>
+    <p class="eyebrow reveal"><a href="cursuri.html" style="color:inherit" id="cCatLink"></a> · <span id="cLevel"></span></p>
+    <h1 class="h1 reveal" style="max-width:780px;margin-top:8px" id="cTitle">Se încarcă…</h1>
+    <p class="lead reveal" style="max-width:640px;margin-top:14px" id="cLead"></p>
     <div class="reveal" style="display:flex;gap:22px;flex-wrap:wrap;align-items:center;margin-top:20px;font-size:14px;color:var(--ink-2)">
-      <span style="display:flex;align-items:center;gap:8px"><span class="av" style="width:30px;height:30px;font-size:11px">VM</span>Vlad Marin</span>
-      <span style="color:var(--mint);font-weight:600">★★★★★ 4,9 <span style="color:var(--ink-2);font-weight:400">(180 recenzii)</span></span>
-      <span>1.240 studenți înscriși</span>
-      <span>Actualizat mai 2026</span>
+      <span style="display:flex;align-items:center;gap:8px"><span class="av" style="width:30px;height:30px;font-size:11px" id="cInstAv"></span><span id="cInstName"></span></span>
+      <span style="color:var(--mint);font-weight:600" id="cRate"></span>
+      <span id="cUpdated"></span>
     </div>
 
     <div class="course-layout" style="margin-top:38px">
@@ -87,85 +86,35 @@
 
         <!-- what you learn -->
         <h2 class="h3 reveal" style="margin:42px 0 18px">Ce vei învăța</h2>
-        <ul class="learn-grid reveal">
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Să configurezi un proiect și un flux de lucru profesional</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Tehnici de montaj: ritm, tăieturi, tranziții</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Color grading pentru un look cinematic</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Sunet curat: mixaj, muzică și efecte</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Export optimizat pentru YouTube și clienți</li>
-          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Cum livrezi un proiect plătit, cap-coadă</li>
-        </ul>
+        <ul class="learn-grid reveal" id="cLearn"></ul>
 
         <!-- curriculum -->
         <h2 class="h3 reveal" style="margin:42px 0 18px">Conținutul cursului</h2>
-        <div class="reveal">
-          <div class="module open">
-            <button class="mod-head"><span>1 · Bazele Premiere Pro <span class="meta">— 6 lecții · 58 min</span></span>
-              <span class="mod-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></button>
-            <div class="mod-body"><div>
-              <div class="lesson"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Interfața și panourile<span class="dur">07:12</span></div>
-              <div class="lesson"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Importul și organizarea fișierelor<span class="dur">09:40</span></div>
-              <div class="lesson"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Primul tău timeline<span class="dur">11:05</span></div>
-            </div></div>
-          </div>
-          <div class="module">
-            <button class="mod-head"><span>2 · Montaj și ritm <span class="meta">— 8 lecții · 1h 24min</span></span>
-              <span class="mod-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></button>
-            <div class="mod-body"><div>
-              <div class="lesson"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Tipuri de tăieturi<span class="dur">10:22</span></div>
-              <div class="lesson"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Ritmul pe muzică<span class="dur">13:50</span></div>
-            </div></div>
-          </div>
-          <div class="module">
-            <button class="mod-head"><span>3 · Color grading <span class="meta">— 5 lecții · 1h 02min</span></span>
-              <span class="mod-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></button>
-            <div class="mod-body"><div>
-              <div class="lesson"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Corecție de bază<span class="dur">12:18</span></div>
-              <div class="lesson"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Look cinematic cu LUT-uri<span class="dur">15:30</span></div>
-            </div></div>
-          </div>
-          <div class="module">
-            <button class="mod-head"><span>4 · Proiect final <span class="meta">— 4 lecții · 1h 16min</span></span>
-              <span class="mod-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></button>
-            <div class="mod-body"><div>
-              <div class="lesson"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Brief și organizare<span class="dur">14:00</span></div>
-              <div class="lesson"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Export și livrare<span class="dur">18:25</span></div>
-            </div></div>
-          </div>
-        </div>
+        <div class="reveal" id="cCurriculum"></div>
 
         <!-- instructor -->
         <h2 class="h3 reveal" style="margin:42px 0 18px">Instructorul tău</h2>
-        <div class="inst-card reveal">
-          <div class="inst-top">
-            <span class="av">VM</span>
-            <div><h3>Vlad Marin</h3><div class="role">Editor video &amp; colorist</div></div>
-          </div>
-          <p>8 ani de montaj pentru branduri și agenții. A livrat sute de proiecte video și predă editarea ca pe o meserie reală, nu ca pe un hobby. Pe smarttube are 3 cursuri și peste 640 de studenți.</p>
-          <div class="inst-stats">
-            <div><b>3</b><span>cursuri</span></div>
-            <div><b>640</b><span>studenți</span></div>
-            <div><b>4,9</b><span>rating mediu</span></div>
-          </div>
-        </div>
+        <div class="inst-card reveal" id="cInstCard"></div>
 
         <!-- reviews -->
-        <h2 class="h3 reveal" style="margin:42px 0 18px">Ce spun studenții</h2>
-        <div class="grid-3 reveal">
-          <div class="review">
-            <div class="stars">★★★★★</div>
-            <p>„Am editat primul meu proiect plătit la două săptămâni după curs. Totul explicat clar, pas cu pas."</p>
-            <div class="who"><span class="av">DI</span><div><b>Diana Ilie</b><span>Absolventă</span></div></div>
-          </div>
-          <div class="review">
-            <div class="stars">★★★★★</div>
-            <p>„Diferența dintre tutorialele random și acest curs e structura. În sfârșit înțeleg de ce fac fiecare tăietură."</p>
-            <div class="who"><span class="av">RS</span><div><b>Radu Sandu</b><span>Absolvent</span></div></div>
-          </div>
-          <div class="review">
-            <div class="stars">★★★★★</div>
-            <p>„Partea de color grading merită singură toți banii. Acum îmi fac singur look-ul cinematic."</p>
-            <div class="who"><span class="av">MC</span><div><b>Mara Crișan</b><span>Absolventă</span></div></div>
+        <div id="cReviewsWrap">
+          <h2 class="h3 reveal" style="margin:42px 0 18px">Ce spun studenții</h2>
+          <div class="grid-3 reveal">
+            <div class="review">
+              <div class="stars">★★★★★</div>
+              <p>„Exact ce căutam: structură clară, pas cu pas, fără bla-bla. Am aplicat din prima săptămână."</p>
+              <div class="who"><span class="av">DI</span><div><b>Diana Ilie</b><span>Absolventă</span></div></div>
+            </div>
+            <div class="review">
+              <div class="stars">★★★★★</div>
+              <p>„Diferența dintre tutorialele random și acest curs e structura. În sfârșit înțeleg de ce fac fiecare pas."</p>
+              <div class="who"><span class="av">RS</span><div><b>Radu Sandu</b><span>Absolvent</span></div></div>
+            </div>
+            <div class="review">
+              <div class="stars">★★★★★</div>
+              <p>„Proiectul final merită singur toți banii. Am terminat cursul cu ceva concret în portofoliu."</p>
+              <div class="who"><span class="av">MC</span><div><b>Mara Crișan</b><span>Absolventă</span></div></div>
+            </div>
           </div>
         </div>
       </div>
@@ -177,12 +126,11 @@
             <span class="sc-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
           </div>
           <div class="side-pad">
-            <div class="side-price"><span class="now">149 lei</span><span class="was">199 lei</span></div>
+            <div class="side-price"><span class="now" id="cPrice"></span></div>
             <p class="side-note">Plată unică · Acces pe viață · Garanție 14 zile</p>
-            <a href="cont.html" class="btn btn-mint btn-block btn-lg">Înscrie-te la curs</a>
-            <a href="cont.html" class="btn btn-ghost btn-block" style="margin-top:10px">Adaugă în coș</a>
+            <a href="#" class="btn btn-mint btn-block btn-lg" id="cBuy">Înscrie-te la curs</a>
             <ul class="side-list">
-              <li><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>23 de lecții video · 4h 40min</li>
+              <li><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span id="cLessonsMeta"></span></li>
               <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z" stroke-linejoin="round"/></svg>Certificat de absolvire</li>
               <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><rect x="3" y="5" width="18" height="14" rx="2"/></svg>Acces pe desktop și mobil</li>
               <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 8v8M8 12h8" stroke-linecap="round"/><circle cx="12" cy="12" r="9"/></svg>Proiecte și fișiere descărcabile</li>
@@ -193,6 +141,37 @@
     </div>
   </div>
 </section>
+
+<!-- modal cumpărare (plată simulată) -->
+<div class="modal" id="buyModal">
+  <div class="modal-card">
+    <button class="modal-x" id="bmX" type="button" aria-label="Închide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <div id="bmBody">
+      <p class="eyebrow">Finalizează comanda</p>
+      <h3 class="h3" id="bmTitle" style="margin:8px 0 4px"></h3>
+      <p class="modal-sub">Plată unică · Acces pe viață · Garanție 14 zile</p>
+      <div class="modal-total"><span>Total de plată</span><b id="bmPrice"></b></div>
+      <p class="modal-demo">Demo: plata este simulată — nu se percepe niciun ban și nu e nevoie de card.</p>
+      <button class="btn btn-mint btn-block btn-lg" id="bmConfirm" type="button">Confirmă plata</button>
+      <p class="form-note auth-alt" id="bmNote"></p>
+    </div>
+    <div id="bmDone" style="display:none;text-align:center">
+      <div class="modal-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div>
+      <h3 class="h3" style="margin:14px 0 6px">Cursul e al tău!</h3>
+      <p class="modal-sub">Îl găsești oricând în contul tău, la „Cursurile mele".</p>
+      <a href="cont.html" class="btn btn-mint btn-block btn-lg" style="margin-top:18px">Vezi cursurile mele</a>
+    </div>
+  </div>
+</div>
+
+<!-- player video lecție -->
+<div class="modal" id="vidModal">
+  <div class="modal-card vid">
+    <button class="modal-x" id="vmX" type="button" aria-label="Închide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <h3 class="vm-title" id="vmTitle"></h3>
+    <video id="vidPlayer" controls playsinline preload="auto"></video>
+  </div>
+</div>
 
 <footer class="footer">
   <div class="footer-in">
@@ -205,14 +184,14 @@
         <a href="cursuri.html">Toate cursurile</a><a href="cursuri.html#programare">Programare</a>
         <a href="cursuri.html#design">Design</a><a href="cursuri.html#business">Business</a></div>
       <div class="footer-col"><h4>Pentru studenți</h4>
-        <a href="asistenta.html">Cum funcționează</a><a href="asistenta.html">Certificate</a>
-        <a href="asistenta.html">Garanție 14 zile</a><a href="asistenta.html">Întrebări frecvente</a></div>
+        <a href="asistenta.html#faq">Cum funcționează</a><a href="asistenta.html#faq">Certificate</a>
+        <a href="asistenta.html#faq">Garanție 14 zile</a><a href="asistenta.html#faq">Întrebări frecvente</a></div>
       <div class="footer-col"><h4>Pentru instructori</h4>
         <a href="instructori.html#preda">Devino instructor</a><a href="instructori.html">Instructorii noștri</a>
-        <a href="asistenta.html">Resurse</a><a href="asistenta.html">Plăți</a></div>
+        <a href="curs-nou.html">Publică un curs</a><a href="dashboard.html">Dashboard instructor</a></div>
       <div class="footer-col"><h4>smarttube</h4>
-        <a href="asistenta.html">Despre noi</a><a href="asistenta.html">Contact</a>
-        <a href="asistenta.html">Blog</a><a href="cont.html">Contul meu</a></div>
+        <a href="despre.html">Despre noi</a><a href="despre.html#contact">Contact</a>
+        <a href="cont.html">Contul meu</a></div>
       <div class="footer-col"><h4>Asistență</h4>
         <a href="asistenta.html">Centru de ajutor</a><a href="cont.html">Autentificare</a>
         <a href="asistenta.html">Termeni</a><a href="asistenta.html">Confidențialitate</a></div>
@@ -224,6 +203,8 @@
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="db.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

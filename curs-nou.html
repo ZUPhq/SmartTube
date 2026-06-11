@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Cursuri — smarttube</title>
+<title>Publică un curs — smarttube</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -63,40 +63,99 @@
   </div>
 </div>
 
-<header class="phead">
+<header class="phead" style="padding-bottom:0">
   <span class="glow"></span>
   <div class="phead-in reveal">
-    <p class="eyebrow">Catalog</p>
-    <h1 class="h1">Toate cursurile</h1>
-    <p class="lead">Alege din peste 1.000 de cursuri, din orice domeniu. Plată unică, acces pe viață.</p>
-  </div>
-  <div class="filterbar reveal">
-    <button class="chip on" data-filter="all">Toate</button>
-    <button class="chip" data-filter="programare">Programare</button>
-    <button class="chip" data-filter="design">Design</button>
-    <button class="chip" data-filter="business">Business</button>
-    <button class="chip" data-filter="video">Foto &amp; Video</button>
-    <button class="chip" data-filter="muzica">Muzică</button>
-    <button class="chip" data-filter="dezvoltare">Dezvoltare</button>
+    <p class="eyebrow">Pentru instructori</p>
+    <h1 class="h1" id="wHeading">Publică un curs</h1>
+    <p class="lead">Patru pași simpli — de la idee la cursul listat în catalog.</p>
   </div>
 </header>
 
-<section class="section tight">
-  <div class="container wide">
-    <div class="catalog-grid" id="catalogGrid">
-      <p class="empty" style="display:block">Se încarcă cursurile…</p>
+<!-- gate -->
+<section class="section tight" id="wizGate" style="display:none">
+  <div class="container">
+    <div class="auth-wrap">
+      <div class="auth-card" id="wizGateCard" style="text-align:center"></div>
     </div>
-    <p class="empty" id="catalogEmpty">Niciun curs nu corespunde căutării. Încearcă alt termen.</p>
   </div>
 </section>
 
-<section class="cta-band">
-  <span class="glow"></span>
-  <div class="cta-band-in reveal">
-    <p class="eyebrow">Nu găsești ce cauți?</p>
-    <h2 class="h2">Spune-ne ce vrei să înveți.</h2>
-    <p class="lead" style="margin:12px 0 24px">Adăugăm cursuri noi în fiecare săptămână, în funcție de ce cer studenții.</p>
-    <a href="asistenta.html" class="btn btn-mint btn-lg">Trimite o sugestie</a>
+<!-- wizard -->
+<section class="section tight" id="wizView" style="display:none">
+  <div class="container" style="max-width:780px">
+    <div class="wsteps">
+      <div class="wstep on" data-step="1"><b>1</b>Informații</div>
+      <div class="wstep" data-step="2"><b>2</b>Curriculum</div>
+      <div class="wstep" data-step="3"><b>3</b>Pagina cursului</div>
+      <div class="wstep" data-step="4"><b>4</b>Preț &amp; publicare</div>
+    </div>
+
+    <div class="auth-card wizard-card">
+      <!-- pas 1: informații de bază -->
+      <div class="wpane on" data-pane="1">
+        <div class="field"><label>Titlul cursului</label><input id="wTitleIn" type="text" maxlength="80" placeholder="ex: Editare video în Premiere Pro" /></div>
+        <div class="field"><label>Subtitlu</label><input id="wSubtitle" type="text" maxlength="160" placeholder="O frază: ce va ști studentul la finalul cursului" /></div>
+        <div class="wgrid-2">
+          <div class="field"><label>Categorie</label>
+            <select id="wCategory">
+              <option value="programare">Programare &amp; IT</option>
+              <option value="design">Design &amp; UX</option>
+              <option value="business">Business &amp; Marketing</option>
+              <option value="video">Foto &amp; Video</option>
+              <option value="muzica">Muzică &amp; Producție</option>
+              <option value="dezvoltare">Dezvoltare personală</option>
+            </select>
+          </div>
+          <div class="field"><label>Nivel</label>
+            <select id="wLevel">
+              <option>Începător</option>
+              <option>Intermediar</option>
+              <option>Avansat</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- pas 2: curriculum -->
+      <div class="wpane" data-pane="2">
+        <p class="whint">Structurează cursul în module, iar fiecare modul în lecții. Minim un modul cu o lecție. La fiecare lecție poți încărca un video (mp4, webm sau mov, max 50MB) — studenții care cumpără cursul îl pot reda din pagina cursului.</p>
+        <div id="wModules"></div>
+        <button type="button" class="wadd" id="wAddModule">+ Adaugă modul</button>
+      </div>
+
+      <!-- pas 3: pagina cursului -->
+      <div class="wpane" data-pane="3">
+        <div class="field"><label>Descriere</label><textarea id="wDesc" maxlength="600" placeholder="Despre ce e cursul, pentru cine e și ce rezultat promiți."></textarea></div>
+        <div class="field"><label>Ce vei învăța</label>
+          <div id="wLearn"></div>
+          <button type="button" class="wadd" id="wAddLearn">+ Adaugă punct</button>
+        </div>
+        <div class="field"><label>Stil de copertă</label>
+          <div class="thumb-pick">
+            <label><input type="radio" name="wThumb" value="g1" checked /><span class="tp g1"></span></label>
+            <label><input type="radio" name="wThumb" value="g2" /><span class="tp g2"></span></label>
+            <label><input type="radio" name="wThumb" value="g3" /><span class="tp g3"></span></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- pas 4: preț & publicare -->
+      <div class="wpane" data-pane="4">
+        <div class="field" style="max-width:220px"><label>Preț (lei)</label><input id="wPrice" type="number" min="0" max="9999" step="1" placeholder="ex: 149" /></div>
+        <div class="recap" id="wRecap"></div>
+        <p class="whint">Cursul publicat apare imediat în catalog și în căutare. Poți să-l retragi oricând din dashboard.</p>
+      </div>
+
+      <p class="form-note auth-alt" id="wNote"></p>
+      <div class="wnav">
+        <button class="btn btn-ghost" id="wBack" type="button" style="visibility:hidden">Înapoi</button>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-ghost" id="wDraft" type="button" style="display:none">Salvează ca draft</button>
+          <button class="btn btn-mint" id="wNext" type="button">Continuă</button>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -133,5 +192,6 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="db.js"></script>
 <script src="app.js"></script>
+<script src="wizard.js"></script>
 </body>
 </html>
