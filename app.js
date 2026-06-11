@@ -11,20 +11,31 @@
     updateNav();
   }
 
-  /* ---- mobile nav ---- */
+  /* ---- nav menu (dropdown on desktop, full-screen on mobile) ---- */
   var burger = document.getElementById('burger');
   var mmenu = document.getElementById('mmenu');
   if(burger && mmenu){
     var setMenu = function(open){
       mmenu.classList.toggle('open', open);
       burger.classList.toggle('on', open);
-      document.body.style.overflow = open ? 'hidden' : '';
+      document.body.style.overflow = (open && innerWidth <= 833) ? 'hidden' : '';
     };
-    burger.addEventListener('click', function(){ setMenu(!mmenu.classList.contains('open')); });
+    burger.addEventListener('click', function(e){
+      e.stopPropagation();
+      setMenu(!mmenu.classList.contains('open'));
+    });
     mmenu.querySelectorAll('a').forEach(function(a){
       a.addEventListener('click', function(){ setMenu(false); });
     });
-    addEventListener('resize', function(){ if(innerWidth>833) setMenu(false); });
+    document.addEventListener('click', function(e){
+      if(mmenu.classList.contains('open') && !mmenu.contains(e.target) && !burger.contains(e.target)){
+        setMenu(false);
+      }
+    });
+    addEventListener('keydown', function(e){ if(e.key === 'Escape') setMenu(false); });
+    addEventListener('resize', function(){
+      document.body.style.overflow = (mmenu.classList.contains('open') && innerWidth <= 833) ? 'hidden' : '';
+    });
   }
 
   /* ---- scroll reveal ---- */
@@ -65,30 +76,66 @@
     frame();
   }
 
-  /* ---- courses carousel ---- */
-  var track = document.getElementById('carTrack');
-  if(track){
-    document.querySelectorAll('[data-car]').forEach(function(b){
-      b.addEventListener('click', function(){
-        var card = track.querySelector('.ccard');
-        var step = card ? card.offsetWidth + 20 : 320;
-        track.scrollBy({left: step*parseInt(b.dataset.car,10), behavior:'smooth'});
-      });
+  /* ---- courses carousel: auto-scroll + manual drag, infinite both ways ---- */
+  var carTrack = document.getElementById('carTrack');
+  var carView = carTrack && carTrack.parentElement;
+  if(carTrack && carView){
+    var carOriginals = [].slice.call(carTrack.children);
+    var carSetW = carTrack.scrollWidth;            // width of one original set
+    var carFill = function(){
+      if(carSetW <= 0){ carSetW = carTrack.scrollWidth; return; }
+      var need = carView.clientWidth + carSetW * 2, guard = 0;
+      while(carTrack.scrollWidth < need && guard++ < 40){
+        carOriginals.forEach(function(n){
+          var c = n.cloneNode(true);
+          c.setAttribute('aria-hidden','true'); c.setAttribute('tabindex','-1');
+          carTrack.appendChild(c);
+        });
+      }
+    };
+    carFill();
+
+    var carPos = 0, carVel = 0, carDragging = false, carLastT = null;
+    var carAuto = reduce ? 0 : 0.035;              // px per ms, drifts left
+    var carWrap = function(){
+      if(carSetW <= 0) return;
+      carPos = carPos % carSetW;
+      if(carPos > 0) carPos -= carSetW;
+    };
+    var carRender = function(){ carTrack.style.transform = 'translate3d(' + carPos.toFixed(2) + 'px,0,0)'; };
+    var carTick = function(t){
+      var dt = carLastT == null ? 16 : Math.min(64, t - carLastT); carLastT = t;
+      if(!carDragging){
+        carPos -= carAuto * dt;
+        carPos += carVel;
+        carVel *= 0.92; if(Math.abs(carVel) < 0.02) carVel = 0;
+        carWrap(); carRender();
+      }
+      requestAnimationFrame(carTick);
+    };
+    requestAnimationFrame(carTick);
+
+    var carSX = 0, carSP = 0, carLX = 0, carMoved = false;
+    carView.addEventListener('pointerdown', function(e){
+      carDragging = true; carMoved = false; carSX = carLX = e.clientX; carSP = carPos; carVel = 0;
+      try{ carView.setPointerCapture(e.pointerId); }catch(_){}
+      carView.classList.add('grabbing');
     });
-    var down=false, sx=0, sl=0, moved=false;
-    track.addEventListener('pointerdown', function(e){
-      down=true; moved=false; sx=e.pageX; sl=track.scrollLeft; track.classList.add('drag');
+    carView.addEventListener('pointermove', function(e){
+      if(!carDragging) return;
+      var dx = e.clientX - carSX;
+      if(Math.abs(dx) > 4) carMoved = true;
+      carPos = carSP + dx; carWrap(); carRender();
+      carVel = e.clientX - carLX; carLX = e.clientX;
     });
-    track.addEventListener('pointermove', function(e){
-      if(!down) return;
-      if(Math.abs(e.pageX-sx)>4) moved=true;
-      track.scrollLeft = sl - (e.pageX-sx);
-    });
-    var endDrag = function(){ down=false; track.classList.remove('drag'); };
-    track.addEventListener('pointerup', endDrag);
-    track.addEventListener('pointercancel', endDrag);
-    track.addEventListener('pointerleave', endDrag);
-    track.addEventListener('click', function(e){ if(moved) e.preventDefault(); }, true);
+    var carEnd = function(){ if(carDragging){ carDragging = false; carView.classList.remove('grabbing'); } };
+    carView.addEventListener('pointerup', carEnd);
+    carView.addEventListener('pointercancel', carEnd);
+    carView.addEventListener('click', function(e){ if(carMoved){ e.preventDefault(); e.stopPropagation(); } }, true);
+    carView.addEventListener('wheel', function(e){
+      if(Math.abs(e.deltaX) > Math.abs(e.deltaY)){ e.preventDefault(); carPos -= e.deltaX; carVel = 0; carWrap(); carRender(); }
+    }, {passive:false});
+    addEventListener('resize', carFill);
   }
 
   /* ---- catalog filter ---- */
