@@ -9,12 +9,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 <link rel="icon" type="image/png" href="media/logos/favicon.png" />
 <link rel="stylesheet" href="styles.css" />
+<script>try{if(localStorage.getItem('theme')==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}</script>
 </head>
 <body>
 
 <nav class="nav">
   <div class="nav-in">
-    <a href="index.html" class="brand"><img src="media/logos/smarttube-logo.png" alt="smarttube" class="brand-logo"></a>
+    <a href="index.html" class="brand"><img class="brand-logo brand-logo-dark" src="media/logos/logo%20smartube%20alb.svg" alt="smarttube"><img class="brand-logo brand-logo-light" src="media/logos/smarttube-logo.png" alt="smarttube"></a>
     <div class="nav-ic">
       <a href="cursuri.html" aria-label="Caută"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5" stroke-linecap="round"/></svg></a>
       <a href="cont.html" aria-label="Cont"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" stroke-linecap="round"/></svg></a>
@@ -49,31 +50,24 @@
 
 <main>
 
-  <!-- flagship -->
-  <section class="tile full hero t-lift">
-    <div class="tile-copy reveal">
-      <h1 class="h-flag">Învață orice.</h1>
-      <p class="t-sub">Mii de cursuri online, predate de oameni care chiar se pricep.<br>Pentru oricine, despre orice.</p>
-      <div class="tile-cta">
-        <a href="cursuri.html" class="btn btn-mint">Vezi cursurile</a>
-        <a href="instructori.html#preda" class="link">Înscrie-te ca instructor</a>
+  <!-- flagship: founders video — grows on scroll, opens fullscreen -->
+  <section class="hero-scrub" id="heroScrub">
+    <div class="hero-stage">
+      <div class="hero-copy reveal">
+        <h1 class="h-flag">Învață orice.</h1>
+        <p class="t-sub">Mii de cursuri online, predate de oameni care chiar se pricep.<br>Pentru oricine, despre orice.</p>
+        <div class="tile-cta">
+          <a href="cursuri.html" class="btn btn-mint">Vezi cursurile</a>
+          <a href="instructori.html#preda" class="link">Înscrie-te ca instructor</a>
+        </div>
       </div>
-    </div>
-    <div class="tile-visual reveal">
-      <div class="screen" data-scale>
-        <div class="sc-hero">
-          <span class="sc-tag">Curs · 5h 20m</span>
-          <span class="sc-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
-        </div>
-        <div class="sc-body">
-          <div class="sc-ttl"></div>
-          <div class="sc-meta"><i style="width:64px"></i><i style="width:44px"></i><i style="width:52px"></i></div>
-          <div class="sc-list">
-            <div class="sc-li act"><span class="n">1</span><span class="bar" style="max-width:72%"></span></div>
-            <div class="sc-li"><span class="n">2</span><span class="bar" style="max-width:88%"></span></div>
-            <div class="sc-li"><span class="n">3</span><span class="bar" style="max-width:60%"></span></div>
-          </div>
-        </div>
+      <div class="hero-vid" id="heroVid">
+        <video id="heroVideo" class="hero-video" poster="media/video/fondatori-poster.jpg" preload="metadata" playsinline>
+          <source src="media/video/fondatori.mp4" type="video/mp4">
+        </video>
+        <span class="hero-vid-tag">Povestea smarttube · Fondatorii</span>
+        <button class="hero-play" id="heroPlay" type="button" aria-label="Redă videoul"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
+        <button class="hero-x" id="heroX" type="button" aria-label="Închide videoul"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
       </div>
     </div>
   </section>

@@ -3,6 +3,32 @@
   'use strict';
   var reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
 
+  /* ---- theme (light/dark) toggle ---- */
+  var getTheme = function(){
+    try{ return localStorage.getItem('theme') === 'light' ? 'light' : 'dark'; }catch(e){ return 'dark'; }
+  };
+  var applyTheme = function(t){
+    if(t === 'light') document.documentElement.setAttribute('data-theme','light');
+    else document.documentElement.removeAttribute('data-theme');
+  };
+  applyTheme(getTheme());
+  var themeSeg = document.getElementById('themeSeg');
+  if(themeSeg){
+    var themeBtns = [].slice.call(themeSeg.querySelectorAll('[data-theme-set]'));
+    var syncSeg = function(t){
+      themeBtns.forEach(function(b){ b.classList.toggle('on', b.dataset.themeSet === t); });
+    };
+    syncSeg(getTheme());
+    themeBtns.forEach(function(b){
+      b.addEventListener('click', function(){
+        var t = b.dataset.themeSet;
+        try{ localStorage.setItem('theme', t); }catch(e){}
+        applyTheme(t);
+        syncSeg(t);
+      });
+    });
+  }
+
   /* ---- nav scroll glass ---- */
   var nav = document.querySelector('.nav');
   if(nav){
@@ -74,6 +100,89 @@
     addEventListener('scroll', onScroll, {passive:true});
     addEventListener('resize', onScroll);
     frame();
+  }
+
+  /* ---- hero founders video: grows on scroll, opens fullscreen modal ---- */
+  var heroScrub = document.getElementById('heroScrub');
+  var heroVid = document.getElementById('heroVid');
+  var heroVideo = document.getElementById('heroVideo');
+  var heroPlay = document.getElementById('heroPlay');
+  var heroX = document.getElementById('heroX');
+  var heroCopy = heroScrub && heroScrub.querySelector('.hero-copy');
+  if(heroScrub && heroVid){
+    var hState = 'idle';            // idle | open | dismissed
+    var hBase = null;               // {fill, dx, dy} measured near the top
+    var hLockY = 0;
+    var heroVidHome = heroVid.parentNode, heroVidNext = heroVid.nextSibling;
+    var heroScrubOn = function(){ return innerWidth > 833 && !reduce; };
+
+    var hScrub = function(){
+      if(hState !== 'idle' || !heroScrubOn()) return;
+      var vw = innerWidth, vh = innerHeight;
+      var top = heroScrub.getBoundingClientRect().top;       // 68 → negative as it pins
+      var span = heroScrub.offsetHeight - vh;
+      var p = span > 0 ? Math.max(0, Math.min(1, -top / span)) : 0;
+      if(p <= 0.01){                                          // transform ≈ identity here: safe to measure
+        var r = heroVid.getBoundingClientRect();
+        hBase = {
+          fill: Math.max(vw / r.width, vh / r.height) * 1.02,
+          dx: vw / 2 - (r.left + r.width / 2),
+          dy: vh / 2 - (r.top + r.height / 2)
+        };
+      }
+      if(!hBase) return;
+      var s = 1 + (hBase.fill - 1) * p;
+      heroVid.style.transform = 'translate(' + (hBase.dx * p).toFixed(1) + 'px,' + (hBase.dy * p).toFixed(1) + 'px) scale(' + s.toFixed(4) + ')';
+      heroVid.style.borderRadius = (Math.max(0, 24 * (1 - p * 1.3)) / s).toFixed(2) + 'px';
+      if(heroCopy) heroCopy.style.opacity = Math.max(0, 1 - p / 0.4).toFixed(3);
+      if(p >= 0.992) heroOpen();
+    };
+
+    function heroOpen(){
+      if(hState === 'open') return;
+      hState = 'open';
+      hLockY = window.pageYOffset || 0;
+      heroVid.style.transform = '';
+      heroVid.style.borderRadius = '';
+      heroVid.classList.add('is-open');
+      document.body.appendChild(heroVid);          // escape the sticky stage's stacking context → true fullscreen
+      document.body.style.top = -hLockY + 'px';
+      document.body.classList.add('hero-locked');
+    }
+
+    var heroPlayNow = function(){
+      if(hState !== 'open') heroOpen();
+      heroVid.classList.add('is-playing');
+      try{ heroVideo.controls = true; var pr = heroVideo.play(); if(pr && pr.catch) pr.catch(function(){}); }catch(e){}
+    };
+
+    var heroClose = function(){
+      if(hState !== 'open') return;
+      try{ heroVideo.pause(); heroVideo.controls = false; heroVideo.currentTime = 0; heroVideo.load(); }catch(e){}
+      heroVid.classList.remove('is-open', 'is-playing');
+      if(heroVidHome) heroVidHome.insertBefore(heroVid, heroVidNext);   // put it back in the hero
+      document.body.classList.remove('hero-locked');
+      document.body.style.top = '';
+      window.scrollTo(0, hLockY);
+      hState = 'dismissed';
+      if(heroCopy) heroCopy.style.opacity = '';
+      heroVid.style.transform = '';
+      heroVid.style.borderRadius = '';
+      if(innerWidth > 833){                                  // collapse the tall scrub so the page continues cleanly
+        heroScrub.style.minHeight = '100vh';
+        heroScrub.style.height = '100vh';
+        window.scrollTo(0, heroScrub.offsetHeight);
+      }
+    };
+
+    if(heroPlay) heroPlay.addEventListener('click', function(e){ e.preventDefault(); heroPlayNow(); });
+    if(heroX) heroX.addEventListener('click', function(e){ e.preventDefault(); heroClose(); });
+    addEventListener('keydown', function(e){ if(e.key === 'Escape' && hState === 'open') heroClose(); });
+
+    var hTick = false;
+    var onHeroScroll = function(){ if(!hTick){ hTick = true; requestAnimationFrame(function(){ hScrub(); hTick = false; }); } };
+    if(heroScrubOn()){ addEventListener('scroll', onHeroScroll, {passive:true}); hScrub(); }
+    addEventListener('resize', function(){ if(hState === 'idle' && heroScrubOn()) hScrub(); });
   }
 
   /* ---- courses carousel: auto-scroll + manual drag, infinite both ways ---- */
