@@ -53,24 +53,41 @@
     document.getElementById('stConv').textContent =
       views.length ? (100 * sales.length / views.length).toFixed(1).replace('.', ',') + '%' : '—';
 
-    /* grafic vânzări pe ultimele 30 de zile */
+    /* grafic vânzări pe ultimele 30 de zile, cu tooltip live (vânzări + încasări pe zi) */
     var chart = document.getElementById('salesChart');
+    var tip = document.getElementById('chartTip');
+    document.body.appendChild(tip);   // scos din card: backdrop-filter-ul cardului ar deturna position:fixed
     var today = new Date(); today.setHours(0, 0, 0, 0);
-    var buckets = [];
-    for(var i = 29; i >= 0; i--) buckets.push(0);
+    var buckets = [], money = [];
+    for(var i = 0; i < 30; i++){ buckets.push(0); money.push(0); }
     sales.forEach(function(s){
       var d = Math.floor((today - new Date(s.created_at).setHours(0,0,0,0)) / DAY);
-      if(d >= 0 && d < 30) buckets[29 - d]++;
+      if(d >= 0 && d < 30){
+        buckets[29 - d]++;
+        money[29 - d] += Number(s.price_paid || 0);
+      }
     });
     var max = Math.max(1, Math.max.apply(null, buckets));
     chart.innerHTML = buckets.map(function(n, idx){
-      var d = new Date(today - (29 - idx) * DAY);
-      return '<span style="height:' + Math.round(100 * n / max) + '%" title="' +
-        d.getDate() + '.' + (d.getMonth() + 1) + ' — ' + n + (n === 1 ? ' vânzare' : ' vânzări') + '"></span>';
+      return '<i data-i="' + idx + '"><span style="height:' + Math.round(100 * n / max) + '%"></span></i>';
     }).join('');
     var fmtD = function(d){ return d.getDate() + '.' + (d.getMonth() + 1) + '.' + d.getFullYear(); };
     document.getElementById('chartFrom').textContent = fmtD(new Date(today - 29 * DAY));
     document.getElementById('chartTo').textContent = 'azi';
+
+    chart.addEventListener('mousemove', function(e){
+      var col = e.target.closest('i');
+      if(!col){ tip.classList.remove('on'); return; }
+      var idx = parseInt(col.dataset.i, 10);
+      var d = new Date(today - (29 - idx) * DAY);
+      var label = idx === 29 ? 'azi' : d.getDate() + '.' + (d.getMonth() + 1);
+      tip.innerHTML = '<b>' + label + '</b>' +
+        buckets[idx] + (buckets[idx] === 1 ? ' vânzare' : ' vânzări') + ' · ' + DB.fmtMoney(money[idx]);
+      tip.style.left = Math.max(70, Math.min(innerWidth - 70, e.clientX)) + 'px';
+      tip.style.top = (e.clientY - 14) + 'px';
+      tip.classList.add('on');
+    });
+    chart.addEventListener('mouseleave', function(){ tip.classList.remove('on'); });
 
     /* surse de trafic */
     var srcBox = document.getElementById('srcBars');

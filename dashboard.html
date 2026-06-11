@@ -97,19 +97,22 @@
     </div>
 
     <div class="dash-cols">
-      <div class="card">
+      <div class="card no-tilt">
         <h3>Vânzări — ultimele 30 de zile</h3>
-        <div class="bar-chart" id="salesChart"></div>
+        <div class="chart-wrap">
+          <div class="bar-chart" id="salesChart"></div>
+          <div class="chart-tip" id="chartTip"></div>
+        </div>
         <div class="chart-x"><span id="chartFrom"></span><span id="chartTo"></span></div>
       </div>
-      <div class="card">
+      <div class="card no-tilt">
         <h3>De unde vin clienții</h3>
         <p style="font-size:13px;margin-top:2px">Sursele vizitelor pe paginile cursurilor tale.</p>
         <div id="srcBars"></div>
       </div>
     </div>
 
-    <div class="card" style="margin-top:16px">
+    <div class="card no-tilt" style="margin-top:16px">
       <div class="hub-head">
         <h3>Cursurile tale</h3>
         <button class="btn btn-ghost" id="genDemo" type="button" style="display:none">Generează date demo</button>

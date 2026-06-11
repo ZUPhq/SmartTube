@@ -73,6 +73,8 @@
       if(contLink) contLink.innerHTML = '<span class="nav-av">' + ini + '</span>';
       var mmAcc = document.querySelector('.mm-acc');
       if(mmAcc) mmAcc.innerHTML = '<span class="nav-av">' + ini + '</span>Contul meu';
+      var mmCta = document.querySelector('.mm-foot .btn-mint');
+      if(mmCta){ mmCta.textContent = 'Cursurile mele'; mmCta.href = 'cont.html'; }
     }).catch(function(){});
   }
 
@@ -387,7 +389,7 @@
   /* ---- 3d card tilt (pointer:fine only) ---- */
   var tiltify = function(root){
     if(matchMedia('(pointer:coarse)').matches) return;
-    root.querySelectorAll('.ccard,.card,.inst-card,.review').forEach(function(card){
+    root.querySelectorAll('.ccard,.card:not(.no-tilt),.inst-card,.review,.stat-card').forEach(function(card){
       if(card._tilt) return;
       card._tilt = true;
       card.addEventListener('mouseenter',function(){
