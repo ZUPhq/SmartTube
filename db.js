@@ -79,6 +79,10 @@ var DB = (function(){
     }
     return _coursesP;
   };
+  var popularCourses = function(n){
+    return sb.rpc('get_popular_courses', {days_back:7, max_n:n || 6})
+      .then(function(r){ return r.data || []; });
+  };
   var getCourse = function(id){
     return sb.from('courses')
       .select('*, course_modules(id,title,position, lessons(id,title,duration_min,position,video_path))')
@@ -230,7 +234,7 @@ var DB = (function(){
     initials:initials, esc:esc,
     getUser:getUser, getProfile:getProfile,
     signUp:signUp, signIn:signIn, signOut:signOut, becomeInstructor:becomeInstructor,
-    publishedCourses:publishedCourses, getCourse:getCourse,
+    publishedCourses:publishedCourses, popularCourses:popularCourses, getCourse:getCourse,
     myPurchases:myPurchases, hasPurchase:hasPurchase, buyCourse:buyCourse,
     logView:logView,
     myCourses:myCourses, courseViews:courseViews, courseSales:courseSales,

@@ -293,10 +293,21 @@
     addEventListener('resize', function(){ if(hState === 'idle' && heroScrubOn()) hScrub(); });
   }
 
-  /* ---- courses carousel: auto-scroll + manual drag, infinite both ways ---- */
+  /* ---- courses carousel: cele mai accesate cursuri din ultimele 7 zile ---- */
   var carTrack = document.getElementById('carTrack');
   var carView = carTrack && carTrack.parentElement;
-  if(carTrack && carView){
+  if(carTrack && carView && hasDB){
+    DB.popularCourses(6).then(function(cs){
+      if(!cs.length) throw new Error('no courses');
+      carTrack.innerHTML = cs.map(function(c){ return courseCardHTML(c, 'front_page'); }).join('');
+      tiltify(carTrack);
+      initCarousel();
+    }).catch(function(){
+      var sec = document.getElementById('populare');
+      if(sec) sec.style.display = 'none';
+    });
+  }
+  function initCarousel(){
     var carOriginals = [].slice.call(carTrack.children);
     var carSetW = carTrack.scrollWidth;            // width of one original set
     var carFill = function(){

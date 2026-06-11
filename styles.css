@@ -528,6 +528,7 @@ body.hero-locked{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 }
 .car-viewport.grabbing{cursor:grabbing}
 .car-track{display:flex;width:max-content;will-change:transform}
+.car-track:empty{min-height:372px;width:100%}
 .car-track .ccard{flex:0 0 304px;margin-right:20px}
 
 /* ---------- page header ---------- */
