@@ -12,20 +12,17 @@
     else document.documentElement.removeAttribute('data-theme');
   };
   applyTheme(getTheme());
-  var themeSeg = document.getElementById('themeSeg');
-  if(themeSeg){
-    var themeBtns = [].slice.call(themeSeg.querySelectorAll('[data-theme-set]'));
-    var syncSeg = function(t){
-      themeBtns.forEach(function(b){ b.classList.toggle('on', b.dataset.themeSet === t); });
-    };
-    syncSeg(getTheme());
-    themeBtns.forEach(function(b){
-      b.addEventListener('click', function(){
-        var t = b.dataset.themeSet;
-        try{ localStorage.setItem('theme', t); }catch(e){}
-        applyTheme(t);
-        syncSeg(t);
-      });
+  var themeBtn = document.getElementById('themeBtn');
+  var syncThemeLabel = function(t){
+    if(themeBtn) themeBtn.setAttribute('aria-label', t === 'light' ? 'Comută pe temă întunecată' : 'Comută pe temă luminoasă');
+  };
+  syncThemeLabel(getTheme());
+  if(themeBtn){
+    themeBtn.addEventListener('click', function(){
+      var t = getTheme() === 'light' ? 'dark' : 'light';
+      try{ localStorage.setItem('theme', t); }catch(e){}
+      applyTheme(t);
+      syncThemeLabel(t);
     });
   }
 
@@ -62,6 +59,84 @@
     addEventListener('resize', function(){
       document.body.style.overflow = (mmenu.classList.contains('open') && innerWidth <= 833) ? 'hidden' : '';
     });
+  }
+
+  /* ---- global search (nav) — courses, instructors, pages ---- */
+  var searchBtn = document.getElementById('searchBtn');
+  var navSearch = document.getElementById('navSearch');
+  var nsInput = document.getElementById('navSearchInput');
+  var nsResults = document.getElementById('navSearchResults');
+  var nsX = document.getElementById('navSearchX');
+  var navSearchBar = document.getElementById('navSearchBar');
+  if(searchBtn && navSearch && nsInput && nsResults && navSearchBar){
+    var NS_ICON = {
+      curs:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M10.5 9.2l4 2.8-4 2.8z" fill="currentColor" stroke="none"/></svg>',
+      instructor:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c0-3.6 3-5.6 7-5.6s7 2 7 5.6"/></svg>',
+      pagina:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h6"/></svg>'
+    };
+    var NS_LABEL = { curs:'Curs', instructor:'Instructor', pagina:'Pagină' };
+    var NS_DATA = [
+      {t:'Editare video în Premiere Pro', s:'Foto & Video · Vlad Marin', u:'curs.html', y:'curs', k:'editare montaj premiere pro'},
+      {t:'Color grading cinematic', s:'Foto & Video · Vlad Marin', u:'curs.html', y:'curs', k:'color grading cinematic video'},
+      {t:'Fotografie pentru începători', s:'Foto & Video · Mara Crișan', u:'curs.html', y:'curs', k:'fotografie foto'},
+      {t:'Python de la zero la primul proiect', s:'Programare & IT · Andrei Pop', u:'curs.html', y:'curs', k:'python programare cod'},
+      {t:'JavaScript modern & React', s:'Programare & IT · Andrei Pop', u:'curs.html', y:'curs', k:'javascript react programare web'},
+      {t:'UI/UX Design cu Figma', s:'Design & UX · Ioana Dima', u:'curs.html', y:'curs', k:'ui ux design figma'},
+      {t:'Branding & identitate vizuală', s:'Design & UX · Ioana Dima', u:'curs.html', y:'curs', k:'branding identitate design logo'},
+      {t:'Marketing pe rețele sociale', s:'Business & Marketing · Radu Stan', u:'curs.html', y:'curs', k:'marketing social media business'},
+      {t:'Vânzări & negociere', s:'Business & Marketing · Radu Stan', u:'curs.html', y:'curs', k:'vanzari negociere business'},
+      {t:'Producție muzicală în Ableton', s:'Muzică & Producție · Alex Toma', u:'curs.html', y:'curs', k:'productie muzicala ableton'},
+      {t:'Mixaj & mastering audio', s:'Muzică & Producție · Alex Toma', u:'curs.html', y:'curs', k:'mixaj mastering audio muzica'},
+      {t:'Obiceiuri & productivitate', s:'Dezvoltare personală · Elena Voicu', u:'curs.html', y:'curs', k:'obiceiuri productivitate focus'},
+      {t:'Vlad Marin', s:'Instructor · Foto & Video', u:'instructori.html', y:'instructor', k:'editare video color'},
+      {t:'Andrei Pop', s:'Instructor · Programare & IT', u:'instructori.html', y:'instructor', k:'python javascript'},
+      {t:'Ioana Dima', s:'Instructor · Design & UX', u:'instructori.html', y:'instructor', k:'figma branding'},
+      {t:'Radu Stan', s:'Instructor · Business & Marketing', u:'instructori.html', y:'instructor', k:'marketing vanzari'},
+      {t:'Alex Toma', s:'Instructor · Muzică & Producție', u:'instructori.html', y:'instructor', k:'ableton mixaj'},
+      {t:'Elena Voicu', s:'Instructor · Dezvoltare personală', u:'instructori.html', y:'instructor', k:'obiceiuri productivitate'},
+      {t:'Cursuri', s:'Catalogul complet', u:'cursuri.html', y:'pagina', k:'catalog toate cursurile'},
+      {t:'Instructori', s:'Cine te învață', u:'instructori.html', y:'pagina', k:'instructori profesori'},
+      {t:'Devino instructor', s:'Predă pe smarttube', u:'instructori.html#preda', y:'pagina', k:'devino instructor preda venit'},
+      {t:'Contact / Asistență', s:'Întrebări și suport', u:'asistenta.html', y:'pagina', k:'contact asistenta suport ajutor faq intrebari'},
+      {t:'Despre noi', s:'Cine suntem', u:'asistenta.html', y:'pagina', k:'despre noi companie'},
+      {t:'Contul meu', s:'Autentificare & cont nou', u:'cont.html', y:'pagina', k:'cont login autentificare inregistrare'}
+    ];
+    var nsNorm = function(s){ return (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); };
+    NS_DATA.forEach(function(it){ it._n = nsNorm(it.t + ' ' + it.s + ' ' + (it.k || '')); });
+    var nsEsc = function(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
+    var nsRender = function(raw){
+      var q = nsNorm(raw).trim();
+      if(!q){ navSearch.classList.remove('open'); nsResults.innerHTML = ''; return; }
+      var toks = q.split(/\s+/);
+      var hits = NS_DATA.filter(function(it){ return toks.every(function(tk){ return it._n.indexOf(tk) > -1; }); }).slice(0, 8);
+      navSearch.classList.add('open');
+      if(!hits.length){ nsResults.innerHTML = '<div class="ns-empty">Niciun rezultat. Încearcă alt termen.</div>'; return; }
+      nsResults.innerHTML = hits.map(function(it){
+        return '<a class="ns-item" href="' + it.u + '"><span class="ns-ic">' + (NS_ICON[it.y] || '') +
+          '</span><span class="ns-tx"><b>' + nsEsc(it.t) + '</b><span>' + nsEsc(it.s) +
+          '</span></span><span class="ns-type">' + (NS_LABEL[it.y] || '') + '</span></a>';
+      }).join('');
+    };
+    var nsOpen = function(){
+      navSearchBar.classList.add('on');
+      document.body.classList.add('searching');
+      nsRender(nsInput.value);
+      setTimeout(function(){ nsInput.focus(); }, 30);
+    };
+    var nsClose = function(){
+      navSearchBar.classList.remove('on');
+      navSearch.classList.remove('open');
+      document.body.classList.remove('searching');
+      nsInput.value = '';
+      nsResults.innerHTML = '';
+    };
+    searchBtn.addEventListener('click', function(e){ e.stopPropagation(); if(navSearchBar.classList.contains('on')) nsClose(); else nsOpen(); });
+    if(nsX) nsX.addEventListener('click', nsClose);
+    nsInput.addEventListener('input', function(){ nsRender(nsInput.value); });
+    nsInput.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ var f = nsResults.querySelector('.ns-item'); if(f) f.click(); } });
+    nsResults.addEventListener('click', function(e){ if(e.target.closest('.ns-item')) nsClose(); });
+    document.addEventListener('click', function(e){ if(navSearchBar.classList.contains('on') && !navSearch.contains(e.target) && !navSearchBar.contains(e.target) && !searchBtn.contains(e.target)) nsClose(); });
+    addEventListener('keydown', function(e){ if(e.key === 'Escape' && navSearchBar.classList.contains('on')) nsClose(); });
   }
 
   /* ---- scroll reveal ---- */
@@ -144,39 +219,46 @@
       hLockY = window.pageYOffset || 0;
       heroVid.style.transform = '';
       heroVid.style.borderRadius = '';
-      heroVid.classList.add('is-open');
+      heroVid.classList.add('is-open', 'is-playing');
       document.body.appendChild(heroVid);          // escape the sticky stage's stacking context → true fullscreen
       document.body.style.top = -hLockY + 'px';
       document.body.classList.add('hero-locked');
+      try{                                          // autoplay: try with sound, fall back to muted if blocked
+        heroVideo.controls = true;
+        heroVideo.muted = false;
+        var pr = heroVideo.play();
+        if(pr && pr.catch) pr.catch(function(){ try{ heroVideo.muted = true; heroVideo.play(); }catch(e){} });
+      }catch(e){}
     }
-
-    var heroPlayNow = function(){
-      if(hState !== 'open') heroOpen();
-      heroVid.classList.add('is-playing');
-      try{ heroVideo.controls = true; var pr = heroVideo.play(); if(pr && pr.catch) pr.catch(function(){}); }catch(e){}
-    };
 
     var heroClose = function(){
       if(hState !== 'open') return;
-      try{ heroVideo.pause(); heroVideo.controls = false; heroVideo.currentTime = 0; heroVideo.load(); }catch(e){}
-      heroVid.classList.remove('is-open', 'is-playing');
-      if(heroVidHome) heroVidHome.insertBefore(heroVid, heroVidNext);   // put it back in the hero
+      hState = 'dismissed';
+      try{ heroVideo.pause(); }catch(e){}
+      // place the page behind the (still-visible) overlay at the next section, then crossfade
       document.body.classList.remove('hero-locked');
       document.body.style.top = '';
-      window.scrollTo(0, hLockY);
-      hState = 'dismissed';
       if(heroCopy) heroCopy.style.opacity = '';
-      heroVid.style.transform = '';
-      heroVid.style.borderRadius = '';
       if(innerWidth > 833){                                  // collapse the tall scrub so the page continues cleanly
         heroScrub.style.minHeight = '100vh';
         heroScrub.style.height = '100vh';
-        window.scrollTo(0, heroScrub.offsetHeight);
+        window.scrollTo(0, heroScrub.offsetHeight);           // featured section at viewport top
+      }else{
+        window.scrollTo(0, hLockY);
       }
+      heroVid.classList.add('is-closing');                   // fade + slight scale-down → reveals the page smoothly
+      setTimeout(function(){
+        heroVid.classList.remove('is-open', 'is-playing', 'is-closing');
+        heroVid.style.transform = '';
+        heroVid.style.borderRadius = '';
+        try{ heroVideo.controls = false; heroVideo.currentTime = 0; heroVideo.muted = false; heroVideo.load(); }catch(e){}
+        if(heroVidHome) heroVidHome.insertBefore(heroVid, heroVidNext);   // put it back in the hero
+      }, 480);
     };
 
-    if(heroPlay) heroPlay.addEventListener('click', function(e){ e.preventDefault(); heroPlayNow(); });
+    if(heroPlay) heroPlay.addEventListener('click', function(e){ e.preventDefault(); heroOpen(); });
     if(heroX) heroX.addEventListener('click', function(e){ e.preventDefault(); heroClose(); });
+    if(heroVideo) heroVideo.addEventListener('ended', heroClose);   // auto-close when the video finishes
     addEventListener('keydown', function(e){ if(e.key === 'Escape' && hState === 'open') heroClose(); });
 
     var hTick = false;
