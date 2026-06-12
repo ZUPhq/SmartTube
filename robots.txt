@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard.html
+Disallow: /curs-nou.html
+
+# Actualizează adresa dacă site-ul se mută pe un domeniu propriu
+Sitemap: https://zuphq.github.io/SmartTube/sitemap.xml

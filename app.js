@@ -767,6 +767,8 @@
     else DB.getCourse(courseId).then(function(c){
       if(!c){ location.replace('cursuri.html'); return; }
       document.title = c.title + ' — smarttube';
+      var metaDesc = document.querySelector('meta[name="description"]');
+      if(metaDesc && c.subtitle) metaDesc.setAttribute('content', c.subtitle);
       var catLink = document.getElementById('cCatLink');
       catLink.textContent = DB.CATS[c.category] || c.category || '';
       catLink.href = 'cursuri.html#' + c.category;

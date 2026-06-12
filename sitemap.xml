@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Actualizează baza URL dacă site-ul se mută pe un domeniu propriu -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://zuphq.github.io/SmartTube/index.html</loc></url>
+  <url><loc>https://zuphq.github.io/SmartTube/cursuri.html</loc></url>
+  <url><loc>https://zuphq.github.io/SmartTube/instructori.html</loc></url>
+  <url><loc>https://zuphq.github.io/SmartTube/despre.html</loc></url>
+  <url><loc>https://zuphq.github.io/SmartTube/asistenta.html</loc></url>
+  <url><loc>https://zuphq.github.io/SmartTube/cont.html</loc></url>
+  <url><loc>https://zuphq.github.io/SmartTube/termeni.html</loc></url>
+  <url><loc>https://zuphq.github.io/SmartTube/confidentialitate.html</loc></url>
+</urlset>
