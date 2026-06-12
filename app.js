@@ -125,7 +125,7 @@
           });
         });
         if(navSearchBar.classList.contains('on')) nsRender(nsInput.value);
-      }).catch(function(){});
+      }).catch(function(){ nsCoursesLoaded = false; });
     };
     var nsEsc = function(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
     var nsRender = function(raw){
@@ -299,6 +299,7 @@
   var carTrack = document.getElementById('carTrack');
   var carView = carTrack && carTrack.parentElement;
   if(carTrack && carView && hasDB){
+    carTrack.innerHTML = new Array(5).join('<div class="ccard skeleton sk-card" aria-hidden="true"></div>');
     DB.popularCourses(6).then(function(cs){
       if(!cs.length) throw new Error('no courses');
       carTrack.innerHTML = cs.map(function(c){ return courseCardHTML(c, 'front_page'); }).join('');
@@ -373,7 +374,7 @@
   var STAR_SVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.9 21l1.2-6.8-5-4.9 6.9-1z"/></svg>';
   var courseCardHTML = function(c, src){
     var rate = c.rating != null
-      ? '<span class="cc-rate">' + STAR_SVG + DB.fmtRating(c.rating) + ' <em>(' + c.rating_count + ')</em></span>'
+      ? '<span class="cc-rate">' + STAR_SVG + DB.fmtRating(c.rating) + ' <em>(' + DB.esc(c.rating_count) + ')</em></span>'
       : '<span class="cc-rate cc-new">Nou</span>';
     return '<a class="ccard" href="curs.html?id=' + c.id + (src ? '&src=' + src : '') + '"' +
       ' data-cat="' + DB.esc(c.category) + '"' +
@@ -415,6 +416,7 @@
     var chips = document.querySelectorAll('.chip');
     var search = document.getElementById('catalogSearch');
     var empty = document.getElementById('catalogEmpty');
+    grid.innerHTML = new Array(7).join('<div class="ccard skeleton sk-card" aria-hidden="true"></div>');
     DB.publishedCourses().then(function(cs){
       grid.innerHTML = cs.map(function(c){ return courseCardHTML(c, 'catalog'); }).join('');
       tiltify(grid);
@@ -539,13 +541,16 @@
             .catch(function(){ b.disabled = false; b.textContent = 'Devino instructor'; });
         });
       }
+      var box = document.getElementById('myCourses');
+      var emptyBox = document.getElementById('myCoursesEmpty');
+      box.innerHTML = new Array(4).join('<div class="ccard skeleton sk-card" aria-hidden="true"></div>');
       DB.myPurchases().then(function(ps){
-        var box = document.getElementById('myCourses');
-        var emptyBox = document.getElementById('myCoursesEmpty');
         var courses = ps.map(function(x){ return x.courses; }).filter(Boolean);
-        if(!courses.length){ emptyBox.style.display = ''; box.style.display = 'none'; return; }
+        if(!courses.length){ emptyBox.style.display = ''; box.style.display = 'none'; box.innerHTML = ''; return; }
         box.innerHTML = courses.map(function(c){ return courseCardHTML(c, ''); }).join('');
         tiltify(box);
+      }).catch(function(){
+        box.innerHTML = '<p class="empty" style="display:block;grid-column:1/-1">Nu am putut încărca cursurile tale. Reîncarcă pagina.</p>';
       });
     };
 
@@ -579,7 +584,8 @@
     });
     var logoutBtn = document.getElementById('hubLogout');
     if(logoutBtn) logoutBtn.addEventListener('click', function(){
-      DB.signOut().then(function(){ location.href = 'cont.html'; });
+      var done = function(){ location.href = 'cont.html'; };
+      DB.signOut().then(done, done);
     });
   }
 
@@ -593,7 +599,7 @@
       if(!c){ location.replace('cursuri.html'); return; }
       document.title = c.title + ' — smarttube';
       var catLink = document.getElementById('cCatLink');
-      catLink.textContent = DB.CATS[c.category] || '';
+      catLink.textContent = DB.CATS[c.category] || c.category || '';
       catLink.href = 'cursuri.html#' + c.category;
       document.getElementById('cLevel').textContent = c.level;
       document.getElementById('cTitle').textContent = c.title;
@@ -674,7 +680,7 @@
       Promise.all([DB.hasPurchase(c.id), DB.getProfile()]).then(function(res){
         if(res[0]) setOwned();
         else if(res[1] && c.instructor_id === res[1].id) canWatch = true;
-      });
+      }).catch(function(){});
       buyBtn.addEventListener('click', function(e){
         if(buyBtn.href && buyBtn.getAttribute('href') !== '#') return;   // deja deținut → link normal
         e.preventDefault();
@@ -688,7 +694,10 @@
           modal.classList.add('open');
         });
       });
-      var bmClose = function(){ modal.classList.remove('open'); };
+      var bmClose = function(){
+        modal.classList.remove('open');
+        document.getElementById('bmNote').textContent = '';
+      };
       document.getElementById('bmX').addEventListener('click', bmClose);
       modal.addEventListener('click', function(e){ if(e.target === modal) bmClose(); });
 
@@ -717,31 +726,50 @@
             modal.classList.add('open');
             return;
           }
-          vmTitle.textContent = el.dataset.vtitle;
+          var vmRetry = document.getElementById('vmRetry');
+          var loadVid = function(){
+            vmTitle.textContent = el.dataset.vtitle;
+            if(vmRetry) vmRetry.style.display = 'none';
+            DB.videoUrl(el.dataset.video).then(function(url){
+              vidPlayer.src = url;
+              var pr = vidPlayer.play();
+              if(pr && pr.catch) pr.catch(function(){});
+            }).catch(function(){
+              vmTitle.textContent = 'Nu am putut încărca videoul.';
+              if(vmRetry) vmRetry.style.display = '';
+            });
+          };
+          if(vmRetry) vmRetry.onclick = loadVid;
           vidModal.classList.add('open');
-          DB.videoUrl(el.dataset.video).then(function(url){
-            vidPlayer.src = url;
-            var pr = vidPlayer.play();
-            if(pr && pr.catch) pr.catch(function(){});
-          }).catch(function(){
-            vmTitle.textContent = 'Nu am putut încărca videoul. Reîncearcă.';
-          });
+          loadVid();
         });
       });
       var bmConfirm = document.getElementById('bmConfirm');
       bmConfirm.addEventListener('click', function(){
+        if(bmConfirm.disabled) return;
         bmConfirm.disabled = true; bmConfirm.textContent = 'Se procesează…';
-        DB.buyCourse(c.id, c.price).then(function(r){
+        var bmFail = function(msg){
           bmConfirm.disabled = false; bmConfirm.textContent = 'Confirmă plata';
+          document.getElementById('bmNote').textContent = msg;
+        };
+        DB.buyCourse(c.id, c.price).then(function(r){
+          /* 23505 = cursul era deja cumpărat — tot al lui e */
           if(r.error && r.error.code !== '23505'){
-            document.getElementById('bmNote').textContent = 'Nu am putut finaliza. Reîncearcă.';
+            bmFail('Nu am putut finaliza plata. Verifică-ți conexiunea și reîncearcă.');
             return;
           }
+          bmConfirm.disabled = false; bmConfirm.textContent = 'Confirmă plata';
           document.getElementById('bmBody').style.display = 'none';
           document.getElementById('bmDone').style.display = '';
           setOwned();
+        }).catch(function(){
+          bmFail('Nu am putut finaliza plata. Verifică-ți conexiunea și reîncearcă.');
         });
       });
+    }).catch(function(){
+      document.getElementById('cTitle').textContent = 'Nu am putut încărca acest curs.';
+      document.getElementById('cLead').innerHTML =
+        'Verifică-ți conexiunea și reîncearcă, sau <a href="cursuri.html" class="link">întoarce-te la catalog</a>.';
     });
   }
 
@@ -751,14 +779,24 @@
     contactForm.addEventListener('submit', function(e){
       e.preventDefault();
       var note = contactForm.querySelector('.form-note');
-      note.style.color = 'var(--ink-2)'; note.textContent = 'Se trimite…';
-      DB.sendContact(contactForm.name.value.trim(), contactForm.email.value.trim(), contactForm.message.value.trim())
-        .then(function(r){
-          if(r.error){ note.style.color = '#e66'; note.textContent = 'Nu am putut trimite mesajul. Reîncearcă.'; return; }
-          note.style.color = 'var(--mint)';
-          note.textContent = 'Mulțumim! Mesajul a ajuns la noi — îți răspundem în maxim o zi lucrătoare.';
-          contactForm.reset();
-        });
+      var sendBtn = contactForm.querySelector('button[type="submit"]');
+      var name = contactForm.name.value.trim();
+      var email = contactForm.email.value.trim();
+      var msg = contactForm.message.value.trim();
+      if(name.length < 2){ note.style.color = '#e66'; note.textContent = 'Scrie-ne și numele tău.'; return; }
+      if(msg.length < 10){ note.style.color = '#e66'; note.textContent = 'Mesajul e prea scurt — dă-ne câteva detalii.'; return; }
+      var sendLabel = sendBtn.textContent;
+      sendBtn.disabled = true; sendBtn.textContent = 'Se trimite…';
+      note.style.color = 'var(--ink-2)'; note.textContent = '';
+      var fail = function(){ note.style.color = '#e66'; note.textContent = 'Nu am putut trimite mesajul. Reîncearcă.'; };
+      DB.sendContact(name, email, msg).then(function(r){
+        if(r.error){ fail(); return; }
+        note.style.color = 'var(--mint)';
+        note.textContent = 'Mulțumim! Mesajul a ajuns la noi — îți răspundem în maxim o zi lucrătoare.';
+        contactForm.reset();
+      }).catch(fail).then(function(){
+        sendBtn.disabled = false; sendBtn.textContent = sendLabel;
+      });
     });
   }
 

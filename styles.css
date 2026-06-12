@@ -1,7 +1,7 @@
 /* ===== smarttube — shared styles (dark, liquid glass) ===== */
 :root{
   --bg:#0a0c11;--bg-2:#11141b;--surface:#161a22;--surface-2:#252b37;
-  --white:#f2f4f7;--ink:#f2f4f7;--ink-2:#9aa4b4;--line:rgba(255,255,255,.1);
+  --white:#f2f4f7;--ink:#f2f4f7;--ink-2:#a7b1c2;--line:rgba(255,255,255,.1);
   --mint:#1aaa8f;--mint-2:#2ec9ab;--mint-deep:#0d7a67;--on-mint:#ffffff;
   --g-mint:linear-gradient(165deg,#2ec9ab 2%,#1aaa8f 50%,#0d7a67 98%);
   --glass:rgba(255,255,255,.05);--glass-2:rgba(255,255,255,.07);
@@ -560,6 +560,20 @@ body.hero-locked{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 .catalog-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:22px}
 .empty{text-align:center;color:var(--ink-2);padding:50px 0;display:none}
 
+/* skeleton loaders + stări de eroare */
+.skeleton{position:relative;overflow:hidden;background:var(--glass);border:1px solid var(--line);border-radius:18px}
+.skeleton::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.07),transparent);
+  animation:skel 1.2s infinite}
+@keyframes skel{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+.sk-card{height:348px}
+[data-theme="light"] .skeleton{background:rgba(0,0,0,.04)}
+[data-theme="light"] .skeleton::after{background:linear-gradient(90deg,transparent,rgba(0,0,0,.05),transparent)}
+.error-box{display:none;padding:18px 20px;border:1px solid rgba(230,102,102,.35);border-radius:14px;
+  background:rgba(230,102,102,.08);color:var(--ink);font-size:15px;margin:14px 0}
+.error-box.on{display:block}
+.error-box .btn{margin-top:12px}
+
 /* ---------- generic grids ---------- */
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
 .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
@@ -753,7 +767,7 @@ body.hero-locked{position:fixed;left:0;right:0;width:100%;overflow:hidden}
    ============================================================ */
 :root[data-theme="light"]{
   --bg:#f5f5f7;--bg-2:#ffffff;--surface:#ffffff;--surface-2:#e8e8ed;
-  --white:#1d1d1f;--ink:#1d1d1f;--ink-2:#6e6e73;--line:rgba(0,0,0,.09);
+  --white:#1d1d1f;--ink:#1d1d1f;--ink-2:#5d5d63;--line:rgba(0,0,0,.09);
   --mint-2:#18bfa3;
   --glass:rgba(255,255,255,.2);--glass-2:rgba(255,255,255,.22);--glass-line:rgba(0,0,0,.08);
 }

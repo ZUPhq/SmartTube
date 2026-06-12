@@ -36,13 +36,21 @@
   });
 
   function load(){
+    var errBox = document.getElementById('dashError');
+    errBox.classList.remove('on');
+    document.getElementById('dashRows').innerHTML =
+      new Array(4).join('<tr><td colspan="7"><div class="skeleton" style="height:48px;border-radius:10px"></div></td></tr>');
     DB.myCourses().then(function(courses){
       var ids = courses.map(function(c){ return c.id; });
-      Promise.all([DB.courseViews(ids), DB.courseSales(ids)]).then(function(res){
+      return Promise.all([DB.courseViews(ids), DB.courseSales(ids)]).then(function(res){
         render(courses, res[0], res[1]);
       });
+    }).catch(function(){
+      document.getElementById('dashRows').innerHTML = '';
+      errBox.classList.add('on');
     });
   }
+  document.getElementById('dashRetry').addEventListener('click', load);
 
   function render(courses, views, sales){
     /* stat cards */
@@ -71,7 +79,7 @@
     chart.innerHTML = buckets.map(function(n, idx){
       return '<i data-i="' + idx + '"><span style="height:' + Math.round(100 * n / max) + '%"></span></i>';
     }).join('');
-    var fmtD = function(d){ return d.getDate() + '.' + (d.getMonth() + 1) + '.' + d.getFullYear(); };
+    var fmtD = function(d){ return isNaN(d.getTime()) ? '—' : d.getDate() + '.' + (d.getMonth() + 1) + '.' + d.getFullYear(); };
     document.getElementById('chartFrom').textContent = fmtD(new Date(today - 29 * DAY));
     document.getElementById('chartTo').textContent = 'azi';
 
@@ -92,7 +100,10 @@
     /* surse de trafic */
     var srcBox = document.getElementById('srcBars');
     var bySrc = {};
-    views.forEach(function(v){ bySrc[v.source] = (bySrc[v.source] || 0) + 1; });
+    views.forEach(function(v){
+      var k = DB.SOURCES[v.source] ? v.source : 'direct';
+      bySrc[k] = (bySrc[k] || 0) + 1;
+    });
     var order = ['front_page','catalog','search','external','direct'];
     if(!views.length){
       srcBox.innerHTML = '<p style="color:var(--ink-2);font-size:14px;margin-top:16px">Încă nicio vizită. Publică un curs sau distribuie linkul de promovare.</p>';
@@ -156,8 +167,26 @@
     });
     rows.querySelectorAll('[data-toggle]').forEach(function(btn){
       btn.addEventListener('click', function(){
+        var next = btn.dataset.next;
+        var course = courses.filter(function(c){ return c.id === btn.dataset.toggle; })[0];
+        if(next === 'draft'){
+          var name = course ? '„' + course.title + '"' : 'cursul';
+          if(!confirm('Retragi ' + name + ' din catalog? Studenții care l-au cumpărat își păstrează accesul, iar tu îl poți republica oricând.')) return;
+        }
+        if(next === 'published' && course && !(course.total_minutes > 0)){
+          alert('Cursul e incomplet — deschide-l cu „Editează" și adaugă curriculum-ul înainte de publicare.');
+          return;
+        }
         btn.disabled = true;
-        DB.setCourseStatus(btn.dataset.toggle, btn.dataset.next).then(function(){ location.reload(); });
+        var was = btn.textContent;
+        btn.textContent = 'Se salvează…';
+        DB.setCourseStatus(btn.dataset.toggle, next).then(function(r){
+          if(r && r.error) throw r.error;
+          location.reload();
+        }).catch(function(){
+          btn.disabled = false; btn.textContent = was;
+          alert('Nu am putut salva schimbarea. Verifică-ți conexiunea și reîncearcă.');
+        });
       });
     });
 
@@ -191,7 +220,10 @@
         });
         DB.sb.from('course_views').insert(vRows).then(function(){
           return DB.sb.from('purchases').insert(pRows);
-        }).then(function(){ location.reload(); });
+        }).then(function(){ location.reload(); })
+        .catch(function(){
+          genBtn.disabled = false; genBtn.textContent = 'Generează date demo';
+        });
       });
     }
   }

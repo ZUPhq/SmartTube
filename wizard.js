@@ -137,6 +137,66 @@
     };
     document.getElementById('wAddLearn').addEventListener('click', function(){ addLearn(); });
 
+    /* ---- draft local: contra pierderii muncii (doar la curs nou) ---- */
+    var DRAFT_KEY = 'wizardDraft';
+    var dirty = false;
+    var snapshot = function(){
+      return JSON.stringify({
+        title:document.getElementById('wTitleIn').value,
+        subtitle:document.getElementById('wSubtitle').value,
+        category:document.getElementById('wCategory').value,
+        level:document.getElementById('wLevel').value,
+        desc:document.getElementById('wDesc').value,
+        price:document.getElementById('wPrice').value,
+        learn:readLearn(),
+        modules:[].slice.call(modBox.querySelectorAll('.wmod')).map(function(el){
+          return {
+            title:el.querySelector('.wm-title').value,
+            lessons:[].slice.call(el.querySelectorAll('.wlesson')).map(function(r){
+              return {title:r.querySelector('.wl-title').value, duration_min:r.querySelector('.wl-dur').value};
+            })
+          };
+        })
+      });
+    };
+    var restoreDraft = function(){
+      var raw = null;
+      try{ raw = localStorage.getItem(DRAFT_KEY); }catch(e){}
+      if(!raw) return false;
+      var d;
+      try{ d = JSON.parse(raw); }catch(e){ return false; }
+      if(!d || (!d.title && !(d.modules || []).length)) return false;
+      document.getElementById('wTitleIn').value = d.title || '';
+      document.getElementById('wSubtitle').value = d.subtitle || '';
+      if(d.category) document.getElementById('wCategory').value = d.category;
+      if(d.level) document.getElementById('wLevel').value = d.level;
+      document.getElementById('wDesc').value = d.desc || '';
+      document.getElementById('wPrice').value = d.price || '';
+      (d.learn && d.learn.length ? d.learn : ['', '', '']).forEach(addLearn);
+      if(d.modules && d.modules.length){
+        d.modules.forEach(function(m){ addModule(m.title, m.lessons || []); });
+      }else{
+        addModule();
+      }
+      return true;
+    };
+    var autoT = null;
+    var markDirty = function(){
+      dirty = true;
+      if(editId) return;
+      clearTimeout(autoT);
+      autoT = setTimeout(function(){
+        try{ localStorage.setItem(DRAFT_KEY, snapshot()); }catch(e){}
+      }, 700);
+    };
+    view.addEventListener('input', markDirty);
+    view.addEventListener('change', markDirty);
+    addEventListener('beforeunload', function(e){
+      if(!dirty) return;
+      e.preventDefault();
+      e.returnValue = '';
+    });
+
     /* ---- precompletare (mod editare) sau schelet gol ---- */
     if(editId){
       document.getElementById('wHeading').textContent = 'Editează cursul';
@@ -149,13 +209,19 @@
         document.getElementById('wLevel').value = c.level;
         document.getElementById('wDesc').value = c.description;
         document.getElementById('wPrice').value = Math.round(c.price);
-        var thumb = document.querySelector('input[name="wThumb"][value="' + c.thumb_style + '"]');
+        var thumb = [].slice.call(document.querySelectorAll('input[name="wThumb"]'))
+          .filter(function(r){ return r.value === c.thumb_style; })[0];
         if(thumb) thumb.checked = true;
         (c.what_you_learn || []).forEach(addLearn);
         if(!(c.what_you_learn || []).length) addLearn();
         (c.course_modules || []).forEach(function(m){ addModule(m.title, m.lessons || []); });
         if(!(c.course_modules || []).length) addModule();
+      }).catch(function(){
+        err('Nu am putut încărca datele cursului. Reîncarcă pagina și încearcă din nou.');
       });
+    }else if(restoreDraft()){
+      note.style.color = 'var(--ink-2)';
+      note.textContent = 'Ți-am restaurat draftul nesalvat din sesiunea anterioară. Videourile trebuie selectate din nou.';
     }else{
       addModule();
       addLearn(); addLearn(); addLearn();
@@ -182,17 +248,35 @@
         .map(function(i){ return i.value.trim(); }).filter(Boolean);
     };
     var err = function(msg){ note.style.color = '#e66'; note.textContent = msg; };
+    var warnedShort = false;
     var validate = function(s){
       note.textContent = '';
       if(s === 1 && !document.getElementById('wTitleIn').value.trim()){ err('Dă-i cursului un titlu.'); return false; }
-      if(s === 2 && !readModules().length){ err('Adaugă cel puțin un modul cu o lecție (cu titlu).'); return false; }
+      if(s === 2){
+        var mods = readModules();
+        if(!mods.length){ err('Adaugă cel puțin un modul cu o lecție (cu titlu).'); return false; }
+        var noDur = [].slice.call(modBox.querySelectorAll('.wlesson')).some(function(r){
+          var t = r.querySelector('.wl-title');
+          if(!t) return false;                      // rândurile „ce vei învăța" n-au durată
+          var d = parseInt(r.querySelector('.wl-dur').value, 10);
+          return t.value.trim() && (isNaN(d) || d < 1);
+        });
+        if(noDur){ err('Completează durata (în minute) pentru fiecare lecție. Videoul e opțional.'); return false; }
+        var total = 0;
+        mods.forEach(function(m){ m.lessons.forEach(function(l){ total += l.duration_min; }); });
+        if(total < 5 && !warnedShort){
+          warnedShort = true;
+          err('Curriculum-ul are doar ' + total + ' min în total — cursurile foarte scurte se vând greu. Apasă din nou ca să continui oricum.');
+          return false;
+        }
+      }
       if(s === 3){
         if(!document.getElementById('wDesc').value.trim()){ err('Scrie o descriere scurtă a cursului.'); return false; }
         if(!readLearn().length){ err('Adaugă cel puțin un punct la „Ce vei învăța".'); return false; }
       }
       if(s === 4){
         var pr = parseFloat(document.getElementById('wPrice').value);
-        if(isNaN(pr) || pr < 0){ err('Setează un preț (poate fi și 0 pentru curs gratuit).'); return false; }
+        if(isNaN(pr) || pr < 0 || pr > 9999){ err('Setează un preț între 0 (gratuit) și 9999 lei.'); return false; }
       }
       return true;
     };
@@ -227,11 +311,22 @@
     };
     backBtn.addEventListener('click', function(){ if(step > 1) show(step - 1); });
     nextBtn.addEventListener('click', function(){
-      if(!validate(step)) return;
-      if(step < 4){ show(step + 1); return; }
+      if(step < 4){
+        if(!validate(step)) return;
+        show(step + 1);
+        return;
+      }
+      /* la publicare validăm toți pașii — utilizatorul putea modifica înapoi */
+      for(var s = 1; s <= 4; s++){
+        if(!validate(s)){
+          if(s !== step){ show(s); validate(s); }
+          return;
+        }
+      }
       save('published');
     });
     draftBtn.addEventListener('click', function(){
+      if(!validate(1)){ show(1); validate(1); return; }
       if(!validate(4)) return;
       save('draft');
     });
@@ -241,6 +336,7 @@
       var mods = readModules();
       var mins = 0;
       mods.forEach(function(m){ m.lessons.forEach(function(l){ mins += l.duration_min; }); });
+      var thumbEl = document.querySelector('input[name="wThumb"]:checked');
       var fields = {
         title:document.getElementById('wTitleIn').value.trim(),
         subtitle:document.getElementById('wSubtitle').value.trim(),
@@ -248,22 +344,25 @@
         category:document.getElementById('wCategory').value,
         level:document.getElementById('wLevel').value,
         what_you_learn:readLearn(),
-        thumb_style:document.querySelector('input[name="wThumb"]:checked').value,
-        price:Math.max(0, parseFloat(document.getElementById('wPrice').value) || 0),
+        thumb_style:thumbEl ? thumbEl.value : 'g1',
+        price:Math.min(9999, Math.max(0, parseFloat(document.getElementById('wPrice').value) || 0)),
         total_minutes:mins,
         status:status
       };
       nextBtn.disabled = true; draftBtn.disabled = true;
       note.style.color = 'var(--ink-2)';
       note.textContent = status === 'published' ? 'Se publică…' : 'Se salvează…';
+      var phase = 'save';
       DB.saveCourse(editId, fields).then(function(course){
         /* upload videouri noi, pe rând (au nevoie de id-ul cursului) */
+        phase = 'upload';
         var ups = [];
         mods.forEach(function(m){
           m.lessons.forEach(function(l){ if(l.file) ups.push(l); });
         });
         var uploadNext = function(i){
           if(i >= ups.length) return Promise.resolve();
+          note.style.color = 'var(--ink-2)';
           note.textContent = 'Se încarcă videourile… ' + (i + 1) + ' din ' + ups.length;
           var l = ups[i];
           return DB.uploadLessonVideo(course.id, l.file).then(function(path){
@@ -274,15 +373,21 @@
           });
         };
         return uploadNext(0).then(function(){
+          phase = 'curriculum';
           note.textContent = 'Se salvează curriculum-ul…';
           return DB.saveCurriculum(course.id, mods);
         });
       }).then(function(){
         pendingDeletes.forEach(function(p){ DB.removeVideo(p); });
+        dirty = false;
+        try{ localStorage.removeItem(DRAFT_KEY); }catch(e){}
         location.href = 'dashboard.html';
       }).catch(function(e){
         nextBtn.disabled = false; draftBtn.disabled = false;
-        err('Nu am putut salva cursul. Reîncearcă.' + (e && e.message ? ' (' + e.message + ')' : ''));
+        var msg = phase === 'upload'
+          ? 'Un video nu s-a putut încărca — verifică-ți conexiunea și apasă din nou. Videourile deja încărcate nu se reîncarcă.'
+          : 'Nu am putut salva cursul. Reîncearcă.';
+        err(msg + (e && e.message ? ' (' + e.message + ')' : ''));
       });
     };
   }
