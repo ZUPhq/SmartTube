@@ -1016,6 +1016,13 @@ body.hero-locked{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 /* despre */
 .about-story{align-items:stretch}
 
+/* pagini legale */
+.legal-body{max-width:720px}
+.legal-body h2{font-size:20px;font-weight:700;letter-spacing:-.01em;margin:34px 0 10px;color:var(--ink)}
+.legal-body p{font-size:15px;line-height:1.7;color:var(--ink-2);margin:0 0 12px}
+.legal-body p b{color:var(--ink)}
+.legal-note{display:inline-block;padding:10px 14px;border:1px solid var(--line);border-radius:12px;font-size:13px;color:var(--ink-2)}
+
 /* responsive */
 @media(max-width:980px){
   .stat-grid{grid-template-columns:repeat(2,1fr)}

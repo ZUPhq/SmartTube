@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Politica de confidențialitate — smarttube</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="icon" type="image/png" href="media/logos/favicon.png" />
+<link rel="stylesheet" href="styles.css" />
+<script>try{if(localStorage.getItem('theme')==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}</script>
+</head>
+<body>
+
+<header class="phead">
+  <span class="glow"></span>
+  <div class="phead-in reveal">
+    <p class="eyebrow">Legal</p>
+    <h1 class="h1">Politica de confidențialitate</h1>
+    <p class="lead">Ce date colectăm, de ce și ce drepturi ai asupra lor.</p>
+  </div>
+</header>
+
+<section class="section tight">
+  <div class="container">
+    <div class="legal-body reveal">
+      <p class="legal-note">Document în formă de draft, în curs de revizuire juridică. Ultima actualizare: iunie 2026.</p>
+
+      <h2>1. Ce date colectăm</h2>
+      <p><b>Date de cont:</b> nume, adresă de email și parola (stocată criptat). <b>Achiziții:</b> cursurile cumpărate și prețul plătit, ca să-ți putem oferi acces pe viață la ele. <b>Mesaje:</b> ce ne trimiți prin formularele de contact. <b>Statistici de vizitare:</b> pentru paginile de curs reținem sursa vizitei (ex. catalog, căutare, link extern) ca să le arătăm instructorilor de unde le vin studenții — fără profilare individuală. <b>Conținut de instructor:</b> cursurile, descrierile și videourile pe care le publici.</p>
+
+      <h2>2. Cum folosim datele</h2>
+      <p>Exclusiv pentru funcționarea platformei: autentificare, accesul la cursurile cumpărate, statistici pentru instructori, răspunsuri la mesajele tale și emailuri strict tranzacționale (ex. confirmarea contului). Nu vindem datele tale și nu le folosim pentru reclame.</p>
+
+      <h2>3. Unde sunt stocate</h2>
+      <p>Datele sunt stocate în infrastructura Supabase, în Uniunea Europeană (regiunea Frankfurt, eu-central-1). Videourile cursurilor sunt găzduite într-un spațiu de stocare privat, accesibil doar cumpărătorilor și instructorului cursului.</p>
+
+      <h2>4. Cât timp le păstrăm</h2>
+      <p>Datele contului — cât timp contul există. Achizițiile — cât timp e nevoie pentru a-ți garanta accesul pe viață la cursuri. Mesajele de contact — maximum 2 ani. Poți cere ștergerea contului oricând.</p>
+
+      <h2>5. Drepturile tale (GDPR)</h2>
+      <p>Ai dreptul de acces la datele tale, de rectificare, de ștergere, de restricționare a prelucrării, de portabilitate și de opoziție. Pentru orice solicitare, scrie-ne prin <a href="despre.html#contact" class="link">formularul de contact</a>. Ai și dreptul de a depune o plângere la ANSPDCP (Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal).</p>
+
+      <h2 id="cookies">6. Cookie-uri și stocare locală</h2>
+      <p>smarttube <b>nu folosește cookie-uri de tracking sau de publicitate</b> și nu integrează servicii de analytics ale terților. Folosim doar stocarea locală a browserului (localStorage) pentru două lucruri: preferința ta de temă (luminoasă/întunecată) și sesiunea de autentificare Supabase. Acestea rămân pe dispozitivul tău și nu sunt folosite pentru a te urmări.</p>
+
+      <h2>7. Contact</h2>
+      <p>Întrebări despre datele tale? Scrie-ne prin <a href="despre.html#contact" class="link">formularul de contact</a> — răspundem în maxim o zi lucrătoare.</p>
+    </div>
+  </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="db.js"></script>
+<script src="partials.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
