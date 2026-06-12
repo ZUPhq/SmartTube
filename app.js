@@ -171,6 +171,9 @@
     nsResults.addEventListener('click', function(e){ if(e.target.closest('.ns-item')) nsClose(); });
     document.addEventListener('click', function(e){ if(navSearchBar.classList.contains('on') && !navSearch.contains(e.target) && !navSearchBar.contains(e.target) && !searchBtn.contains(e.target)) nsClose(); });
     addEventListener('keydown', function(e){ if(e.key === 'Escape' && navSearchBar.classList.contains('on')) nsClose(); });
+    /* preîncărcăm indexul de căutare când browserul are timp liber */
+    if('requestIdleCallback' in window) requestIdleCallback(nsLoadCourses);
+    else setTimeout(nsLoadCourses, 2500);
   }
 
   /* ---- scroll reveal ---- */
@@ -221,6 +224,10 @@
   var heroX = document.getElementById('heroX');
   var heroCopy = heroScrub && heroScrub.querySelector('.hero-copy');
   if(heroScrub && heroVid){
+    /* pe mobil nu pornim videoul automat — consumă date; posterul + butonul play rămân */
+    if(heroVideo && innerWidth <= 833){
+      try{ heroVideo.autoplay = false; heroVideo.pause(); }catch(e){}
+    }
     var hState = 'idle';            // idle | open | dismissed
     var hBase = null;               // {fill, dx, dy} measured near the top
     var hLockY = 0;
@@ -389,7 +396,11 @@
       carPos += e.key === 'ArrowLeft' ? 324 : -324;   // lățimea unui card + gap
       carVel = 0; carWrap(); carRender();
     });
-    addEventListener('resize', carFill);
+    var carFillT = null;
+    addEventListener('resize', function(){
+      clearTimeout(carFillT);
+      carFillT = setTimeout(carFill, 250);
+    });
   }
 
   /* ---- card de curs (markup identic cu cel static) ---- */
@@ -503,6 +514,18 @@
     }).catch(function(){
       grid.innerHTML = '<p class="empty" style="display:block">Nu am putut încărca acum cursurile. Reîncearcă în câteva momente.</p>';
     });
+  }
+
+  /* ---- despre: cifre live (cursuri publicate + instructori activi) ---- */
+  var statCoursesEl = document.getElementById('statCourses');
+  if(statCoursesEl && hasDB){
+    DB.publishedCourses().then(function(cs){
+      statCoursesEl.textContent = cs.length;
+      var instr = {};
+      cs.forEach(function(c){ if(c.instructor_name) instr[c.instructor_name] = 1; });
+      var si = document.getElementById('statInstructors');
+      if(si) si.textContent = Object.keys(instr).length;
+    }).catch(function(){});
   }
 
   /* ---- pagina instructori: carduri din DB, cu statistici reale; click → catalog filtrat ---- */
