@@ -12,6 +12,7 @@
     'despre.html': 'despre'
   }[page] || '';
   var on = function(k){ return active === k ? ' active' : ''; };
+  var cur = function(k){ return active === k ? ' aria-current="page"' : ''; };
 
   var NAV_HTML =
 '<nav class="nav">\n' +
@@ -37,19 +38,19 @@
 '</div>\n' +
 '<div class="mmenu" id="mmenu">\n' +
 '  <div class="mmenu-in">\n' +
-'    <a class="mm-item' + on('cursuri') + '" href="cursuri.html">\n' +
+'    <a class="mm-item' + on('cursuri') + '" href="cursuri.html"' + cur('cursuri') + '>\n' +
 '      <span class="mm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M10.5 9.2l4 2.8-4 2.8z" fill="currentColor" stroke="none"/></svg></span>\n' +
 '      <span class="mm-label">Cursuri</span>\n' +
 '    </a>\n' +
-'    <a class="mm-item' + on('instructori') + '" href="instructori.html">\n' +
+'    <a class="mm-item' + on('instructori') + '" href="instructori.html"' + cur('instructori') + '>\n' +
 '      <span class="mm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.6 19.5c.6-3 2.9-4.6 5.4-4.6s4.8 1.6 5.4 4.6"/><path d="M16.5 5.2a3 3 0 0 1 0 5.8"/><path d="M18.8 19.5c-.3-2-1.2-3.4-2.6-4.2"/></svg></span>\n' +
 '      <span class="mm-label">Instructori</span>\n' +
 '    </a>\n' +
-'    <a class="mm-item' + on('asistenta') + '" href="asistenta.html">\n' +
+'    <a class="mm-item' + on('asistenta') + '" href="asistenta.html"' + cur('asistenta') + '>\n' +
 '      <span class="mm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a7.5 7.5 0 0 1-10.9 6.7L4 20l1.8-5.1A7.5 7.5 0 1 1 21 11.5z"/></svg></span>\n' +
 '      <span class="mm-label">Asistență</span>\n' +
 '    </a>\n' +
-'    <a class="mm-item' + on('despre') + '" href="despre.html">\n' +
+'    <a class="mm-item' + on('despre') + '" href="despre.html"' + cur('despre') + '>\n' +
 '      <span class="mm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><path d="M12 7.6h.01"/></svg></span>\n' +
 '      <span class="mm-label">Despre noi</span>\n' +
 '    </a>\n' +

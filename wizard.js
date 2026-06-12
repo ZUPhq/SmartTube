@@ -35,6 +35,11 @@
   function init(profile){
     var step = 1;
     var note = document.getElementById('wNote');
+    var setNote = function(msg, kind){
+      note.classList.remove('err', 'ok');
+      if(kind) note.classList.add(kind);
+      note.textContent = msg;
+    };
     var nextBtn = document.getElementById('wNext');
     var backBtn = document.getElementById('wBack');
     var draftBtn = document.getElementById('wDraft');
@@ -220,8 +225,7 @@
         err('Nu am putut încărca datele cursului. Reîncarcă pagina și încearcă din nou.');
       });
     }else if(restoreDraft()){
-      note.style.color = 'var(--ink-2)';
-      note.textContent = 'Ți-am restaurat draftul nesalvat din sesiunea anterioară. Videourile trebuie selectate din nou.';
+      setNote('Ți-am restaurat draftul nesalvat din sesiunea anterioară. Videourile trebuie selectate din nou.');
     }else{
       addModule();
       addLearn(); addLearn(); addLearn();
@@ -247,7 +251,7 @@
       return [].slice.call(learnBox.querySelectorAll('.wlearn-in'))
         .map(function(i){ return i.value.trim(); }).filter(Boolean);
     };
-    var err = function(msg){ note.style.color = '#e66'; note.textContent = msg; };
+    var err = function(msg){ setNote(msg, 'err'); };
     var warnedShort = false;
     var validate = function(s){
       note.textContent = '';
@@ -350,8 +354,7 @@
         status:status
       };
       nextBtn.disabled = true; draftBtn.disabled = true;
-      note.style.color = 'var(--ink-2)';
-      note.textContent = status === 'published' ? 'Se publică…' : 'Se salvează…';
+      setNote(status === 'published' ? 'Se publică…' : 'Se salvează…');
       var phase = 'save';
       DB.saveCourse(editId, fields).then(function(course){
         /* upload videouri noi, pe rând (au nevoie de id-ul cursului) */
@@ -362,8 +365,7 @@
         });
         var uploadNext = function(i){
           if(i >= ups.length) return Promise.resolve();
-          note.style.color = 'var(--ink-2)';
-          note.textContent = 'Se încarcă videourile… ' + (i + 1) + ' din ' + ups.length;
+          setNote('Se încarcă videourile… ' + (i + 1) + ' din ' + ups.length);
           var l = ups[i];
           return DB.uploadLessonVideo(course.id, l.file).then(function(path){
             if(l.video_path) pendingDeletes.push(l.video_path);   // video înlocuit
@@ -374,7 +376,7 @@
         };
         return uploadNext(0).then(function(){
           phase = 'curriculum';
-          note.textContent = 'Se salvează curriculum-ul…';
+          setNote('Se salvează curriculum-ul…');
           return DB.saveCurriculum(course.id, mods);
         });
       }).then(function(){

@@ -4,6 +4,14 @@
   var reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
   var hasDB = typeof window.DB !== 'undefined';
 
+  /* ---- mesaje de stare în formulare: .form-note cu clase err/ok ---- */
+  var setNote = function(el, msg, kind){
+    if(!el) return;
+    el.classList.remove('err', 'ok');
+    if(kind) el.classList.add(kind);
+    el.textContent = msg;
+  };
+
   /* ---- theme (light/dark) toggle ---- */
   var getTheme = function(){
     try{ return localStorage.getItem('theme') === 'light' ? 'light' : 'dark'; }catch(e){ return 'dark'; }
@@ -643,8 +651,7 @@
   document.querySelectorAll('form[data-demo]').forEach(function(f){
     f.addEventListener('submit', function(e){
       e.preventDefault();
-      var note = f.querySelector('.form-note');
-      if(note){ note.textContent = 'Mulțumim! Acesta este un demo — formularul nu trimite date reale.'; note.style.color = 'var(--mint)'; }
+      setNote(f.querySelector('.form-note'), 'Mulțumim! Acesta este un demo — formularul nu trimite date reale.', 'ok');
     });
   });
 
@@ -734,21 +741,20 @@
     if(loginForm) loginForm.addEventListener('submit', function(e){
       e.preventDefault();
       var note = noteOf(loginForm);
-      note.style.color = 'var(--ink-2)'; note.textContent = 'Se verifică…';
+      setNote(note, 'Se verifică…');
       DB.signIn(loginForm.email.value.trim(), loginForm.password.value).then(function(r){
-        if(r.error){ note.style.color = '#e66'; note.textContent = authMsg(r.error); return; }
+        if(r.error){ setNote(note, authMsg(r.error), 'err'); return; }
         location.href = redirect || 'cont.html';
       });
     });
     if(registerForm) registerForm.addEventListener('submit', function(e){
       e.preventDefault();
       var note = noteOf(registerForm);
-      note.style.color = 'var(--ink-2)'; note.textContent = 'Se creează contul…';
+      setNote(note, 'Se creează contul…');
       DB.signUp(registerForm.name.value.trim(), registerForm.email.value.trim(), registerForm.password.value).then(function(r){
-        if(r.error){ note.style.color = '#e66'; note.textContent = authMsg(r.error); return; }
+        if(r.error){ setNote(note, authMsg(r.error), 'err'); return; }
         if(r.data.session){ location.href = redirect || 'cont.html'; return; }
-        note.style.color = 'var(--mint)';
-        note.textContent = 'Cont creat! Ți-am trimis un email de confirmare — apasă linkul din el, apoi intră în cont.';
+        setNote(note, 'Cont creat! Ți-am trimis un email de confirmare — apasă linkul din el, apoi intră în cont.', 'ok');
       });
     });
     var logoutBtn = document.getElementById('hubLogout');
@@ -855,13 +861,11 @@
         DB.upsertReview(c.id, parseInt(document.getElementById('rvRating').value, 10),
           document.getElementById('rvComment').value.trim())
           .then(function(){
-            rnote.style.color = 'var(--mint)';
-            rnote.textContent = 'Mulțumim! Recenzia ta a fost salvată.';
+            setNote(rnote, 'Mulțumim! Recenzia ta a fost salvată.', 'ok');
             rbtn.textContent = 'Actualizează recenzia';
             renderReviews();
           }).catch(function(){
-            rnote.style.color = '#e66';
-            rnote.textContent = 'Nu am putut salva recenzia. Reîncearcă.';
+            setNote(rnote, 'Nu am putut salva recenzia. Reîncearcă.', 'err');
           }).then(function(){ rbtn.disabled = false; });
       });
 
@@ -1000,16 +1004,17 @@
       var name = contactForm.name.value.trim();
       var email = contactForm.email.value.trim();
       var msg = contactForm.message.value.trim();
-      if(name.length < 2){ note.style.color = '#e66'; note.textContent = 'Scrie-ne și numele tău.'; return; }
-      if(msg.length < 10){ note.style.color = '#e66'; note.textContent = 'Mesajul e prea scurt — dă-ne câteva detalii.'; return; }
+      contactForm.name.removeAttribute('aria-invalid');
+      contactForm.message.removeAttribute('aria-invalid');
+      if(name.length < 2){ contactForm.name.setAttribute('aria-invalid', 'true'); setNote(note, 'Scrie-ne și numele tău.', 'err'); return; }
+      if(msg.length < 10){ contactForm.message.setAttribute('aria-invalid', 'true'); setNote(note, 'Mesajul e prea scurt — dă-ne câteva detalii.', 'err'); return; }
       var sendLabel = sendBtn.textContent;
       sendBtn.disabled = true; sendBtn.textContent = 'Se trimite…';
-      note.style.color = 'var(--ink-2)'; note.textContent = '';
-      var fail = function(){ note.style.color = '#e66'; note.textContent = 'Nu am putut trimite mesajul. Reîncearcă.'; };
+      setNote(note, '');
+      var fail = function(){ setNote(note, 'Nu am putut trimite mesajul. Reîncearcă.', 'err'); };
       DB.sendContact(name, email, msg).then(function(r){
         if(r.error){ fail(); return; }
-        note.style.color = 'var(--mint)';
-        note.textContent = 'Mulțumim! Mesajul a ajuns la noi — îți răspundem în maxim o zi lucrătoare.';
+        setNote(note, 'Mulțumim! Mesajul a ajuns la noi — îți răspundem în maxim o zi lucrătoare.', 'ok');
         contactForm.reset();
       }).catch(fail).then(function(){
         sendBtn.disabled = false; sendBtn.textContent = sendLabel;
