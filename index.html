@@ -17,9 +17,9 @@
 <link rel="icon" type="image/png" href="media/logos/favicon.png" />
 <link rel="stylesheet" href="styles.css" />
 <script>try{if(localStorage.getItem('theme')==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}</script>
-<!-- userii logați ajung pe dashboard-ul lor la intrare, DAR pot reveni la homepage cu ?home
-     (alegerea se ține minte pe sesiune, ca logo-ul să nu-i mai trimită înapoi) -->
-<script>try{if(location.search.indexOf('home')>-1)sessionStorage.setItem('viewHome','1');if(!sessionStorage.getItem('viewHome')){for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('sb-')===0&&k.indexOf('-auth-token')>0){location.replace('cont.html');break;}}}}catch(e){}</script>
+<!-- userii logați au „acasă" dashboard-ul: orice acces la index.html (inclusiv logo-ul) îi duce acolo.
+     Excepție: linkul „Acasă" din meniu folosește ?home și arată homepage-ul fix de data asta, fără sticky. -->
+<script>try{if(location.search.indexOf('home')===-1){for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('sb-')===0&&k.indexOf('-auth-token')>0){location.replace('cont.html');break;}}}}catch(e){}</script>
 </head>
 <body>
 
