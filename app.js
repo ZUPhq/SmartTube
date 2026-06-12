@@ -841,6 +841,16 @@
       var months = ['ianuarie','februarie','martie','aprilie','mai','iunie','iulie','august','septembrie','octombrie','noiembrie','decembrie'];
       document.getElementById('cUpdated').textContent = 'Actualizat ' + months[when.getMonth()] + ' ' + when.getFullYear();
 
+      /* coperta preia gradientul cursului — continuitate cu cardul din catalog */
+      document.querySelectorAll('#coursePage .sc-hero').forEach(function(el){
+        el.classList.add(/^g[123]$/.test(c.thumb_style) ? c.thumb_style : 'g1');
+      });
+      var cover = document.getElementById('cCover');
+      if(cover){
+        cover.innerHTML = '<span class="cc-tag">' + DB.esc(DB.CAT_SHORT[c.category] || '') + '</span>' +
+          '<span class="cc-dur">' + DB.fmtDur(c.total_minutes) + '</span>';
+      }
+
       var check = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
       document.getElementById('cLearn').innerHTML = (c.what_you_learn || []).map(function(x){
         return '<li>' + check + DB.esc(x) + '</li>';
@@ -864,6 +874,16 @@
           ' <span class="meta">— ' + (m.lessons || []).length + ' lecții · ' + DB.fmtDur(mins) + '</span></span>' +
           plus + '</button><div class="mod-body"><div>' + rows + '</div></div></div>';
       }).join('');
+
+      /* facts row: cifrele cursului dintr-o privire (după calculul curriculum-ului) */
+      var facts = document.getElementById('cFacts');
+      if(facts){
+        document.getElementById('cfLessons').textContent = lessonCount;
+        document.getElementById('cfDur').textContent = DB.fmtDur(totalMin || c.total_minutes);
+        document.getElementById('cfLevel').textContent = c.level || '—';
+        document.getElementById('cfModules').textContent = (c.course_modules || []).length;
+        facts.style.display = '';
+      }
 
       document.getElementById('cInstCard').innerHTML =
         '<div class="inst-top"><span class="av">' + DB.esc(c.instructor_initials) + '</span>' +

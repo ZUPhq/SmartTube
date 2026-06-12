@@ -545,6 +545,16 @@ a.inst-card{display:block}
 .inst-stats b{display:block;font-size:18px;color:var(--ink);font-weight:700}
 .inst-stats span{font-size:12px;color:var(--ink-2)}
 
+/* facts row pe pagina cursului — reutilizează .inst-stats într-un card fără padding */
+.course-facts{padding:0;margin-top:18px}
+.course-facts .inst-stats{border-top:0}
+@media(max-width:600px){
+  .course-facts .inst-stats{display:grid;grid-template-columns:1fr 1fr}
+  .course-facts .inst-stats div{border-right:0;border-top:1px solid var(--line)}
+  .course-facts .inst-stats div:nth-child(-n+2){border-top:0}
+  .course-facts .inst-stats div:nth-child(odd){border-right:1px solid var(--line)}
+}
+
 /* reviews */
 .review{border-radius:var(--r-xl);padding:24px;
   will-change:transform;transition:transform var(--dur-slow) var(--ease),box-shadow var(--dur-med)}

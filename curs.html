@@ -35,7 +35,17 @@
       <div>
         <!-- copertă vizuală (fără player fals — previzualizarea gratuită e un feature viitor) -->
         <div class="screen reveal" style="width:100%;max-width:none">
-          <div class="sc-hero" style="aspect-ratio:16/8.5" aria-hidden="true"></div>
+          <div class="sc-hero" id="cCover" style="aspect-ratio:16/8.5" aria-hidden="true"></div>
+        </div>
+
+        <!-- cifrele cursului dintr-o privire -->
+        <div class="card no-tilt course-facts reveal" id="cFacts" style="display:none" aria-label="Pe scurt despre curs">
+          <div class="inst-stats">
+            <div><b id="cfLessons">—</b><span>lecții video</span></div>
+            <div><b id="cfDur">—</b><span>durată totală</span></div>
+            <div><b id="cfLevel">—</b><span>nivel</span></div>
+            <div><b id="cfModules">—</b><span>module</span></div>
+          </div>
         </div>
 
         <!-- what you learn -->
