@@ -620,13 +620,19 @@
       }, {threshold:.3});
       sio.observe(statCoursesEl);
     });
-    Promise.all([DB.publishedCourses(), statsVisible]).then(function(r){
+    Promise.all([
+      DB.publishedCourses(),
+      DB.instructorStats().catch(function(){ return []; }),
+      statsVisible
+    ]).then(function(r){
       var cs = r[0];
       countUp(statCoursesEl, cs.length);
       var instr = {};
       cs.forEach(function(c){ if(c.instructor_name) instr[c.instructor_name] = 1; });
       var si = document.getElementById('statInstructors');
       if(si) countUp(si, Object.keys(instr).length);
+      var ss = document.getElementById('statStudents');
+      if(ss) countUp(ss, r[1].reduce(function(s, i){ return s + (Number(i.students_count) || 0); }, 0));
     }).catch(function(){});
   }
 
@@ -638,6 +644,10 @@
       if(!list.length){
         instGrid.innerHTML = '<p class="empty" style="display:block;grid-column:1/-1">Încă niciun instructor cu cursuri publicate.</p>';
         return;
+      }
+      var instLead = document.getElementById('instLead');
+      if(instLead && list.length >= 2){
+        instLead.textContent = list.length + ' instructori predau acum pe smarttube — fiecare e practician în domeniul lui.';
       }
       var fmtK = function(n){ return n >= 1000 ? (Math.round(n / 100) / 10).toLocaleString('ro-RO') + 'k' : String(n); };
       instGrid.innerHTML = list.map(function(i){

@@ -923,10 +923,15 @@ a.card{display:block}
 
 /* pagini legale */
 .legal-body{max-width:720px}
-.legal-body h2{font-size:20px;font-weight:700;letter-spacing:-.01em;margin:34px 0 10px;color:var(--ink)}
-.legal-body p{font-size:15px;line-height:1.7;color:var(--ink-2);margin:0 0 12px}
+.legal-body h2{font-size:20px;font-weight:700;letter-spacing:-.01em;margin:40px 0 12px;color:var(--ink);
+  padding-top:22px;border-top:1px solid var(--line)}
+.legal-body h2:first-of-type{padding-top:0;border-top:0}
+.legal-body p{font-size:15.5px;line-height:1.7;color:var(--ink-2);margin:0 0 12px}
 .legal-body p b{color:var(--ink)}
 .legal-note{display:inline-block;padding:10px 14px;border:1px solid var(--line);border-radius:var(--r-md);font-size:13px;color:var(--ink-2)}
+.legal-toc{display:flex;flex-wrap:wrap;gap:6px 18px;margin:18px 0 8px;font-size:13px}
+.legal-toc a{color:var(--ink-2);transition:color .15s}
+.legal-toc a:hover{color:var(--mint)}
 
 /* responsive */
 @media(max-width:980px){
