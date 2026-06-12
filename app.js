@@ -639,10 +639,10 @@
   /* ---- pagina instructori: carduri din DB, cu statistici reale; click → catalog filtrat ---- */
   var instGrid = document.getElementById('instGrid');
   if(instGrid && hasDB){
-    instGrid.innerHTML = new Array(7).join('<div class="inst-card skeleton" style="height:208px" aria-hidden="true"></div>');
+    instGrid.innerHTML = new Array(7).join('<div class="inst-card skeleton sk-inst" aria-hidden="true"></div>');
     DB.instructorStats().then(function(list){
       if(!list.length){
-        instGrid.innerHTML = '<p class="empty" style="display:block;grid-column:1/-1">Încă niciun instructor cu cursuri publicate.</p>';
+        instGrid.innerHTML = '<p class="empty span-all" style="display:block">Încă niciun instructor cu cursuri publicate.</p>';
         return;
       }
       var instLead = document.getElementById('instLead');
@@ -668,7 +668,7 @@
       [].forEach.call(instGrid.children, function(el){ el.classList.add('reveal'); });
       revealify(instGrid);
     }).catch(function(){
-      instGrid.innerHTML = '<p class="empty" style="display:block;grid-column:1/-1">Nu am putut încărca instructorii. Reîncarcă pagina.</p>';
+      instGrid.innerHTML = '<p class="empty span-all" style="display:block">Nu am putut încărca instructorii. Reîncarcă pagina.</p>';
     });
   }
 
@@ -869,7 +869,7 @@
         [].forEach.call(box.children, function(el){ el.classList.add('reveal'); });
         revealify(box);
       }).catch(function(){
-        box.innerHTML = '<p class="empty" style="display:block;grid-column:1/-1">Nu am putut încărca cursurile tale. Reîncarcă pagina.</p>';
+        box.innerHTML = '<p class="empty span-all" style="display:block">Nu am putut încărca cursurile tale. Reîncarcă pagina.</p>';
       });
     };
 
@@ -929,7 +929,7 @@
       var rateEl = document.getElementById('cRate');
       if(c.rating != null){
         rateEl.innerHTML = '★★★★★ ' + DB.fmtRating(c.rating) +
-          ' <span style="color:var(--ink-2);font-weight:400">(' + c.rating_count + ' recenzii)</span>';
+          ' <span class="rate-n">(' + c.rating_count + ' recenzii)</span>';
       }else{
         rateEl.textContent = 'Curs nou pe smarttube';
       }

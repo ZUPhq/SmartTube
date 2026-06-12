@@ -75,6 +75,21 @@ h1,h2,h3,h4{font-weight:600;letter-spacing:-.02em;line-height:1.08;color:var(--i
 .lead{font-size:clamp(17px,2vw,21px);font-weight:400;color:var(--ink-2);line-height:1.4}
 .mint-tx{color:var(--mint)}
 
+/* utilities — înlocuiesc inline styles recurente */
+.sect-alt{background:var(--bg-2)}
+.sec-title{margin:var(--sp-7) 0 18px}
+.sec-head{margin-bottom:var(--sp-6)}
+.phead.flat{padding-bottom:0}
+.link-sm{font-size:13px}
+.av-sm{width:30px;height:30px;font-size:11px}
+.span-all{grid-column:1/-1}
+.auth-wrap.lg{max-width:520px}
+.sk-inst{height:208px}
+.sk-row{height:48px;border-radius:var(--r-md)}
+.td-sub{color:var(--ink-2);font-size:12.5px}
+.gate-sub{color:var(--ink-2);font-size:15px;margin-bottom:20px}
+.rate-n{color:var(--ink-2);font-weight:400}
+
 /* ---------- buttons / links ---------- */
 .btn{display:inline-flex;align-items:center;justify-content:center;font-size:17px;
   font-weight:500;line-height:1;padding:13px 24px;border-radius:var(--r-pill);

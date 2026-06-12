@@ -21,7 +21,7 @@
     }
     if(!p.is_instructor){
       showGate('<h3 class="h3" style="margin-bottom:10px">Activează modul instructor</h3>' +
-        '<p style="color:var(--ink-2);font-size:15px;margin-bottom:20px">Contul tău e de cursant. Activează modul instructor ca să publici cursuri și să-ți vezi vânzările.</p>' +
+        '<p class="gate-sub">Contul tău e de cursant. Activează modul instructor ca să publici cursuri și să-ți vezi vânzările.</p>' +
         '<button class="btn btn-mint btn-block btn-lg" id="gateActivate" type="button">Devino instructor</button>');
       var b = document.getElementById('gateActivate');
       b.addEventListener('click', function(){
@@ -39,7 +39,7 @@
     var errBox = document.getElementById('dashError');
     errBox.classList.remove('on');
     document.getElementById('dashRows').innerHTML =
-      new Array(4).join('<tr><td colspan="7"><div class="skeleton" style="height:48px;border-radius:10px"></div></td></tr>');
+      new Array(4).join('<tr><td colspan="7"><div class="skeleton sk-row"></div></td></tr>');
     DB.myCourses().then(function(courses){
       var ids = courses.map(function(c){ return c.id; });
       return Promise.all([DB.courseViews(ids), DB.courseSales(ids)]).then(function(res){
@@ -160,7 +160,7 @@
     rows.innerHTML = courses.map(function(c){
       var pub = c.status === 'published';
       return '<tr>' +
-        '<td><b>' + DB.esc(c.title) + '</b><br><span style="color:var(--ink-2);font-size:12.5px">' + DB.esc(DB.CATS[c.category] || '') + '</span></td>' +
+        '<td><b>' + DB.esc(c.title) + '</b><br><span class="td-sub">' + DB.esc(DB.CATS[c.category] || '') + '</span></td>' +
         '<td><span class="badge ' + (pub ? 'pub' : 'draft') + '">' + (pub ? 'Publicat' : 'Draft') + '</span></td>' +
         '<td class="num">' + DB.fmtPrice(c.price) + '</td>' +
         '<td class="num">' + (vBy[c.id] || 0) + '</td>' +

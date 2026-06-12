@@ -18,7 +18,7 @@
     if(!p.is_instructor){
       gate.style.display = '';
       gateCard.innerHTML = '<h3 class="h3" style="margin-bottom:10px">Activează modul instructor</h3>' +
-        '<p style="color:var(--ink-2);font-size:15px;margin-bottom:20px">Ca să publici cursuri, activează mai întâi modul instructor pe contul tău.</p>' +
+        '<p class="gate-sub">Ca să publici cursuri, activează mai întâi modul instructor pe contul tău.</p>' +
         '<button class="btn btn-mint btn-block btn-lg" id="wizActivate" type="button">Devino instructor</button>';
       var b = document.getElementById('wizActivate');
       b.addEventListener('click', function(){
