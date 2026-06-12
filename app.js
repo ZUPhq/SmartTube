@@ -43,7 +43,8 @@
       mmenu.classList.toggle('open', open);
       burger.classList.toggle('on', open);
       burger.setAttribute('aria-expanded', open ? 'true' : 'false');
-      document.body.style.overflow = (open && innerWidth <= 833) ? 'hidden' : '';
+      if(open && innerWidth <= 833) document.body.style.overflow = 'hidden';
+      else if(!openDialogs) document.body.style.overflow = '';
     };
     burger.addEventListener('click', function(e){
       e.stopPropagation();
@@ -59,6 +60,7 @@
     });
     addEventListener('keydown', function(e){ if(e.key === 'Escape') setMenu(false); });
     addEventListener('resize', function(){
+      if(openDialogs) return;   // dialogul deschis își păstrează scroll lock-ul
       document.body.style.overflow = (mmenu.classList.contains('open') && innerWidth <= 833) ? 'hidden' : '';
     });
   }
@@ -87,6 +89,7 @@
   var nsX = document.getElementById('navSearchX');
   var navSearchBar = document.getElementById('navSearchBar');
   if(searchBtn && navSearch && nsInput && nsResults && navSearchBar){
+    if(matchMedia('(max-width:600px)').matches) nsInput.placeholder = 'Caută…';
     var NS_ICON = {
       curs:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M10.5 9.2l4 2.8-4 2.8z" fill="currentColor" stroke="none"/></svg>',
       instructor:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c0-3.6 3-5.6 7-5.6s7 2 7 5.6"/></svg>',
