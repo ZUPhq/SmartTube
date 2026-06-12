@@ -248,99 +248,70 @@
     frame();
   }
 
-  /* ---- hero founders video: grows on scroll, opens fullscreen modal ---- */
-  var heroScrub = document.getElementById('heroScrub');
-  var heroVid = document.getElementById('heroVid');
+  /* ---- hero MacBook: ecranul se deschide/zoom pe scroll, video pe ecran ---- */
+  var mbkScrub = document.getElementById('mbkScrub');
+  var mbk = document.getElementById('mbk');
+  var mbkScreen = document.getElementById('mbkScreen');
+  var mbkHead = document.getElementById('mbkHead');
   var heroVideo = document.getElementById('heroVideo');
   var heroPlay = document.getElementById('heroPlay');
-  var heroX = document.getElementById('heroX');
-  var heroCopy = heroScrub && heroScrub.querySelector('.hero-copy');
-  if(heroScrub && heroVid){
-    /* pe mobil nu pornim videoul automat — consumă date; posterul + butonul play rămân */
-    if(heroVideo && innerWidth <= 833){
-      try{ heroVideo.autoplay = false; heroVideo.pause(); }catch(e){}
-    }
-    var hState = 'idle';            // idle | open | dismissed
-    var hBase = null;               // {fill, dx, dy} measured near the top
-    var hLockY = 0;
-    var heroVidHome = heroVid.parentNode, heroVidNext = heroVid.nextSibling;
-    var heroScrubOn = function(){ return innerWidth > 833 && !reduce; };
+  if(mbkScrub && mbk && mbkScreen){
+    /* pe mobil nu pornim videoul automat — consumă date; posterul + play rămân */
+    if(heroVideo && innerWidth <= 833){ try{ heroVideo.autoplay = false; heroVideo.pause(); }catch(e){} }
 
-    var hScrub = function(){
-      if(hState !== 'idle' || !heroScrubOn()) return;
-      var vw = innerWidth, vh = innerHeight;
-      var top = heroScrub.getBoundingClientRect().top;       // 68 → negative as it pins
-      var span = heroScrub.offsetHeight - vh;
-      var p = span > 0 ? Math.max(0, Math.min(1, -top / span)) : 0;
-      if(p <= 0.01){                                          // transform ≈ identity here: safe to measure
-        var r = heroVid.getBoundingClientRect();
-        hBase = {
-          fill: Math.max(vw / r.width, vh / r.height) * 1.02,
-          dx: vw / 2 - (r.left + r.width / 2),
-          dy: vh / 2 - (r.top + r.height / 2)
-        };
+    var fitMbk = function(){
+      /* 640 = ecranul la lățime maximă (512×1.2 ≈ 614) + margine, ca să nu iasă lateral pe niciun ecran */
+      var s = Math.min((innerWidth - 28) / 640, (innerHeight * 0.6) / 600, 1.12);
+      mbk.style.setProperty('--mbk-scale', Math.max(0.32, s).toFixed(3));
+    };
+    fitMbk();
+    addEventListener('load', fitMbk);   // re-fit după ce se așază layout-ul/fonturile
+
+    var mbkOn = function(){ return innerWidth > 833 && !reduce; };
+    var lerp = function(a, b, t){ return a + (b - a) * t; };
+    var cl = function(v){ return v < 0 ? 0 : v > 1 ? 1 : v; };
+    var mbkScrubFn = function(){
+      if(!mbkOn()) return;
+      var top = mbkScrub.getBoundingClientRect().top;
+      var span = mbkScrub.offsetHeight - innerHeight;
+      var q = span > 0 ? cl(-top / span) : 0;
+      /* exact ca Aceternity: scaleX 1.2→1.5, scaleY .6→1.5 (q[0,.3]); rotateX -28→0 (q[.1,.3]) */
+      var a = cl(q / 0.3);
+      var sx = lerp(1.2, 1.5, a), sy = lerp(0.6, 1.5, a);
+      var rot = q < 0.1 ? -28 : lerp(-28, 0, cl((q - 0.1) / 0.2));
+      mbkScreen.style.transform = 'rotateX(' + rot.toFixed(2) + 'deg) scale(' + sx.toFixed(3) + ',' + sy.toFixed(3) + ')';
+      if(mbkHead){
+        mbkHead.style.opacity = (1 - cl(q / 0.2)).toFixed(3);
+        mbkHead.style.transform = 'translateY(' + (100 * a).toFixed(1) + 'px)';
       }
-      if(!hBase) return;
-      var s = 1 + (hBase.fill - 1) * p;
-      heroVid.style.transform = 'translate(' + (hBase.dx * p).toFixed(1) + 'px,' + (hBase.dy * p).toFixed(1) + 'px) scale(' + s.toFixed(4) + ')';
-      heroVid.style.borderRadius = (Math.max(0, 24 * (1 - p * 1.3)) / s).toFixed(2) + 'px';
-      if(heroCopy) heroCopy.style.opacity = Math.max(0, 1 - p / 0.4).toFixed(3);
-      if(p >= 0.992) heroOpen();
     };
 
-    function heroOpen(){
-      if(hState === 'open') return;
-      hState = 'open';
-      hLockY = window.pageYOffset || 0;
-      heroVid.style.transform = '';
-      heroVid.style.borderRadius = '';
-      heroVid.classList.add('is-open', 'is-playing');
-      document.body.appendChild(heroVid);          // escape the sticky stage's stacking context → true fullscreen
-      document.body.style.top = -hLockY + 'px';
-      document.body.classList.add('hero-locked');
-      try{                                          // fullscreen: play with sound (mute fallback), no loop so it can end
-        heroVideo.controls = true;
-        heroVideo.loop = false;
-        heroVideo.muted = false;
+    var mbkTick = false;
+    var onMbkScroll = function(){ if(!mbkTick){ mbkTick = true; requestAnimationFrame(function(){ mbkScrubFn(); mbkTick = false; }); } };
+    if(mbkOn()){ addEventListener('scroll', onMbkScroll, {passive:true}); mbkScrubFn(); }
+    addEventListener('resize', function(){
+      fitMbk();
+      if(mbkOn()){ mbkScrubFn(); }
+      else { mbkScreen.style.transform = '';
+        if(mbkHead){ mbkHead.style.opacity = ''; mbkHead.style.transform = ''; } }
+    });
+
+    /* play → fullscreen cu sunet; la ieșire revine pe mut + loop */
+    if(heroPlay && heroVideo){
+      heroPlay.addEventListener('click', function(e){
+        e.preventDefault();
+        try{ heroVideo.muted = false; heroVideo.controls = true; }catch(_){}
+        var req = heroVideo.requestFullscreen || heroVideo.webkitRequestFullscreen;
+        if(req){ try{ req.call(heroVideo); }catch(_){} }
+        else if(heroVideo.webkitEnterFullscreen){ try{ heroVideo.webkitEnterFullscreen(); }catch(_){} }
         var pr = heroVideo.play();
-        if(pr && pr.catch) pr.catch(function(){ try{ heroVideo.muted = true; heroVideo.play(); }catch(e){} });
-      }catch(e){}
+        if(pr && pr.catch) pr.catch(function(){ try{ heroVideo.muted = true; heroVideo.play(); }catch(e2){} });
+      });
+      var mbkRestore = function(){ try{ heroVideo.controls = false; heroVideo.muted = true; }catch(e){} };
+      document.addEventListener('fullscreenchange', function(){ if(!document.fullscreenElement) mbkRestore(); });
+      document.addEventListener('webkitfullscreenchange', function(){ if(!document.webkitFullscreenElement) mbkRestore(); });
+      heroVideo.addEventListener('webkitendfullscreen', mbkRestore);
     }
-
-    var heroClose = function(){
-      if(hState !== 'open') return;
-      hState = 'dismissed';
-      try{ heroVideo.pause(); }catch(e){}
-      // place the page behind the (still-visible) overlay at the next section, then crossfade
-      document.body.classList.remove('hero-locked');
-      document.body.style.top = '';
-      if(heroCopy) heroCopy.style.opacity = '';
-      if(innerWidth > 833){                                  // collapse the tall scrub so the page continues cleanly
-        heroScrub.style.minHeight = '100vh';
-        heroScrub.style.height = '100vh';
-        window.scrollTo(0, heroScrub.offsetHeight);           // featured section at viewport top
-      }else{
-        window.scrollTo(0, hLockY);
-      }
-      heroVid.classList.add('is-closing');                   // fade + slight scale-down → reveals the page smoothly
-      setTimeout(function(){
-        heroVid.classList.remove('is-open', 'is-playing', 'is-closing');
-        heroVid.style.transform = '';
-        heroVid.style.borderRadius = '';
-        try{ heroVideo.controls = false; heroVideo.loop = true; heroVideo.currentTime = 0; heroVideo.load(); }catch(e){}
-        if(heroVidHome) heroVidHome.insertBefore(heroVid, heroVidNext);   // put it back in the hero
-      }, 480);
-    };
-
-    if(heroPlay) heroPlay.addEventListener('click', function(e){ e.preventDefault(); heroOpen(); });
-    if(heroX) heroX.addEventListener('click', function(e){ e.preventDefault(); heroClose(); });
-    if(heroVideo) heroVideo.addEventListener('ended', heroClose);   // auto-close when the video finishes
-    addEventListener('keydown', function(e){ if(e.key === 'Escape' && hState === 'open') heroClose(); });
-
-    var hTick = false;
-    var onHeroScroll = function(){ if(!hTick){ hTick = true; requestAnimationFrame(function(){ hScrub(); hTick = false; }); } };
-    if(heroScrubOn()){ addEventListener('scroll', onHeroScroll, {passive:true}); hScrub(); }
-    addEventListener('resize', function(){ if(hState === 'idle' && heroScrubOn()) hScrub(); });
   }
 
   /* ---- courses carousel: cele mai accesate cursuri din ultimele 7 zile ---- */
