@@ -184,16 +184,28 @@
     else setTimeout(nsLoadCourses, 2500);
   }
 
-  /* ---- scroll reveal ---- */
-  var reveals = document.querySelectorAll('.reveal');
-  if(reveals.length){
-    var io = new IntersectionObserver(function(es){
-      es.forEach(function(e){
-        if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
-      });
-    }, {threshold:.14, rootMargin:'0px 0px -8% 0px'});
-    reveals.forEach(function(el){ io.observe(el); });
-  }
+  /* ---- scroll reveal (stagger per batch de intersecție — viewport-relative) ---- */
+  var revealIO = new IntersectionObserver(function(es){
+    var batch = 0;
+    es.forEach(function(e){
+      if(!e.isIntersecting) return;
+      var el = e.target;
+      if(!reduce){
+        el.style.transitionDelay = Math.min(batch++ * 60, 420) + 'ms';
+        el.addEventListener('transitionend', function h(){
+          el.style.transitionDelay = '';
+          el.removeEventListener('transitionend', h);
+        });
+      }
+      el.classList.add('in');
+      revealIO.unobserve(el);
+    });
+  }, {threshold:.14, rootMargin:'0px 0px -8% 0px'});
+  var revealify = function(root){
+    [].forEach.call(root.querySelectorAll('.reveal:not(.in)'), function(el){ revealIO.observe(el); });
+    if(root !== document && root.classList && root.classList.contains('reveal') && !root.classList.contains('in')) revealIO.observe(root);
+  };
+  revealify(document);
 
   /* ---- parallax + scroll-zoom (home) ---- */
   var parEls = [].slice.call(document.querySelectorAll('[data-par]'));
@@ -350,13 +362,15 @@
     };
     carFill();
 
-    /* accesibil din tastatură: focusabil + săgeți; drift-ul se oprește cât e focusat */
-    var carFocus = false;
+    /* accesibil din tastatură: focusabil + săgeți; drift-ul se oprește cât e focusat sau sub cursor */
+    var carFocus = false, carHover = false;
     carView.setAttribute('tabindex', '0');
     carView.setAttribute('role', 'region');
     carView.setAttribute('aria-label', 'Cursuri populare — navighează cu săgețile stânga și dreapta');
     carView.addEventListener('focus', function(){ carFocus = true; });
     carView.addEventListener('blur', function(){ carFocus = false; });
+    carView.addEventListener('mouseenter', function(){ carHover = true; });
+    carView.addEventListener('mouseleave', function(){ carHover = false; });
 
     var carPos = 0, carVel = 0, carDragging = false, carLastT = null;
     var carAuto = reduce ? 0 : 0.035;              // px per ms, drifts left
@@ -369,7 +383,7 @@
     var carTick = function(t){
       var dt = carLastT == null ? 16 : Math.min(64, t - carLastT); carLastT = t;
       if(!carDragging){
-        carPos -= (carFocus ? 0 : carAuto) * dt;
+        carPos -= ((carFocus || carHover) ? 0 : carAuto) * dt;
         carPos += carVel;
         carVel *= 0.92; if(Math.abs(carVel) < 0.02) carVel = 0;
         carWrap(); carRender();
@@ -401,8 +415,12 @@
     carView.addEventListener('keydown', function(e){
       if(e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
       e.preventDefault();
-      carPos += e.key === 'ArrowLeft' ? 324 : -324;   // lățimea unui card + gap
-      carVel = 0; carWrap(); carRender();
+      if(reduce){
+        carPos += e.key === 'ArrowLeft' ? 324 : -324;   // lățimea unui card + gap
+        carVel = 0; carWrap(); carRender();
+        return;
+      }
+      carVel += e.key === 'ArrowLeft' ? 28 : -28;       // impuls prin inerția existentă ≈ un card
     });
     var carFillT = null;
     addEventListener('resize', function(){
@@ -454,6 +472,20 @@
   };
   tiltify(document);
 
+  /* ---- count-up pentru statistici reale (instant la prefers-reduced-motion) ---- */
+  var countUp = function(el, target, fmt){
+    fmt = fmt || function(n){ return String(Math.round(n)); };
+    if(!el) return;
+    if(reduce || !(target > 0)){ el.textContent = fmt(target); return; }
+    var t0 = performance.now(), DUR = 800;
+    var step = function(t){
+      var p = Math.min(1, (t - t0) / DUR);
+      el.textContent = fmt(target * (1 - Math.pow(1 - p, 3)));
+      if(p < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+
   /* ---- catalog: render din DB + filtre ---- */
   var grid = document.getElementById('catalogGrid');
   if(grid && hasDB){
@@ -464,6 +496,8 @@
     DB.publishedCourses().then(function(cs){
       grid.innerHTML = cs.map(function(c){ return courseCardHTML(c, 'catalog'); }).join('');
       tiltify(grid);
+      [].forEach.call(grid.children, function(el){ el.classList.add('reveal'); });
+      revealify(grid);
       var cards = [].slice.call(grid.querySelectorAll('.ccard'));
       var apply = function(cat){
         var q = (search && search.value || '').trim().toLowerCase();
@@ -524,15 +558,22 @@
     });
   }
 
-  /* ---- despre: cifre live (cursuri publicate + instructori activi) ---- */
+  /* ---- despre: cifre live (cursuri publicate + instructori activi), cu count-up la intrarea în viewport ---- */
   var statCoursesEl = document.getElementById('statCourses');
   if(statCoursesEl && hasDB){
-    DB.publishedCourses().then(function(cs){
-      statCoursesEl.textContent = cs.length;
+    var statsVisible = new Promise(function(res){
+      var sio = new IntersectionObserver(function(es){
+        if(es.some(function(e){ return e.isIntersecting; })){ sio.disconnect(); res(); }
+      }, {threshold:.3});
+      sio.observe(statCoursesEl);
+    });
+    Promise.all([DB.publishedCourses(), statsVisible]).then(function(r){
+      var cs = r[0];
+      countUp(statCoursesEl, cs.length);
       var instr = {};
       cs.forEach(function(c){ if(c.instructor_name) instr[c.instructor_name] = 1; });
       var si = document.getElementById('statInstructors');
-      if(si) si.textContent = Object.keys(instr).length;
+      if(si) countUp(si, Object.keys(instr).length);
     }).catch(function(){});
   }
 
@@ -549,7 +590,7 @@
       instGrid.innerHTML = list.map(function(i){
         var cats = (i.categories || []).map(function(k){ return DB.CAT_SHORT[k] || k; }).join(' · ');
         var first = (i.instructor_name || '').split(' ')[0];
-        return '<a class="inst-card reveal in" href="cursuri.html?q=' + encodeURIComponent(i.instructor_name) + '"' +
+        return '<a class="inst-card" href="cursuri.html?q=' + encodeURIComponent(i.instructor_name) + '"' +
           ' aria-label="Vezi cursurile publicate de ' + DB.esc(i.instructor_name) + '">' +
           '<div class="inst-top"><span class="av" aria-hidden="true">' + DB.esc(i.instructor_initials || DB.initials(i.instructor_name)) + '</span>' +
           '<div><h3>' + DB.esc(i.instructor_name) + '</h3><div class="role">' + DB.esc(cats) + '</div></div></div>' +
@@ -561,6 +602,8 @@
           '</div></a>';
       }).join('');
       tiltify(instGrid);
+      [].forEach.call(instGrid.children, function(el){ el.classList.add('reveal'); });
+      revealify(instGrid);
     }).catch(function(){
       instGrid.innerHTML = '<p class="empty" style="display:block;grid-column:1/-1">Nu am putut încărca instructorii. Reîncarcă pagina.</p>';
     });
@@ -720,11 +763,15 @@
             var recGrid = document.getElementById('myCoursesRecGrid');
             recGrid.innerHTML = cs.map(function(c){ return courseCardHTML(c, 'front_page'); }).join('');
             tiltify(recGrid);
+            [].forEach.call(recGrid.children, function(el){ el.classList.add('reveal'); });
+            revealify(recGrid);
           }).catch(function(){});
           return;
         }
         box.innerHTML = courses.map(function(c){ return courseCardHTML(c, ''); }).join('');
         tiltify(box);
+        [].forEach.call(box.children, function(el){ el.classList.add('reveal'); });
+        revealify(box);
       }).catch(function(){
         box.innerHTML = '<p class="empty" style="display:block;grid-column:1/-1">Nu am putut încărca cursurile tale. Reîncarcă pagina.</p>';
       });
@@ -838,6 +885,8 @@
               '<div><b>' + DB.esc(r.author_name) + '</b><span>Student</span></div></div></div>';
           }).join('');
           tiltify(rvList);
+          [].forEach.call(rvList.children, function(el){ el.classList.add('reveal'); });
+          revealify(rvList);
         }).catch(function(){});
       };
       renderReviews();
@@ -1023,5 +1072,5 @@
   }
 
   /* expune helperi pentru paginile cu script propriu (dashboard, wizard) */
-  window.App = { courseCardHTML:courseCardHTML, tiltify:tiltify, authMsg:authMsg };
+  window.App = { courseCardHTML:courseCardHTML, tiltify:tiltify, authMsg:authMsg, revealify:revealify, countUp:countUp };
 })();

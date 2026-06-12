@@ -53,13 +53,17 @@
   document.getElementById('dashRetry').addEventListener('click', load);
 
   function render(courses, views, sales){
-    /* stat cards */
+    /* stat cards (count-up; instant la prefers-reduced-motion) */
     var revenue = sales.reduce(function(s, x){ return s + Number(x.price_paid || 0); }, 0);
-    document.getElementById('stRevenue').textContent = DB.fmtMoney(revenue);
-    document.getElementById('stSales').textContent = sales.length;
-    document.getElementById('stViews').textContent = views.length;
-    document.getElementById('stConv').textContent =
-      views.length ? (100 * sales.length / views.length).toFixed(1).replace('.', ',') + '%' : '—';
+    App.countUp(document.getElementById('stRevenue'), revenue, DB.fmtMoney);
+    App.countUp(document.getElementById('stSales'), sales.length);
+    App.countUp(document.getElementById('stViews'), views.length);
+    if(views.length){
+      App.countUp(document.getElementById('stConv'), 100 * sales.length / views.length,
+        function(n){ return n.toFixed(1).replace('.', ',') + '%'; });
+    }else{
+      document.getElementById('stConv').textContent = '—';
+    }
 
     /* grafic vânzări pe ultimele 30 de zile, cu tooltip live (vânzări + încasări pe zi) */
     var chart = document.getElementById('salesChart');
@@ -80,7 +84,7 @@
       var d = new Date(today - (29 - idx) * DAY);
       var lab = (idx === 29 ? 'azi' : d.getDate() + '.' + (d.getMonth() + 1)) + ': ' +
         n + (n === 1 ? ' vânzare' : ' vânzări');
-      return '<i data-i="' + idx + '" tabindex="0" aria-label="' + lab + '">' +
+      return '<i data-i="' + idx + '" tabindex="0" style="--bi:' + idx + '" aria-label="' + lab + '">' +
         '<span style="height:' + Math.round(100 * n / max) + '%"></span></i>';
     }).join('');
     var fmtD = function(d){ return isNaN(d.getTime()) ? '—' : d.getDate() + '.' + (d.getMonth() + 1) + '.' + d.getFullYear(); };
