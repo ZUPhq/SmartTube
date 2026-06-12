@@ -18,7 +18,7 @@
   <div class="phead-in reveal">
     <p class="eyebrow">Catalog</p>
     <h1 class="h1">Toate cursurile</h1>
-    <p class="lead">Alege din peste 1.000 de cursuri, din orice domeniu. Plată unică, acces pe viață.</p>
+    <p class="lead" id="catalogLead">Cursuri de la practicieni, din orice domeniu. Plată unică, acces pe viață.</p>
   </div>
   <div class="filterbar reveal">
     <button class="chip on" data-filter="all">Toate</button>
@@ -33,6 +33,22 @@
 
 <section class="section tight">
   <div class="container wide">
+    <div class="catalog-tools reveal">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5" stroke-linecap="round"/></svg>
+        <input type="search" id="catalogSearch" placeholder="Caută după curs sau instructor…" aria-label="Caută în catalog" autocomplete="off" />
+      </div>
+      <div class="sort-wrap">
+        <label for="catalogSort" class="sr-only">Sortează cursurile</label>
+        <select id="catalogSort">
+          <option value="popular">Cele mai populare</option>
+          <option value="nou">Cele mai noi</option>
+          <option value="rating">Cel mai bun rating</option>
+          <option value="pret-asc">Preț crescător</option>
+          <option value="pret-desc">Preț descrescător</option>
+        </select>
+      </div>
+    </div>
     <div class="catalog-grid" id="catalogGrid">
       <p class="empty" style="display:block">Se încarcă cursurile…</p>
     </div>

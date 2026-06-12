@@ -43,26 +43,28 @@
         <h2 class="h3 reveal" style="margin:42px 0 18px">Instructorul tău</h2>
         <div class="inst-card reveal" id="cInstCard"></div>
 
-        <!-- reviews -->
+        <!-- recenzii reale, din DB -->
         <div id="cReviewsWrap">
           <h2 class="h3 reveal" style="margin:42px 0 18px">Ce spun studenții</h2>
-          <div class="grid-3 reveal">
-            <div class="review">
-              <div class="stars">★★★★★</div>
-              <p>„Exact ce căutam: structură clară, pas cu pas, fără bla-bla. Am aplicat din prima săptămână."</p>
-              <div class="who"><span class="av">DI</span><div><b>Diana Ilie</b><span>Absolventă</span></div></div>
+          <div class="grid-3 reveal" id="cReviews"></div>
+          <p class="empty" id="cReviewsEmpty" style="padding:18px 0;text-align:left">Nicio recenzie scrisă încă pentru acest curs.</p>
+          <form class="auth-card" id="reviewForm" style="display:none;max-width:540px;margin-top:22px">
+            <h3 style="margin-bottom:12px">Evaluează cursul</h3>
+            <div class="field"><label for="rvRating">Nota ta</label>
+              <select id="rvRating">
+                <option value="5">★★★★★ — Excelent</option>
+                <option value="4">★★★★ — Foarte bun</option>
+                <option value="3">★★★ — Bun</option>
+                <option value="2">★★ — Slab</option>
+                <option value="1">★ — Foarte slab</option>
+              </select>
             </div>
-            <div class="review">
-              <div class="stars">★★★★★</div>
-              <p>„Diferența dintre tutorialele random și acest curs e structura. În sfârșit înțeleg de ce fac fiecare pas."</p>
-              <div class="who"><span class="av">RS</span><div><b>Radu Sandu</b><span>Absolvent</span></div></div>
+            <div class="field"><label for="rvComment">Recenzia ta (opțional)</label>
+              <textarea id="rvComment" maxlength="1000" placeholder="Ce ți-a plăcut? Cui i-l recomanzi?"></textarea>
             </div>
-            <div class="review">
-              <div class="stars">★★★★★</div>
-              <p>„Proiectul final merită singur toți banii. Am terminat cursul cu ceva concret în portofoliu."</p>
-              <div class="who"><span class="av">MC</span><div><b>Mara Crișan</b><span>Absolventă</span></div></div>
-            </div>
-          </div>
+            <button type="submit" class="btn btn-mint">Trimite recenzia</button>
+            <p class="form-note auth-alt" aria-live="polite"></p>
+          </form>
         </div>
       </div>
 

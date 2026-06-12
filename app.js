@@ -97,12 +97,6 @@
     };
     var NS_LABEL = { curs:'Curs', instructor:'Instructor', pagina:'Pagină' };
     var NS_DATA = [
-      {t:'Vlad Marin', s:'Instructor · Foto & Video', u:'instructori.html', y:'instructor', k:'editare video color'},
-      {t:'Andrei Pop', s:'Instructor · Programare & IT', u:'instructori.html', y:'instructor', k:'python javascript'},
-      {t:'Ioana Dima', s:'Instructor · Design & UX', u:'instructori.html', y:'instructor', k:'figma branding'},
-      {t:'Radu Stan', s:'Instructor · Business & Marketing', u:'instructori.html', y:'instructor', k:'marketing vanzari'},
-      {t:'Alex Toma', s:'Instructor · Muzică & Producție', u:'instructori.html', y:'instructor', k:'ableton mixaj'},
-      {t:'Elena Voicu', s:'Instructor · Dezvoltare personală', u:'instructori.html', y:'instructor', k:'obiceiuri productivitate'},
       {t:'Cursuri', s:'Catalogul complet', u:'cursuri.html', y:'pagina', k:'catalog toate cursurile'},
       {t:'Instructori', s:'Cine te învață', u:'instructori.html', y:'pagina', k:'instructori profesori'},
       {t:'Devino instructor', s:'Predă pe smarttube', u:'instructori.html#preda', y:'pagina', k:'devino instructor preda venit'},
@@ -122,12 +116,23 @@
       if(nsCoursesLoaded || !hasDB) return;
       nsCoursesLoaded = true;
       DB.publishedCourses().then(function(cs){
-        nsCourses = cs.map(function(c){
+        var items = cs.map(function(c){
           return nsIndex({
             t:c.title, s:(DB.CATS[c.category] || '') + ' · ' + c.instructor_name,
             u:'curs.html?id=' + c.id + '&src=search', y:'curs', k:c.category
           });
         });
+        /* instructorii vin tot din DB — click duce la cursurile lor în catalog */
+        var seen = {};
+        cs.forEach(function(c){
+          if(!c.instructor_name || seen[c.instructor_name]) return;
+          seen[c.instructor_name] = 1;
+          items.push(nsIndex({
+            t:c.instructor_name, s:'Instructor · ' + (DB.CATS[c.category] || ''),
+            u:'cursuri.html?q=' + encodeURIComponent(c.instructor_name), y:'instructor', k:'instructor'
+          }));
+        });
+        nsCourses = items;
         if(navSearchBar.classList.contains('on')) nsRender(nsInput.value);
       }).catch(function(){ nsCoursesLoaded = false; });
     };
@@ -396,6 +401,8 @@
       : '<span class="cc-rate cc-new">Nou</span>';
     return '<a class="ccard" href="curs.html?id=' + c.id + (src ? '&src=' + src : '') + '"' +
       ' data-cat="' + DB.esc(c.category) + '"' +
+      ' data-price="' + (Number(c.price) || 0) + '" data-rating="' + (c.rating == null ? -1 : Number(c.rating)) + '"' +
+      ' data-pop="' + (Number(c.rating_count) || 0) + '" data-created="' + DB.esc(c.created_at || '') + '"' +
       ' data-search="' + DB.esc((c.title + ' ' + c.instructor_name + ' ' + (DB.CATS[c.category] || '')).toLowerCase()) + '">' +
       '<div class="cc-thumb ' + DB.esc(c.thumb_style) + '"><span class="cc-tag">' + DB.esc(DB.CAT_SHORT[c.category] || '') + '</span>' +
       '<span class="cc-dur">' + DB.fmtDur(c.total_minutes) + '</span><span class="cc-play">' + PLAY_SVG + '</span></div>' +
@@ -462,8 +469,32 @@
           apply(current);
         });
       });
-      if(search) search.addEventListener('input', function(){ apply(current); });
-      /* preselect via #hash (e.g. cursuri.html#design) */
+      var searchT = null;
+      if(search) search.addEventListener('input', function(){
+        clearTimeout(searchT);
+        searchT = setTimeout(function(){ apply(current); }, 150);
+      });
+      /* sortare */
+      var sortSel = document.getElementById('catalogSort');
+      var sorters = {
+        popular:function(a, b){ return (+b.dataset.pop) - (+a.dataset.pop); },
+        nou:function(a, b){ return (b.dataset.created || '').localeCompare(a.dataset.created || ''); },
+        rating:function(a, b){ return (+b.dataset.rating) - (+a.dataset.rating); },
+        'pret-asc':function(a, b){ return (+a.dataset.price) - (+b.dataset.price); },
+        'pret-desc':function(a, b){ return (+b.dataset.price) - (+a.dataset.price); }
+      };
+      if(sortSel) sortSel.addEventListener('change', function(){
+        cards.sort(sorters[sortSel.value] || sorters.popular).forEach(function(el){ grid.appendChild(el); });
+      });
+      /* număr real de cursuri în intro */
+      var lead = document.getElementById('catalogLead');
+      if(lead && cs.length){
+        lead.textContent = cs.length + (cs.length >= 20 ? ' de' : '') +
+          ' cursuri de la practicieni, din orice domeniu. Plată unică, acces pe viață.';
+      }
+      /* preselect: ?q=NumeInstructor (din cardurile de instructori) sau #hash de categorie */
+      var qParam = new URLSearchParams(location.search).get('q');
+      if(qParam && search){ search.value = qParam; apply(current); }
       var h = (location.hash || '').replace('#','');
       if(h){
         var match = document.querySelector('.chip[data-filter="'+h+'"]');
@@ -471,6 +502,36 @@
       }
     }).catch(function(){
       grid.innerHTML = '<p class="empty" style="display:block">Nu am putut încărca acum cursurile. Reîncearcă în câteva momente.</p>';
+    });
+  }
+
+  /* ---- pagina instructori: carduri din DB, cu statistici reale; click → catalog filtrat ---- */
+  var instGrid = document.getElementById('instGrid');
+  if(instGrid && hasDB){
+    instGrid.innerHTML = new Array(7).join('<div class="inst-card skeleton" style="height:208px" aria-hidden="true"></div>');
+    DB.instructorStats().then(function(list){
+      if(!list.length){
+        instGrid.innerHTML = '<p class="empty" style="display:block;grid-column:1/-1">Încă niciun instructor cu cursuri publicate.</p>';
+        return;
+      }
+      var fmtK = function(n){ return n >= 1000 ? (Math.round(n / 100) / 10).toLocaleString('ro-RO') + 'k' : String(n); };
+      instGrid.innerHTML = list.map(function(i){
+        var cats = (i.categories || []).map(function(k){ return DB.CAT_SHORT[k] || k; }).join(' · ');
+        var first = (i.instructor_name || '').split(' ')[0];
+        return '<a class="inst-card reveal in" href="cursuri.html?q=' + encodeURIComponent(i.instructor_name) + '"' +
+          ' aria-label="Vezi cursurile publicate de ' + DB.esc(i.instructor_name) + '">' +
+          '<div class="inst-top"><span class="av" aria-hidden="true">' + DB.esc(i.instructor_initials || DB.initials(i.instructor_name)) + '</span>' +
+          '<div><h3>' + DB.esc(i.instructor_name) + '</h3><div class="role">' + DB.esc(cats) + '</div></div></div>' +
+          '<p>Practician pe smarttube — vezi toate cursurile publicate de ' + DB.esc(first) + '.</p>' +
+          '<div class="inst-stats">' +
+          '<div><b>' + i.courses_count + '</b><span>' + (Number(i.courses_count) === 1 ? 'curs' : 'cursuri') + '</span></div>' +
+          '<div><b>' + fmtK(Number(i.students_count)) + '</b><span>studenți</span></div>' +
+          '<div><b>' + (i.avg_rating != null ? DB.fmtRating(i.avg_rating) : '—') + '</b><span>rating</span></div>' +
+          '</div></a>';
+      }).join('');
+      tiltify(instGrid);
+    }).catch(function(){
+      instGrid.innerHTML = '<p class="empty" style="display:block;grid-column:1/-1">Nu am putut încărca instructorii. Reîncarcă pagina.</p>';
     });
   }
 
@@ -619,7 +680,19 @@
       box.innerHTML = new Array(4).join('<div class="ccard skeleton sk-card" aria-hidden="true"></div>');
       DB.myPurchases().then(function(ps){
         var courses = ps.map(function(x){ return x.courses; }).filter(Boolean);
-        if(!courses.length){ emptyBox.style.display = ''; box.style.display = 'none'; box.innerHTML = ''; return; }
+        if(!courses.length){
+          emptyBox.style.display = ''; box.style.display = 'none'; box.innerHTML = '';
+          /* recomandări ca punct de plecare */
+          DB.popularCourses(3).then(function(cs){
+            var rec = document.getElementById('myCoursesRec');
+            if(!rec || !cs.length) return;
+            rec.style.display = '';
+            var recGrid = document.getElementById('myCoursesRecGrid');
+            recGrid.innerHTML = cs.map(function(c){ return courseCardHTML(c, 'front_page'); }).join('');
+            tiltify(recGrid);
+          }).catch(function(){});
+          return;
+        }
         box.innerHTML = courses.map(function(c){ return courseCardHTML(c, ''); }).join('');
         tiltify(box);
       }).catch(function(){
@@ -719,10 +792,53 @@
         '<div><h3>' + DB.esc(c.instructor_name) + '</h3><div class="role">' + DB.esc(DB.CATS[c.category] || '') + '</div></div></div>' +
         '<p>' + DB.esc(c.description) + '</p>';
 
-      if(c.rating == null){
-        var rv = document.getElementById('cReviewsWrap');
-        if(rv) rv.style.display = 'none';
-      }
+      /* recenzii reale din DB + formular doar pentru cumpărători */
+      var rvList = document.getElementById('cReviews');
+      var rvEmpty = document.getElementById('cReviewsEmpty');
+      var rvForm = document.getElementById('reviewForm');
+      var renderReviews = function(){
+        DB.getReviews(c.id, 6).then(function(rs){
+          if(!rs.length){ rvList.style.display = 'none'; rvEmpty.style.display = 'block'; return; }
+          rvEmpty.style.display = 'none'; rvList.style.display = '';
+          rvList.innerHTML = rs.map(function(r){
+            return '<div class="review"><div class="stars">' + new Array((r.rating || 0) + 1).join('★') + '</div>' +
+              (r.comment ? '<p>„' + DB.esc(r.comment) + '"</p>' : '') +
+              '<div class="who"><span class="av" aria-hidden="true">' + DB.esc(DB.initials(r.author_name)) + '</span>' +
+              '<div><b>' + DB.esc(r.author_name) + '</b><span>Student</span></div></div></div>';
+          }).join('');
+          tiltify(rvList);
+        }).catch(function(){});
+      };
+      renderReviews();
+      var reviewFormShown = false;
+      var showReviewForm = function(){
+        if(reviewFormShown || !rvForm) return;
+        reviewFormShown = true;
+        rvForm.style.display = '';
+        DB.myReview(c.id).then(function(mine){
+          if(!mine) return;
+          document.getElementById('rvRating').value = String(mine.rating);
+          document.getElementById('rvComment').value = mine.comment || '';
+          rvForm.querySelector('button[type="submit"]').textContent = 'Actualizează recenzia';
+        }).catch(function(){});
+      };
+      if(rvForm) rvForm.addEventListener('submit', function(e){
+        e.preventDefault();
+        var rnote = rvForm.querySelector('.form-note');
+        var rbtn = rvForm.querySelector('button[type="submit"]');
+        rbtn.disabled = true;
+        DB.upsertReview(c.id, parseInt(document.getElementById('rvRating').value, 10),
+          document.getElementById('rvComment').value.trim())
+          .then(function(){
+            rnote.style.color = 'var(--mint)';
+            rnote.textContent = 'Mulțumim! Recenzia ta a fost salvată.';
+            rbtn.textContent = 'Actualizează recenzia';
+            renderReviews();
+          }).catch(function(){
+            rnote.style.color = '#e66';
+            rnote.textContent = 'Nu am putut salva recenzia. Reîncearcă.';
+          }).then(function(){ rbtn.disabled = false; });
+      });
 
       document.getElementById('cPrice').textContent = DB.fmtPrice(c.price);
       document.getElementById('cLessonsMeta').textContent =
@@ -749,6 +865,7 @@
         buyBtn.classList.remove('btn-mint');
         buyBtn.classList.add('btn-ghost');
         buyBtn.onclick = null;
+        showReviewForm();   // cumpărătorii pot lăsa o recenzie
       };
       Promise.all([DB.hasPurchase(c.id), DB.getProfile()]).then(function(res){
         if(res[0]) setOwned();

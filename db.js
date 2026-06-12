@@ -223,6 +223,37 @@ var DB = (function(){
       });
   };
 
+  /* ---- recenzii (doar cumpărătorii pot scrie; agregarea pe curs o face un trigger) ---- */
+  var getReviews = function(courseId, n){
+    return sb.from('reviews').select('*').eq('course_id', courseId)
+      .order('created_at', {ascending:false}).limit(n || 6)
+      .then(function(r){ return r.data || []; });
+  };
+  var myReview = function(courseId){
+    return getUser().then(function(u){
+      if(!u) return null;
+      return sb.from('reviews').select('*').eq('course_id', courseId).eq('user_id', u.id)
+        .maybeSingle().then(function(r){ return r.data; });
+    });
+  };
+  var upsertReview = function(courseId, rating, comment){
+    return getProfile().then(function(p){
+      if(!p) throw new Error('Nu ești autentificat.');
+      return sb.from('reviews').upsert({
+        course_id:courseId, user_id:p.id, rating:rating,
+        comment:(comment || '').slice(0, 1000) || null,
+        author_name:p.name || 'Student'
+      }, {onConflict:'course_id,user_id'}).then(function(r){
+        if(r.error) throw r.error;
+      });
+    });
+  };
+
+  /* ---- instructori: statistici publice agregate (RPC) ---- */
+  var instructorStats = function(){
+    return sb.rpc('get_instructor_stats').then(function(r){ return r.data || []; });
+  };
+
   /* ---- contact ---- */
   var sendContact = function(name, email, message){
     return sb.from('contact_messages').insert({name:name, email:email, message:message});
@@ -237,6 +268,8 @@ var DB = (function(){
     publishedCourses:publishedCourses, popularCourses:popularCourses, getCourse:getCourse,
     myPurchases:myPurchases, hasPurchase:hasPurchase, buyCourse:buyCourse,
     logView:logView,
+    getReviews:getReviews, myReview:myReview, upsertReview:upsertReview,
+    instructorStats:instructorStats,
     myCourses:myCourses, courseViews:courseViews, courseSales:courseSales,
     setCourseStatus:setCourseStatus, saveCourse:saveCourse, saveCurriculum:saveCurriculum,
     uploadLessonVideo:uploadLessonVideo, removeVideo:removeVideo, videoUrl:videoUrl,
