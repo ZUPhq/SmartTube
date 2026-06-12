@@ -102,6 +102,26 @@
         <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Fără abonament</span>
         <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>Certificat de absolvire</span>
       </div>
+      <!-- cifre reale, din platformă — completate de app.js; rămâne ascuns dacă nu există date -->
+      <div class="card no-tilt home-stats" id="homeStats" style="display:none" aria-label="smarttube în cifre">
+        <div class="inst-stats">
+          <div><b id="homeStatCourses">0</b><span>cursuri publicate</span></div>
+          <div><b id="homeStatInstructors">0</b><span>instructori practicieni</span></div>
+          <div><b id="homeStatStudents">0</b><span>studenți înscriși</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- recenzii reale (social proof onest — secțiunea apare doar dacă există ≥3 recenzii) -->
+  <section class="section t-deep" id="homeReviews" style="display:none">
+    <div class="container">
+      <div class="center reveal" style="margin-bottom:34px">
+        <p class="eyebrow">Studenții noștri</p>
+        <h2 class="h2">Recenzii reale, de la oameni reali.</h2>
+        <p class="lead" style="margin-top:12px">Fiecare recenzie vine de la un student care a cumpărat cursul — direct de pe platformă.</p>
+      </div>
+      <div class="grid-3" id="homeReviewsGrid"></div>
     </div>
   </section>
 

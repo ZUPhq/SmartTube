@@ -429,6 +429,53 @@
     });
   }
 
+  /* ---- homepage: cifre reale + recenzii reale (social proof onest, pe idle) ---- */
+  var homeStats = document.getElementById('homeStats');
+  if(homeStats && hasDB){
+    var renderHomeStats = function(){
+      Promise.all([DB.publishedCourses(), DB.instructorStats()]).then(function(r){
+        var nCourses = r[0].length;
+        var nInstr = r[1].length;
+        var nStudents = r[1].reduce(function(s, i){ return s + (Number(i.students_count) || 0); }, 0);
+        if(!nCourses || !nInstr) return;   // niciodată cifre goale pe homepage
+        homeStats.style.display = '';
+        var hio = new IntersectionObserver(function(es){
+          if(es.some(function(e){ return e.isIntersecting; })){
+            hio.disconnect();
+            countUp(document.getElementById('homeStatCourses'), nCourses);
+            countUp(document.getElementById('homeStatInstructors'), nInstr);
+            countUp(document.getElementById('homeStatStudents'), nStudents);
+          }
+        }, {threshold:.3});
+        hio.observe(homeStats);
+      }).catch(function(){});
+    };
+    if('requestIdleCallback' in window) requestIdleCallback(renderHomeStats);
+    else setTimeout(renderHomeStats, 1200);
+  }
+  var homeReviews = document.getElementById('homeReviews');
+  if(homeReviews && hasDB && DB.recentReviews){
+    var renderHomeReviews = function(){
+      DB.recentReviews(6).then(function(rs){
+        if(rs.length < 3){ homeReviews.remove(); return; }
+        var rGrid = document.getElementById('homeReviewsGrid');
+        rGrid.innerHTML = rs.slice(0, 6).map(function(r){
+          return '<div class="review"><div class="stars">' + new Array((r.rating || 0) + 1).join('★') + '</div>' +
+            '<p>„' + DB.esc(r.comment) + '"</p>' +
+            '<div class="who"><span class="av" aria-hidden="true">' + DB.esc(DB.initials(r.author_name)) + '</span>' +
+            '<div><b>' + DB.esc(r.author_name) + '</b><span>Student</span></div></div>' +
+            '<a class="link" href="curs.html?id=' + r.courses.id + '&src=front_page">' + DB.esc(r.courses.title) + '</a></div>';
+        }).join('');
+        homeReviews.style.display = '';
+        tiltify(rGrid);
+        [].forEach.call(rGrid.children, function(el){ el.classList.add('reveal'); });
+        revealify(homeReviews);
+      }).catch(function(){ homeReviews.remove(); });
+    };
+    if('requestIdleCallback' in window) requestIdleCallback(renderHomeReviews);
+    else setTimeout(renderHomeReviews, 1200);
+  }
+
   /* ---- card de curs (markup identic cu cel static) ---- */
   var PLAY_SVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
   var STAR_SVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.9 21l1.2-6.8-5-4.9 6.9-1z"/></svg>';

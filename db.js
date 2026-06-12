@@ -249,6 +249,16 @@ var DB = (function(){
     });
   };
 
+  /* ---- recenzii recente cu comentariu, de pe cursuri publicate (homepage) ---- */
+  var recentReviews = function(n){
+    return sb.from('reviews').select('*, courses(id,title,status)')
+      .not('comment', 'is', null)
+      .order('created_at', {ascending:false}).limit(n || 6)
+      .then(function(r){
+        return (r.data || []).filter(function(x){ return x.courses && x.courses.status === 'published'; });
+      });
+  };
+
   /* ---- instructori: statistici publice agregate (RPC) ---- */
   var instructorStats = function(){
     return sb.rpc('get_instructor_stats').then(function(r){ return r.data || []; });
@@ -268,7 +278,7 @@ var DB = (function(){
     publishedCourses:publishedCourses, popularCourses:popularCourses, getCourse:getCourse,
     myPurchases:myPurchases, hasPurchase:hasPurchase, buyCourse:buyCourse,
     logView:logView,
-    getReviews:getReviews, myReview:myReview, upsertReview:upsertReview,
+    getReviews:getReviews, myReview:myReview, upsertReview:upsertReview, recentReviews:recentReviews,
     instructorStats:instructorStats,
     myCourses:myCourses, courseViews:courseViews, courseSales:courseSales,
     setCourseStatus:setCourseStatus, saveCourse:saveCourse, saveCurriculum:saveCurriculum,
