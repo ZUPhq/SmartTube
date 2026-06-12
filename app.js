@@ -89,6 +89,16 @@
       if(mmAcc) mmAcc.innerHTML = '<span class="nav-av">' + ini + '</span>Contul meu';
       var mmCta = document.querySelector('.mm-foot .btn-mint');
       if(mmCta){ mmCta.textContent = 'Cursurile mele'; mmCta.href = 'cont.html'; }
+      /* logat: logo-ul duce la dashboard, așa că adăugăm „Acasă" în meniu spre pagina principală
+         (?home dezactivează redirect-ul, altfel te-ar trimite înapoi pe dashboard) */
+      var mmenuIn = document.querySelector('.mmenu-in');
+      if(mmenuIn && !document.getElementById('mmHome')){
+        mmenuIn.insertAdjacentHTML('afterbegin',
+          '<a class="mm-item" id="mmHome" href="index.html?home">' +
+          '<span class="mm-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg></span>' +
+          '<span class="mm-label">Acasă</span></a>');
+        if(mmenu) document.getElementById('mmHome').addEventListener('click', function(){ if(typeof setMenu === 'function') setMenu(false); });
+      }
     }).catch(function(){});
   }
 
