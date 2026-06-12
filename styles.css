@@ -369,17 +369,69 @@ body.hero-locked{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 .eq i:nth-child(4){animation-delay:.2s}.eq i:nth-child(5){animation-delay:.7s}
 .eq i:nth-child(6){animation-delay:1.1s}.eq i:nth-child(7){animation-delay:.35s}
 
-/* visual: broadcast */
-.bcast{position:relative;width:240px;height:240px;display:grid;place-items:center}
-.bcast .ring{position:absolute;border-radius:50%;border:1.5px solid rgba(46,201,171,.3)}
-.bcast .r1{width:120px;height:120px}.bcast .r2{width:180px;height:180px}
-.bcast .r3{width:240px;height:240px}
-.bcast .core{width:84px;height:84px;border-radius:50%;display:grid;place-items:center;
-  background:var(--g-av);transition:transform .3s var(--ease)}
-.bcast-link{display:block;cursor:pointer}
-.bcast-link:hover .core{transform:scale(1.14)}
-.viz-link{display:block;cursor:pointer}
-.bcast .core svg{width:30px;height:30px;color:#fff;margin-left:5px}
+/* ---------- carduri 3D (homepage: „pe viață" + „panou instructor") ---------- */
+.tile.split{flex-direction:row;align-items:center;text-align:left;
+  gap:clamp(34px,6vw,80px);
+  padding-left:max(24px,calc((100% - var(--maxw))/2 + 24px));
+  padding-right:max(24px,calc((100% - var(--maxw))/2 + 24px))}
+.tile.split .tile-copy{max-width:520px;flex:0 1 520px}
+.tile.split .tile-cta,.tile.split .promise{justify-content:flex-start}
+.tile.split .home-stats{margin-left:0}
+.tile.split .tile-visual{margin-top:0;flex:1 1 auto}
+
+.d3-stage{width:min(380px,84vw)}
+.d3-stage.wide{width:min(440px,88vw)}
+.d3-float{animation:d3float 6s ease-in-out infinite}
+@keyframes d3float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+.d3-card{position:relative;border-radius:var(--r-3xl);overflow:hidden;
+  border:1px solid var(--card-line);box-shadow:var(--elev-5);
+  transition:transform .7s var(--ease)}
+.pass-sheen{position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(120% 90% at 12% 0%,rgba(255,255,255,.14),transparent 46%)}
+
+/* card „pass pe viață" (secțiunea studenți) */
+.d3-card.pass{padding:28px 26px 14px;
+  background:linear-gradient(158deg,rgba(46,201,171,.20),transparent 56%),var(--surface);
+  transform:perspective(1500px) rotateX(7deg) rotateY(-17deg)}
+.d3-stage:hover .d3-card.pass{transform:perspective(1500px) rotateX(3deg) rotateY(-7deg)}
+.pass-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+.pass-brand{font-size:16px;font-weight:700;letter-spacing:-.03em;color:var(--ink)}
+.pass-brand .t{color:var(--mint)}
+.pass-inf{font-size:32px;line-height:1;font-weight:600;color:var(--mint)}
+.pass-kicker{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2)}
+.pass-title{font-size:clamp(34px,5vw,46px);font-weight:700;letter-spacing:-.03em;line-height:1;margin:5px 0 18px;color:var(--ink)}
+.pass-rows div{display:flex;justify-content:space-between;align-items:center;
+  padding:13px 0;border-top:1px solid var(--line);font-size:14.5px}
+.pass-rows span{color:var(--ink-2)}
+.pass-rows b{color:var(--ink);font-weight:600}
+
+/* card „panou instructor" (secțiunea creatori) */
+.d3-card.panel{padding:22px 22px 24px;
+  background:linear-gradient(158deg,rgba(46,201,171,.16),transparent 54%),var(--surface);
+  transform:perspective(1500px) rotateX(7deg) rotateY(16deg)}
+.d3-stage:hover .d3-card.panel{transform:perspective(1500px) rotateX(3deg) rotateY(7deg)}
+.panel-head{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:var(--ink)}
+.panel-live{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;
+  color:var(--mint-2);background:rgba(26,170,143,.16);padding:4px 11px;border-radius:var(--r-pill)}
+.panel-live i{width:7px;height:7px;border-radius:50%;background:var(--mint-2);animation:pulseDot 1.8s ease-in-out infinite}
+@keyframes pulseDot{0%,100%{opacity:1}50%{opacity:.25}}
+.panel-chart{display:flex;align-items:flex-end;gap:7px;height:116px;margin:20px 0 18px}
+.panel-chart i{flex:1;background:var(--g-mint);border-radius:4px 4px 0 0;height:var(--h,40%);min-height:6px;
+  transform-origin:bottom;opacity:.92;animation:barGrow .6s var(--ease-out) backwards;animation-delay:calc(var(--i,0)*70ms)}
+.panel-foot{display:flex;align-items:center;gap:12px;padding-top:16px;border-top:1px solid var(--line)}
+.panel-foot div{flex:1}
+.panel-foot b{display:block;font-size:14px;color:var(--ink);font-weight:600}
+.panel-foot span{font-size:12.5px;color:var(--ink-2)}
+.panel-arr{width:22px;height:22px;color:var(--mint);flex:none}
+
+@media(max-width:833px){
+  .tile.split{flex-direction:column;text-align:center;gap:0;padding-left:22px;padding-right:22px}
+  .tile.split .tile-copy{flex:none;max-width:560px;margin:0 auto}
+  .tile.split .tile-cta,.tile.split .promise{justify-content:center}
+  .tile.split .home-stats{margin-left:auto}
+  .tile.split .tile-visual{margin-top:48px}
+  .d3-card.pass,.d3-card.panel{transform:none}
+}
 
 /* promise */
 .promise{display:flex;gap:14px 30px;justify-content:center;flex-wrap:wrap;margin-top:22px}
@@ -740,7 +792,6 @@ a.card{display:block}
 [data-theme="light"] .player-inner{box-shadow:0 40px 80px -28px rgba(0,0,0,.35)}
 [data-theme="light"] .screen{background:rgba(255,255,255,.28);border-color:rgba(255,255,255,.5);
   box-shadow:0 24px 64px rgba(0,0,0,.13),0 4px 14px rgba(0,0,0,.07)}
-[data-theme="light"] .bcast .ring{border-color:rgba(26,170,143,.22)}
 [data-theme="light"] .step .num{color:#d1d1d6}
 [data-theme="light"] .cta-band{background:rgba(255,255,255,.62)}
 [data-theme="light"] .auth-tab.on{box-shadow:0 1px 4px rgba(0,0,0,.1)}
