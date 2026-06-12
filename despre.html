@@ -38,7 +38,7 @@
           <div class="inst-stats" style="margin-top:18px;border-top:1px solid var(--line)">
             <div><b id="statCourses">—</b><span>cursuri publicate</span></div>
             <div><b>6</b><span>domenii</span></div>
-            <div><b>14 zile</b><span>garanție</span></div>
+            <div><b id="statInstructors">—</b><span>instructori</span></div>
           </div>
           <div class="inst-stats">
             <div><b>1×</b><span>plată unică</span></div>
@@ -83,7 +83,7 @@
       <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z" stroke-linejoin="round"/></svg></div>
         <h3>Cursuri &amp; instructori</h3><p>Verificăm fiecare curs înainte de publicare și ajutăm instructorii să predea mai bine.</p></div>
       <div class="card reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 11.5a7.5 7.5 0 0 1-10.9 6.7L4 20l1.8-5.1A7.5 7.5 0 1 1 21 11.5z" stroke-linejoin="round"/></svg></div>
-        <h3>Suport studenți</h3><p>Răspundem în maxim o zi lucrătoare și ne ocupăm de rambursări fără discuții.</p></div>
+        <h3>Suport studenți</h3><p>Răspundem în maxim o zi lucrătoare și te ajutăm cu orice problemă de cont sau de acces.</p></div>
     </div>
   </div>
 </section>
@@ -115,9 +115,12 @@
 <script src="partials.js"></script>
 <script src="app.js"></script>
 <script>
-  /* cifră live: numărul de cursuri publicate */
+  /* cifre live: cursuri publicate + instructori activi */
   if(window.DB) DB.publishedCourses().then(function(cs){
     document.getElementById('statCourses').textContent = cs.length;
+    var instr = {};
+    cs.forEach(function(c){ if(c.instructor_id) instr[c.instructor_id] = 1; });
+    document.getElementById('statInstructors').textContent = Object.keys(instr).length;
   }).catch(function(){});
 </script>
 </body>
