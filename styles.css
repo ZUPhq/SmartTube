@@ -234,7 +234,10 @@ h1,h2,h3,h4{font-weight:600;letter-spacing:-.02em;line-height:1.08;color:var(--i
 .tile-cta{margin-top:24px;display:flex;gap:14px 26px;justify-content:center;align-items:center;flex-wrap:wrap}
 
 /* featured giant tile */
-.glow{display:none}
+.glow{position:absolute;left:50%;top:-140px;transform:translateX(-50%);
+  width:min(920px,130vw);height:460px;pointer-events:none;z-index:0;
+  background:radial-gradient(closest-side,rgba(46,201,171,.14),transparent 70%)}
+[data-theme="light"] .glow{background:radial-gradient(closest-side,rgba(26,170,143,.10),transparent 70%)}
 .feat-small{font-size:clamp(24px,3.4vw,46px);font-weight:600;letter-spacing:-.015em;
   color:var(--ink);margin-bottom:-.04em}
 .feat-giant{font-size:clamp(64px,15vw,188px);font-weight:800;letter-spacing:-.035em;
