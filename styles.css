@@ -785,7 +785,7 @@ a.card{display:block}
 .inst-panel-cta{display:flex;gap:10px;flex-wrap:wrap}
 @media(max-width:560px){.inst-panel-cta{width:100%}.inst-panel-cta .btn{flex:1}}
 .hub-shortcuts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
-.hub-sc{display:flex;align-items:center;gap:14px;padding:18px 20px}
+.card.hub-sc{display:flex;align-items:center;gap:14px;padding:18px 20px}
 .hub-sc .sc-ic{width:42px;height:42px;border-radius:var(--r-md);background:var(--surface-2);
   display:grid;place-items:center;color:var(--mint);flex:none}
 .hub-sc .sc-ic svg{width:20px;height:20px}
