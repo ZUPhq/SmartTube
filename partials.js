@@ -75,10 +75,12 @@
 '    <div class="footer-cols">\n' +
 '      <div class="footer-col"><h4>Explorează</h4>\n' +
 '        <a href="cursuri.html">Toate cursurile</a><a href="cursuri.html#programare">Programare</a>\n' +
-'        <a href="cursuri.html#design">Design</a><a href="cursuri.html#business">Business</a></div>\n' +
+'        <a href="cursuri.html#design">Design</a><a href="cursuri.html#business">Business</a>\n' +
+'        <a href="cursuri.html#video">Foto &amp; Video</a><a href="cursuri.html#muzica">Muzică</a>\n' +
+'        <a href="cursuri.html#dezvoltare">Dezvoltare personală</a></div>\n' +
 '      <div class="footer-col"><h4>Pentru studenți</h4>\n' +
-'        <a href="asistenta.html#faq">Cum funcționează</a><a href="asistenta.html#faq">Certificate</a>\n' +
-'        <a href="asistenta.html#faq">Acces pe viață</a><a href="asistenta.html#faq">Întrebări frecvente</a></div>\n' +
+'        <a href="asistenta.html#faq-plata">Cum funcționează</a><a href="asistenta.html#faq-certificat">Certificate</a>\n' +
+'        <a href="asistenta.html#faq-acces">Acces pe viață</a><a href="asistenta.html#faq">Întrebări frecvente</a></div>\n' +
 '      <div class="footer-col"><h4>Pentru instructori</h4>\n' +
 '        <a href="instructori.html#preda">Devino instructor</a><a href="instructori.html">Instructorii noștri</a>\n' +
 '        <a href="curs-nou.html">Publică un curs</a><a href="dashboard.html">Dashboard instructor</a></div>\n' +

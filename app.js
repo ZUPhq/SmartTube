@@ -4,6 +4,9 @@
   var reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
   var hasDB = typeof window.DB !== 'undefined';
 
+  /* ---- normalizare pentru căutare: litere mici, fără diacritice ---- */
+  var norm = function(s){ return (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); };
+
   /* ---- mesaje de stare în formulare: .form-note cu clase err/ok ---- */
   var setNote = function(el, msg, kind){
     if(!el) return;
@@ -115,8 +118,7 @@
       {t:'Contact', s:'Scrie-ne un mesaj', u:'despre.html#contact', y:'pagina', k:'contact mesaj scrie-ne'},
       {t:'Contul meu', s:'Autentificare & cont nou', u:'cont.html', y:'pagina', k:'cont login autentificare inregistrare cursurile mele'}
     ];
-    var nsNorm = function(s){ return (s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); };
-    var nsIndex = function(it){ it._n = nsNorm(it.t + ' ' + it.s + ' ' + (it.k || '')); return it; };
+    var nsIndex = function(it){ it._n = norm(it.t + ' ' + it.s + ' ' + (it.k || '')); return it; };
     NS_DATA.forEach(nsIndex);
     /* cursurile vin live din DB, ca să apară și cele publicate prin wizard */
     var nsCourses = [], nsCoursesLoaded = false;
@@ -146,7 +148,7 @@
     };
     var nsEsc = function(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); };
     var nsRender = function(raw){
-      var q = nsNorm(raw).trim();
+      var q = norm(raw).trim();
       if(!q){ navSearch.classList.remove('open'); nsResults.innerHTML = ''; return; }
       var toks = q.split(/\s+/);
       var hits = nsCourses.concat(NS_DATA).filter(function(it){ return toks.every(function(tk){ return it._n.indexOf(tk) > -1; }); }).slice(0, 8);
@@ -547,11 +549,11 @@
       revealify(grid);
       var cards = [].slice.call(grid.querySelectorAll('.ccard'));
       var apply = function(cat){
-        var q = (search && search.value || '').trim().toLowerCase();
+        var q = norm(search && search.value || '').trim();
         var shown = 0;
         cards.forEach(function(c){
           var okCat = (cat==='all') || (c.dataset.cat===cat);
-          var okQ = !q || c.dataset.search.indexOf(q) > -1;
+          var okQ = !q || norm(c.dataset.search).indexOf(q) > -1;
           var show = okCat && okQ;
           c.style.display = show ? '' : 'none';
           if(show) shown++;
@@ -595,11 +597,15 @@
       /* preselect: ?q=NumeInstructor (din cardurile de instructori) sau #hash de categorie */
       var qParam = new URLSearchParams(location.search).get('q');
       if(qParam && search){ search.value = qParam; apply(current); }
-      var h = (location.hash || '').replace('#','');
-      if(h){
+      var applyHashChip = function(){
+        var h = (location.hash || '').replace('#','');
+        if(!h) return;
         var match = document.querySelector('.chip[data-filter="'+h+'"]');
         if(match) match.click();
-      }
+      };
+      applyHashChip();
+      /* linkurile de categorie din footer funcționează și când ești deja în catalog */
+      addEventListener('hashchange', applyHashChip);
     }).catch(function(){
       grid.innerHTML = '<p class="empty" style="display:block">Nu am putut încărca acum cursurile. Reîncearcă în câteva momente.</p>';
     });
@@ -680,6 +686,39 @@
       h.setAttribute('aria-expanded', mod.classList.contains('open') ? 'true' : 'false');
     }
   });
+
+  /* ---- FAQ: deschidere din hash (#faq-…) + căutare inline ---- */
+  var faqOpenFromHash = function(){
+    var id = (location.hash || '').replace('#', '');
+    if(!id) return;
+    var item = document.getElementById(id);
+    if(!item || !item.classList.contains('faq-item')) return;
+    item.parentElement.querySelectorAll('.faq-item').forEach(function(i){
+      i.classList.toggle('open', i === item);
+      var b = i.querySelector('.faq-q');
+      if(b) b.setAttribute('aria-expanded', i === item ? 'true' : 'false');
+    });
+  };
+  if(document.querySelector('.faq-item')){
+    faqOpenFromHash();
+    addEventListener('hashchange', faqOpenFromHash);
+  }
+  var faqSearch = document.getElementById('faqSearch');
+  if(faqSearch){
+    var faqItems = [].slice.call(document.querySelectorAll('.faq-item'));
+    var faqEmpty = document.getElementById('faqEmpty');
+    faqItems.forEach(function(i){ i._n = norm(i.textContent); });
+    faqSearch.addEventListener('input', function(){
+      var q = norm(faqSearch.value).trim();
+      var shown = 0;
+      faqItems.forEach(function(i){
+        var ok = !q || i._n.indexOf(q) > -1;
+        i.style.display = ok ? '' : 'none';
+        if(ok) shown++;
+      });
+      if(faqEmpty) faqEmpty.style.display = shown ? 'none' : 'block';
+    });
+  }
 
   /* ---- dialoguri accesibile: role, focus trap, scroll lock, focus înapoi ---- */
   var openDialogs = 0;

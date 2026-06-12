@@ -460,6 +460,7 @@ body.hero-locked{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 .sort-wrap select:focus{outline:none;border-color:var(--mint)}
 [data-theme="light"] .sort-wrap select{background:#fff}
 a.inst-card{display:block}
+a.card{display:block}
 .search-wrap{max-width:440px;margin:0 auto;position:relative;z-index:2}
 .search-wrap input{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);
   padding:13px 16px 13px 42px;color:var(--ink);font-family:inherit;font-size:15px}
