@@ -33,19 +33,20 @@
         </div>
 
         <form class="auth-pane on" data-pane="login" id="loginForm">
-          <div class="field"><label>Email</label><input type="email" name="email" placeholder="email@exemplu.ro" required /></div>
-          <div class="field"><label>Parolă</label><input type="password" name="password" placeholder="Parola ta" required /></div>
+          <div class="field"><label for="loginEmail">Email</label><input type="email" id="loginEmail" name="email" placeholder="email@exemplu.ro" autocomplete="email" required /></div>
+          <div class="field"><label for="loginPassword">Parolă</label><input type="password" id="loginPassword" name="password" placeholder="Parola ta" autocomplete="current-password" required /></div>
           <button type="submit" class="btn btn-mint btn-block btn-lg">Intră în cont</button>
-          <p class="form-note auth-alt"></p>
-          <p class="auth-alt">Ai uitat parola? <a href="asistenta.html" class="link" style="font-size:13px">Scrie-ne</a></p>
+          <p class="form-note auth-alt" aria-live="polite"></p>
+          <!-- TODO viitor: flux real de resetare parolă cu DB.sb.auth.resetPasswordForEmail (atenție: SMTP-ul built-in pe plan gratuit ≈ 2 emailuri/oră) -->
+          <p class="auth-alt">Ai uitat parola? <a href="asistenta.html" class="link" style="font-size:13px">Scrie-ne la asistență și o resetăm împreună</a></p>
         </form>
 
         <form class="auth-pane" data-pane="register" id="registerForm">
-          <div class="field"><label>Nume complet</label><input type="text" name="name" placeholder="Numele tău" required /></div>
-          <div class="field"><label>Email</label><input type="email" name="email" placeholder="email@exemplu.ro" required /></div>
-          <div class="field"><label>Parolă</label><input type="password" name="password" placeholder="Alege o parolă (minim 6 caractere)" minlength="6" required /></div>
+          <div class="field"><label for="regName">Nume complet</label><input type="text" id="regName" name="name" placeholder="Numele tău" autocomplete="name" required /></div>
+          <div class="field"><label for="regEmail">Email</label><input type="email" id="regEmail" name="email" placeholder="email@exemplu.ro" autocomplete="email" required /></div>
+          <div class="field"><label for="regPassword">Parolă</label><input type="password" id="regPassword" name="password" placeholder="Alege o parolă (minim 6 caractere)" minlength="6" autocomplete="new-password" required /></div>
           <button type="submit" class="btn btn-mint btn-block btn-lg">Creează cont</button>
-          <p class="form-note auth-alt"></p>
+          <p class="form-note auth-alt" aria-live="polite"></p>
           <p class="auth-alt">Creând un cont, ești de acord cu <a href="termeni.html" class="link" style="font-size:13px">Termenii</a> și <a href="confidentialitate.html" class="link" style="font-size:13px">Politica de confidențialitate</a></p>
         </form>
       </div>

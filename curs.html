@@ -19,19 +19,16 @@
     <h1 class="h1 reveal" style="max-width:780px;margin-top:8px" id="cTitle">Se încarcă…</h1>
     <p class="lead reveal" style="max-width:640px;margin-top:14px" id="cLead"></p>
     <div class="reveal" style="display:flex;gap:22px;flex-wrap:wrap;align-items:center;margin-top:20px;font-size:14px;color:var(--ink-2)">
-      <span style="display:flex;align-items:center;gap:8px"><span class="av" style="width:30px;height:30px;font-size:11px" id="cInstAv"></span><span id="cInstName"></span></span>
+      <span style="display:flex;align-items:center;gap:8px"><span class="av" style="width:30px;height:30px;font-size:11px" id="cInstAv" aria-hidden="true"></span><span id="cInstName"></span></span>
       <span style="color:var(--mint);font-weight:600" id="cRate"></span>
       <span id="cUpdated"></span>
     </div>
 
     <div class="course-layout" style="margin-top:38px">
       <div>
-        <!-- preview -->
+        <!-- copertă vizuală (fără player fals — previzualizarea gratuită e un feature viitor) -->
         <div class="screen reveal" style="width:100%;max-width:none">
-          <div class="sc-hero" style="aspect-ratio:16/8.5">
-            <span class="sc-tag">Previzualizare gratuită · 2:40</span>
-            <span class="sc-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
-          </div>
+          <div class="sc-hero" style="aspect-ratio:16/8.5" aria-hidden="true"></div>
         </div>
 
         <!-- what you learn -->
@@ -72,9 +69,7 @@
       <!-- side card -->
       <aside>
         <div class="side-card reveal">
-          <div class="sc-hero">
-            <span class="sc-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
-          </div>
+          <div class="sc-hero" aria-hidden="true"></div>
           <div class="side-pad">
             <div class="side-price"><span class="now" id="cPrice"></span></div>
             <p class="side-note">Plată unică · Acces pe viață · Fără abonament</p>

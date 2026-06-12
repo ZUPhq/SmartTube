@@ -77,7 +77,11 @@
     });
     var max = Math.max(1, Math.max.apply(null, buckets));
     chart.innerHTML = buckets.map(function(n, idx){
-      return '<i data-i="' + idx + '"><span style="height:' + Math.round(100 * n / max) + '%"></span></i>';
+      var d = new Date(today - (29 - idx) * DAY);
+      var lab = (idx === 29 ? 'azi' : d.getDate() + '.' + (d.getMonth() + 1)) + ': ' +
+        n + (n === 1 ? ' vânzare' : ' vânzări');
+      return '<i data-i="' + idx + '" tabindex="0" aria-label="' + lab + '">' +
+        '<span style="height:' + Math.round(100 * n / max) + '%"></span></i>';
     }).join('');
     var fmtD = function(d){ return isNaN(d.getTime()) ? '—' : d.getDate() + '.' + (d.getMonth() + 1) + '.' + d.getFullYear(); };
     document.getElementById('chartFrom').textContent = fmtD(new Date(today - 29 * DAY));
@@ -96,6 +100,21 @@
       tip.classList.add('on');
     });
     chart.addEventListener('mouseleave', function(){ tip.classList.remove('on'); });
+    /* tooltip și din tastatură (focus pe bare) */
+    chart.addEventListener('focusin', function(e){
+      var col = e.target.closest('i');
+      if(!col) return;
+      var idx = parseInt(col.dataset.i, 10);
+      var d = new Date(today - (29 - idx) * DAY);
+      var label = idx === 29 ? 'azi' : d.getDate() + '.' + (d.getMonth() + 1);
+      var r = col.getBoundingClientRect();
+      tip.innerHTML = '<b>' + label + '</b>' +
+        buckets[idx] + (buckets[idx] === 1 ? ' vânzare' : ' vânzări') + ' · ' + DB.fmtMoney(money[idx]);
+      tip.style.left = Math.max(70, Math.min(innerWidth - 70, r.left + r.width / 2)) + 'px';
+      tip.style.top = (r.top - 14) + 'px';
+      tip.classList.add('on');
+    });
+    chart.addEventListener('focusout', function(){ tip.classList.remove('on'); });
 
     /* surse de trafic */
     var srcBox = document.getElementById('srcBars');
@@ -144,10 +163,10 @@
         '<td class="num">' + (sBy[c.id] || 0) + '</td>' +
         '<td class="num">' + DB.fmtMoney(rBy[c.id] || 0) + '</td>' +
         '<td><div class="tbl-actions">' +
-          '<a class="tbl-btn" href="curs-nou.html?id=' + c.id + '">Editează</a>' +
-          (pub ? '<a class="tbl-btn" href="curs.html?id=' + c.id + '">Vezi pagina</a>' : '') +
-          '<button class="tbl-btn" data-promo="' + c.id + '" type="button"' + (pub ? '' : ' disabled') + '>Link promovare</button>' +
-          '<button class="tbl-btn" data-toggle="' + c.id + '" data-next="' + (pub ? 'draft' : 'published') + '" type="button">' + (pub ? 'Retrage' : 'Publică') + '</button>' +
+          '<a class="tbl-btn" href="curs-nou.html?id=' + c.id + '" aria-label="Editează cursul ' + DB.esc(c.title) + '">Editează</a>' +
+          (pub ? '<a class="tbl-btn" href="curs.html?id=' + c.id + '" aria-label="Vezi pagina cursului ' + DB.esc(c.title) + '">Vezi pagina</a>' : '') +
+          '<button class="tbl-btn" data-promo="' + c.id + '" type="button" aria-label="Copiază linkul de promovare pentru ' + DB.esc(c.title) + '"' + (pub ? '' : ' disabled') + '>Link promovare</button>' +
+          '<button class="tbl-btn" data-toggle="' + c.id + '" data-next="' + (pub ? 'draft' : 'published') + '" type="button" aria-label="' + (pub ? 'Retrage' : 'Publică') + ' cursul ' + DB.esc(c.title) + '">' + (pub ? 'Retrage' : 'Publică') + '</button>' +
         '</div></td></tr>';
     }).join('');
 

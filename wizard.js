@@ -51,8 +51,8 @@
     var addLesson = function(modEl, title, dur, videoPath){
       var row = document.createElement('div');
       row.className = 'wlesson';
-      row.innerHTML = '<input type="text" class="wl-title" maxlength="90" placeholder="Titlul lecției" />' +
-        '<input type="number" class="wl-dur" min="1" max="600" placeholder="min" title="Durata în minute" />' +
+      row.innerHTML = '<input type="text" class="wl-title" maxlength="90" placeholder="Titlul lecției" aria-label="Titlul lecției" />' +
+        '<input type="number" class="wl-dur" min="1" max="600" placeholder="min" title="Durata în minute" aria-label="Durata lecției în minute" />' +
         '<button type="button" class="wvid" title="Video pentru lecție (mp4/webm/mov, max 50MB)">' + camIcon + '<span>Video</span></button>' +
         '<button type="button" class="wx wvx" aria-label="Șterge videoul" title="Șterge videoul" style="display:none">' +
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>' +
@@ -107,7 +107,7 @@
       var el = document.createElement('div');
       el.className = 'wmod';
       el.innerHTML = '<div class="wmod-head">' +
-        '<input type="text" class="wm-title" maxlength="90" placeholder="Titlul modulului (ex: Introducere)" />' + xBtn +
+        '<input type="text" class="wm-title" maxlength="90" placeholder="Titlul modulului (ex: Introducere)" aria-label="Titlul modulului" />' + xBtn +
         '</div><div class="wlessons"></div>' +
         '<button type="button" class="wadd wadd-lesson">+ Adaugă lecție</button>';
       el.querySelector('.wm-title').value = title || '';
@@ -130,7 +130,7 @@
     var addLearn = function(text){
       var row = document.createElement('div');
       row.className = 'wlesson';
-      row.innerHTML = '<input type="text" class="wlearn-in" maxlength="120" placeholder="ex: Să configurezi un proiect de la zero" />' + xBtn;
+      row.innerHTML = '<input type="text" class="wlearn-in" maxlength="120" placeholder="ex: Să configurezi un proiect de la zero" aria-label="Punct la secțiunea Ce vei învăța" />' + xBtn;
       row.querySelector('.wlearn-in').value = text || '';
       row.querySelector('.wx').addEventListener('click', function(){ row.remove(); });
       learnBox.appendChild(row);

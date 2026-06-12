@@ -98,11 +98,11 @@
         <p class="lead" style="margin-top:10px">Întrebări, idei, parteneriate — îți răspundem în maxim o zi lucrătoare.</p>
       </div>
       <form class="auth-card" id="contactForm">
-        <div class="field"><label>Nume</label><input type="text" name="name" placeholder="Numele tău" required /></div>
-        <div class="field"><label>Email</label><input type="email" name="email" placeholder="email@exemplu.ro" required /></div>
-        <div class="field"><label>Mesaj</label><textarea name="message" maxlength="2000" placeholder="Cu ce te putem ajuta?" required></textarea></div>
+        <div class="field"><label for="contactName">Nume</label><input type="text" id="contactName" name="name" placeholder="Numele tău" autocomplete="name" required /></div>
+        <div class="field"><label for="contactEmail">Email</label><input type="email" id="contactEmail" name="email" placeholder="email@exemplu.ro" autocomplete="email" required /></div>
+        <div class="field"><label for="contactMsg">Mesaj</label><textarea id="contactMsg" name="message" maxlength="2000" placeholder="Cu ce te putem ajuta?" required></textarea></div>
         <button type="submit" class="btn btn-mint btn-block btn-lg">Trimite mesajul</button>
-        <p class="form-note auth-alt"></p>
+        <p class="form-note auth-alt" aria-live="polite"></p>
       </form>
       <p class="auth-alt" style="margin-top:18px">Cauți răspunsuri rapide? <a href="asistenta.html#faq" class="link" style="font-size:13px">Vezi întrebările frecvente</a></p>
     </div>

@@ -42,6 +42,7 @@
     var setMenu = function(open){
       mmenu.classList.toggle('open', open);
       burger.classList.toggle('on', open);
+      burger.setAttribute('aria-expanded', open ? 'true' : 'false');
       document.body.style.overflow = (open && innerWidth <= 833) ? 'hidden' : '';
     };
     burger.addEventListener('click', function(e){
@@ -326,6 +327,14 @@
     };
     carFill();
 
+    /* accesibil din tastatură: focusabil + săgeți; drift-ul se oprește cât e focusat */
+    var carFocus = false;
+    carView.setAttribute('tabindex', '0');
+    carView.setAttribute('role', 'region');
+    carView.setAttribute('aria-label', 'Cursuri populare — navighează cu săgețile stânga și dreapta');
+    carView.addEventListener('focus', function(){ carFocus = true; });
+    carView.addEventListener('blur', function(){ carFocus = false; });
+
     var carPos = 0, carVel = 0, carDragging = false, carLastT = null;
     var carAuto = reduce ? 0 : 0.035;              // px per ms, drifts left
     var carWrap = function(){
@@ -337,7 +346,7 @@
     var carTick = function(t){
       var dt = carLastT == null ? 16 : Math.min(64, t - carLastT); carLastT = t;
       if(!carDragging){
-        carPos -= carAuto * dt;
+        carPos -= (carFocus ? 0 : carAuto) * dt;
         carPos += carVel;
         carVel *= 0.92; if(Math.abs(carVel) < 0.02) carVel = 0;
         carWrap(); carRender();
@@ -366,6 +375,12 @@
     carView.addEventListener('wheel', function(e){
       if(Math.abs(e.deltaX) > Math.abs(e.deltaY)){ e.preventDefault(); carPos -= e.deltaX; carVel = 0; carWrap(); carRender(); }
     }, {passive:false});
+    carView.addEventListener('keydown', function(e){
+      if(e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
+      e.preventDefault();
+      carPos += e.key === 'ArrowLeft' ? 324 : -324;   // lățimea unui card + gap
+      carVel = 0; carWrap(); carRender();
+    });
     addEventListener('resize', carFill);
   }
 
@@ -435,9 +450,11 @@
       };
       var current = 'all';
       chips.forEach(function(ch){
+        ch.setAttribute('aria-pressed', ch.classList.contains('on') ? 'true' : 'false');
         ch.addEventListener('click', function(){
-          chips.forEach(function(x){ x.classList.remove('on'); });
+          chips.forEach(function(x){ x.classList.remove('on'); x.setAttribute('aria-pressed', 'false'); });
           ch.classList.add('on');
+          ch.setAttribute('aria-pressed', 'true');
           current = ch.dataset.filter;
           apply(current);
         });
@@ -455,18 +472,71 @@
   }
 
   /* ---- accordions (faq + curriculum) — delegate, conținutul poate fi dinamic ---- */
+  document.querySelectorAll('.faq-item .faq-q').forEach(function(b){
+    b.setAttribute('aria-expanded', b.closest('.faq-item').classList.contains('open') ? 'true' : 'false');
+  });
   document.addEventListener('click', function(e){
     var q = e.target.closest('.faq-q');
     if(q){
       var item = q.closest('.faq-item');
       var open = item.classList.contains('open');
-      item.parentElement.querySelectorAll('.faq-item').forEach(function(i){ i.classList.remove('open'); });
-      if(!open) item.classList.add('open');
+      item.parentElement.querySelectorAll('.faq-item').forEach(function(i){
+        i.classList.remove('open');
+        var b = i.querySelector('.faq-q');
+        if(b) b.setAttribute('aria-expanded', 'false');
+      });
+      if(!open){ item.classList.add('open'); q.setAttribute('aria-expanded', 'true'); }
       return;
     }
     var h = e.target.closest('.mod-head');
-    if(h) h.closest('.module').classList.toggle('open');
+    if(h){
+      var mod = h.closest('.module');
+      mod.classList.toggle('open');
+      h.setAttribute('aria-expanded', mod.classList.contains('open') ? 'true' : 'false');
+    }
   });
+
+  /* ---- dialoguri accesibile: role, focus trap, scroll lock, focus înapoi ---- */
+  var openDialogs = 0;
+  var dialogify = function(modal, labelId){
+    if(!modal) return;
+    var card = modal.querySelector('.modal-card');
+    if(!card) return;
+    card.setAttribute('role', 'dialog');
+    card.setAttribute('aria-modal', 'true');
+    if(labelId) card.setAttribute('aria-labelledby', labelId);
+    var lastFocus = null, wasOpen = false;
+    var trap = function(e){
+      if(e.key !== 'Tab') return;
+      var els = [].slice.call(card.querySelectorAll(
+        'a[href],button:not([disabled]),video,input,select,textarea,[tabindex]:not([tabindex="-1"])'
+      )).filter(function(el){ return el.offsetParent !== null; });
+      if(!els.length) return;
+      var first = els[0], last = els[els.length - 1];
+      if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+      else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+    };
+    new MutationObserver(function(){
+      var open = modal.classList.contains('open');
+      if(open === wasOpen) return;
+      wasOpen = open;
+      if(open){
+        lastFocus = document.activeElement;
+        openDialogs++;
+        document.body.style.overflow = 'hidden';
+        modal.addEventListener('keydown', trap);
+        setTimeout(function(){
+          var f = card.querySelector('button:not([disabled]),a[href],input,select,textarea');
+          if(f) f.focus();
+        }, 40);
+      }else{
+        openDialogs = Math.max(0, openDialogs - 1);
+        if(!openDialogs) document.body.style.overflow = '';
+        modal.removeEventListener('keydown', trap);
+        if(lastFocus && lastFocus.focus) try{ lastFocus.focus(); }catch(err){}
+      }
+    }).observe(modal, {attributes:true, attributeFilter:['class']});
+  };
 
   /* ---- account tabs ---- */
   var authTabs = document.querySelectorAll('.auth-tab');
@@ -636,7 +706,7 @@
         }).join('');
         totalMin += mins;
         return '<div class="module' + (i === 0 ? ' open' : '') + '">' +
-          '<button class="mod-head"><span>' + (i + 1) + ' · ' + DB.esc(m.title) +
+          '<button class="mod-head" aria-expanded="' + (i === 0 ? 'true' : 'false') + '"><span>' + (i + 1) + ' · ' + DB.esc(m.title) +
           ' <span class="meta">— ' + (m.lessons || []).length + ' lecții · ' + DB.fmtDur(mins) + '</span></span>' +
           plus + '</button><div class="mod-body"><div>' + rows + '</div></div></div>';
       }).join('');
@@ -705,6 +775,8 @@
       var vidModal = document.getElementById('vidModal');
       var vidPlayer = document.getElementById('vidPlayer');
       var vmTitle = document.getElementById('vmTitle');
+      dialogify(modal, 'bmTitle');
+      dialogify(vidModal, 'vmTitle');
       var vidClose = function(){
         vidModal.classList.remove('open');
         try{ vidPlayer.pause(); vidPlayer.removeAttribute('src'); vidPlayer.load(); }catch(e){}
