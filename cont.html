@@ -62,12 +62,17 @@
   </div>
 </section>
 
-<!-- logat: hub de cont -->
+<!-- logat: dashboard personal (student sau instructor) -->
 <section class="section tight" id="hubView" style="display:none">
   <div class="container wide">
+
+    <!-- panou instructor (doar pentru instructori; populat din app.js) -->
+    <div id="instPanel"></div>
+
+    <!-- cursurile mele / continuă să înveți -->
     <div class="hub-head">
-      <h2 class="h3">Cursurile mele</h2>
-      <button class="btn btn-ghost" id="hubLogout" type="button">Ieși din cont</button>
+      <h2 class="h3" id="myCoursesTitle">Cursurile mele</h2>
+      <a class="link link-sm" href="cursuri.html">Explorează catalogul</a>
     </div>
     <div class="catalog-grid" id="myCourses"></div>
     <div class="hub-empty" id="myCoursesEmpty" style="display:none">
@@ -75,18 +80,38 @@
       <a href="cursuri.html" class="btn btn-mint">Vezi cursurile</a>
     </div>
     <div id="myCoursesRec" style="display:none">
-      <h3 class="h3 sec-title">Populare acum pe smarttube</h3>
+      <h3 class="h3 sec-title">Recomandate pentru tine</h3>
       <div class="catalog-grid" id="myCoursesRecGrid"></div>
     </div>
 
-    <h2 class="h3 sec-title">Profil</h2>
+    <!-- scurtături -->
+    <h2 class="h3 sec-title">Scurtături</h2>
+    <div class="hub-shortcuts">
+      <a class="card no-tilt hub-sc" href="cursuri.html">
+        <span class="sc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M10.5 9.2l4 2.8-4 2.8z" fill="currentColor" stroke="none"/></svg></span>
+        <span class="hub-sc-tx"><b>Catalog</b><span>Toate cursurile</span></span>
+      </a>
+      <a class="card no-tilt hub-sc" href="instructori.html">
+        <span class="sc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.6 19.5c.6-3 2.9-4.6 5.4-4.6s4.8 1.6 5.4 4.6"/><path d="M16.5 5.2a3 3 0 0 1 0 5.8"/><path d="M18.8 19.5c-.3-2-1.2-3.4-2.6-4.2"/></svg></span>
+        <span class="hub-sc-tx"><b>Instructori</b><span>Cine te învață</span></span>
+      </a>
+      <a class="card no-tilt hub-sc" href="asistenta.html">
+        <span class="sc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a7.5 7.5 0 0 1-10.9 6.7L4 20l1.8-5.1A7.5 7.5 0 1 1 21 11.5z"/></svg></span>
+        <span class="hub-sc-tx"><b>Asistență</b><span>Întrebări &amp; suport</span></span>
+      </a>
+    </div>
+
+    <!-- cont -->
+    <h2 class="h3 sec-title">Contul tău</h2>
     <div class="grid-2 hub-grid">
-      <div class="card">
+      <div class="card no-tilt">
         <h3>Datele contului</h3>
         <p class="hub-line"><span>Nume</span><b id="hubName"></b></p>
         <p class="hub-line"><span>Email</span><b id="hubEmail"></b></p>
+        <p class="hub-line"><span>Tip cont</span><b id="hubRole"></b></p>
+        <div class="hub-cta"><button class="btn btn-ghost" id="hubLogout" type="button">Ieși din cont</button></div>
       </div>
-      <div class="card" id="hubInstr"></div>
+      <div class="card no-tilt" id="hubInstr"></div>
     </div>
   </div>
 </section>

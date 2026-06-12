@@ -17,6 +17,8 @@
 <link rel="icon" type="image/png" href="media/logos/favicon.png" />
 <link rel="stylesheet" href="styles.css" />
 <script>try{if(localStorage.getItem('theme')==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}</script>
+<!-- userii logați au „acasă" propriul dashboard, nu pagina de marketing: redirect sincron, fără flash -->
+<script>try{for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('sb-')===0&&k.indexOf('-auth-token')>0){location.replace('cont.html');break;}}}catch(e){}</script>
 </head>
 <body>
 

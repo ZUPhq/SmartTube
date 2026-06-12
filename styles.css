@@ -778,6 +778,21 @@ a.card{display:block}
 #myCourses{margin-top:18px}
 .cc-new{color:var(--mint);font-weight:600;font-size:13px}
 
+/* dashboard logat: panou instructor + scurtături */
+.inst-panel{display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;margin-bottom:34px}
+.inst-panel-main{max-width:560px}
+.inst-panel-main p{color:var(--ink-2);font-size:15px;margin-top:8px}
+.inst-panel-cta{display:flex;gap:10px;flex-wrap:wrap}
+@media(max-width:560px){.inst-panel-cta{width:100%}.inst-panel-cta .btn{flex:1}}
+.hub-shortcuts{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.hub-sc{display:flex;align-items:center;gap:14px;padding:18px 20px}
+.hub-sc .sc-ic{width:42px;height:42px;border-radius:var(--r-md);background:var(--surface-2);
+  display:grid;place-items:center;color:var(--mint);flex:none}
+.hub-sc .sc-ic svg{width:20px;height:20px}
+.hub-sc-tx b{display:block;font-size:15px;color:var(--ink);font-weight:600}
+.hub-sc-tx span{font-size:13px;color:var(--ink-2)}
+@media(max-width:700px){.hub-shortcuts{grid-template-columns:1fr}}
+
 /* modal checkout (plată simulată) */
 .modal{position:fixed;inset:0;z-index:90;display:none;place-items:center;padding:20px;
   background:rgba(8,10,14,.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}

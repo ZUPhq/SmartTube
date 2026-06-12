@@ -341,7 +341,8 @@
     DB.popularCourses(6).then(function(cs){
       if(!cs.length) throw new Error('no courses');
       carTrack.innerHTML = cs.map(function(c){ return courseCardHTML(c, 'front_page'); }).join('');
-      tiltify(carTrack);
+      /* fără tilt 3D pe cardurile din carusel: pe un track care driftează, transformul de hover
+         se bate cu mișcarea și pare că sare. Tilt-ul rămâne pe grilele statice (catalog etc.) */
       initCarousel();
     }).catch(function(){
       var sec = document.getElementById('populare');
@@ -364,15 +365,14 @@
     };
     carFill();
 
-    /* accesibil din tastatură: focusabil + săgeți; drift-ul se oprește cât e focusat sau sub cursor */
-    var carFocus = false, carHover = false;
+    /* accesibil din tastatură: focusabil + săgeți; drift-ul se oprește doar cât e focusat din tastatură
+       (la hover cu mouse-ul NU îngheață — userul îl poate trage/derula liber) */
+    var carFocus = false;
     carView.setAttribute('tabindex', '0');
     carView.setAttribute('role', 'region');
     carView.setAttribute('aria-label', 'Cursuri populare — navighează cu săgețile stânga și dreapta');
     carView.addEventListener('focus', function(){ carFocus = true; });
     carView.addEventListener('blur', function(){ carFocus = false; });
-    carView.addEventListener('mouseenter', function(){ carHover = true; });
-    carView.addEventListener('mouseleave', function(){ carHover = false; });
 
     var carPos = 0, carVel = 0, carDragging = false, carLastT = null;
     var carAuto = reduce ? 0 : 0.035;              // px per ms, drifts left
@@ -385,7 +385,7 @@
     var carTick = function(t){
       var dt = carLastT == null ? 16 : Math.min(64, t - carLastT); carLastT = t;
       if(!carDragging){
-        carPos -= ((carFocus || carHover) ? 0 : carAuto) * dt;
+        carPos -= (carFocus ? 0 : carAuto) * dt;
         carPos += carVel;
         carVel *= 0.92; if(Math.abs(carVel) < 0.02) carVel = 0;
         carWrap(); carRender();
@@ -823,33 +823,63 @@
     var showAuth = function(){ authView.style.display = ''; hubView.style.display = 'none'; };
     var showHub = function(p){
       authView.style.display = 'none'; hubView.style.display = '';
+      var first = p.name.split(' ')[0] || 'cursant';
       if(contHead){
-        contHead.querySelector('.h1').textContent = 'Salut, ' + (p.name.split(' ')[0] || 'cursant') + '.';
-        contHead.querySelector('.lead').textContent = 'Cursurile tale, profilul și — dacă predai — dashboard-ul tău.';
+        contHead.querySelector('.h1').textContent = 'Salut, ' + first + '.';
+        contHead.querySelector('.lead').textContent = p.is_instructor
+          ? 'Cursurile tale, panoul de instructor și contul — toate într-un singur loc.'
+          : 'Continuă de unde ai rămas, descoperă cursuri noi și gestionează-ți contul.';
       }
       document.getElementById('hubName').textContent = p.name;
       document.getElementById('hubEmail').textContent = p.email;
+      var roleEl = document.getElementById('hubRole');
+      if(roleEl) roleEl.textContent = p.is_instructor ? 'Instructor' : 'Student';
+
+      /* panou instructor proeminent (sus) + cardul de cont secundar */
+      var panel = document.getElementById('instPanel');
       var instr = document.getElementById('hubInstr');
       if(p.is_instructor){
-        instr.innerHTML = '<h3>Modul instructor</h3><p>Contul tău de instructor e activ. Vezi vânzările, accesările și cursurile tale.</p>' +
-          '<div class="hub-cta"><a class="btn btn-mint" href="dashboard.html">Deschide dashboard-ul</a>' +
-          '<a class="btn btn-ghost" href="curs-nou.html">Curs nou</a></div>';
+        if(panel){
+          panel.innerHTML = '<div class="card no-tilt inst-panel">' +
+            '<div class="inst-panel-main"><p class="eyebrow">Panoul tău de instructor</p>' +
+            '<h2 class="h3">Cursurile și vânzările tale</h2>' +
+            '<p id="instPanelSub">Vezi accesări, vânzări și încasări în timp real.</p></div>' +
+            '<div class="inst-panel-cta"><a class="btn btn-mint" href="dashboard.html">Deschide dashboard-ul</a>' +
+            '<a class="btn btn-ghost" href="curs-nou.html">Curs nou</a></div></div>';
+          DB.myCourses().then(function(cs){
+            var pub = cs.filter(function(c){ return c.status === 'published'; }).length;
+            var sub = document.getElementById('instPanelSub');
+            if(sub && cs.length){
+              sub.textContent = cs.length + (cs.length === 1 ? ' curs' : ' cursuri') + ' (' + pub +
+                ' publicate) · accesări, vânzări și încasări în timp real.';
+            }
+          }).catch(function(){});
+        }
+        if(instr) instr.innerHTML = '<h3>Mod instructor activ</h3>' +
+          '<p>Predai pe smarttube. Gestionează-ți cursurile din panoul de sus sau publică unul nou.</p>' +
+          '<div class="hub-cta"><a class="btn btn-ghost" href="curs-nou.html">Publică un curs</a></div>';
       }else{
-        instr.innerHTML = '<h3>Predă pe smarttube</h3><p>Transformă ce știi într-un venit. Activează modul instructor și publică primul tău curs.</p>' +
-          '<div class="hub-cta"><button class="btn btn-mint" id="becomeInstr" type="button">Devino instructor</button></div>';
-        var b = document.getElementById('becomeInstr');
-        b.addEventListener('click', function(){
-          b.disabled = true; b.textContent = 'Se activează…';
-          DB.becomeInstructor().then(function(){ location.href = 'dashboard.html'; })
-            .catch(function(){ b.disabled = false; b.textContent = 'Devino instructor'; });
-        });
+        if(panel) panel.innerHTML = '';
+        if(instr){
+          instr.innerHTML = '<h3>Predă pe smarttube</h3><p>Transformă ce știi într-un venit. Activează modul instructor și publică primul tău curs.</p>' +
+            '<div class="hub-cta"><button class="btn btn-mint" id="becomeInstr" type="button">Devino instructor</button></div>';
+          var b = document.getElementById('becomeInstr');
+          if(b) b.addEventListener('click', function(){
+            b.disabled = true; b.textContent = 'Se activează…';
+            DB.becomeInstructor().then(function(){ location.href = 'dashboard.html'; })
+              .catch(function(){ b.disabled = false; b.textContent = 'Devino instructor'; });
+          });
+        }
       }
+
       var box = document.getElementById('myCourses');
       var emptyBox = document.getElementById('myCoursesEmpty');
+      var myTitle = document.getElementById('myCoursesTitle');
       box.innerHTML = new Array(4).join('<div class="ccard skeleton sk-card" aria-hidden="true"></div>');
       DB.myPurchases().then(function(ps){
         var courses = ps.map(function(x){ return x.courses; }).filter(Boolean);
         if(!courses.length){
+          if(myTitle) myTitle.textContent = 'Începe să înveți';
           emptyBox.style.display = ''; box.style.display = 'none'; box.innerHTML = '';
           /* recomandări ca punct de plecare */
           DB.popularCourses(3).then(function(cs){
@@ -864,6 +894,7 @@
           }).catch(function(){});
           return;
         }
+        if(myTitle) myTitle.textContent = courses.length === 1 ? 'Cursul tău' : 'Cursurile mele';
         box.innerHTML = courses.map(function(c){ return courseCardHTML(c, ''); }).join('');
         tiltify(box);
         [].forEach.call(box.children, function(el){ el.classList.add('reveal'); });
