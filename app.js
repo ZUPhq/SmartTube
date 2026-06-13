@@ -248,16 +248,24 @@
     frame();
   }
 
-  /* ---- hero MacBook: ecranul se deschide/zoom pe scroll, video pe ecran ---- */
+  /* ---- hero MacBook „Portalul": laptopul se deschide la ecran plat, apoi videoul se desprinde
+         din ramă și face dolly-in spre privitor (umple cadrul) iar carcasa se retrage ---- */
   var mbkScrub = document.getElementById('mbkScrub');
   var mbk = document.getElementById('mbk');
   var mbkScreen = document.getElementById('mbkScreen');
   var mbkHead = document.getElementById('mbkHead');
+  var mbkStage = document.querySelector('.mbk-stage');
+  var mbkPop = document.getElementById('mbkPop');
   var heroVideo = document.getElementById('heroVideo');
   var heroPlay = document.getElementById('heroPlay');
+  var heroSound = document.getElementById('heroSound');
   if(mbkScrub && mbk && mbkScreen){
     /* pe mobil nu pornim videoul automat — consumă date; posterul + play rămân */
     if(heroVideo && innerWidth <= 833){ try{ heroVideo.autoplay = false; heroVideo.pause(); }catch(e){} }
+
+    var mbkBezel = heroVideo && heroVideo.parentElement;        // .mbk-bezel (referință fixă)
+    var mbkTag = mbkBezel && mbkBezel.querySelector('.mbk-tag');
+    var popTag = mbkPop && mbkPop.querySelector('.pop-tag');
 
     var fitMbk = function(){
       /* 640 = ecranul la lățime maximă (512×1.2 ≈ 614) + margine, ca să nu iasă lateral pe niciun ecran */
@@ -270,19 +278,76 @@
     var mbkOn = function(){ return innerWidth > 833 && !reduce; };
     var lerp = function(a, b, t){ return a + (b - a) * t; };
     var cl = function(v){ return v < 0 ? 0 : v > 1 ? 1 : v; };
+    var eoc = function(p){ p = cl(p); return 1 - Math.pow(1 - p, 3); };     // easeOutCubic
+    var curScale = function(){ return parseFloat(getComputedStyle(mbk).getPropertyValue('--mbk-scale')) || 1; };
+
+    var handed = false, popGeom = null;
+    /* HANDOFF: la ecran perfect plat (q=0.30) mut videoul în overlay-ul plat, măsurat pe bezel */
+    var doHandoff = function(){
+      mbkScreen.style.transform = 'rotateX(0deg) scale(1,1)';
+      var r = mbkBezel.getBoundingClientRect(), s = mbkStage.getBoundingClientRect();
+      var L = r.left - s.left, T = r.top - s.top, W = r.width, H = r.height;
+      mbkPop.style.cssText = 'position:absolute;left:' + L + 'px;top:' + T + 'px;width:' + W + 'px;height:' + H +
+        'px;border-radius:12px;background:#000;overflow:hidden;z-index:5;transform-origin:center;' +
+        'transform:translate(0,0) scale(1);will-change:transform';
+      mbkPop.hidden = false;
+      mbkPop.insertBefore(heroVideo, mbkPop.firstChild);          // appendChild păstrează redarea (fără reload)
+      heroVideo.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:left top';
+      mbkBezel.classList.add('mbk-bezel--ghost');                 // rama rămasă arată posterul, nu negru
+      popGeom = {W:W, H:H, cx:L + W / 2, cy:T + H / 2};
+      handed = true;
+      var pr = heroVideo.play(); if(pr && pr.catch) pr.catch(function(){});
+    };
+    var undoHandoff = function(){
+      mbkBezel.insertBefore(heroVideo, mbkBezel.firstChild);
+      heroVideo.style.cssText = '';
+      mbkPop.hidden = true; mbkPop.style.cssText = '';
+      mbkBezel.classList.remove('mbk-bezel--ghost');
+      mbk.style.transform = ''; mbk.style.opacity = ''; mbk.style.filter = ''; mbk.style.pointerEvents = '';
+      handed = false;
+      var pr = heroVideo.play(); if(pr && pr.catch) pr.catch(function(){});
+    };
+
     var mbkScrubFn = function(){
       if(!mbkOn()) return;
       var top = mbkScrub.getBoundingClientRect().top;
       var span = mbkScrub.offsetHeight - innerHeight;
       var q = span > 0 ? cl(-top / span) : 0;
-      /* exact ca Aceternity: scaleX 1.2→1.5, scaleY .6→1.5 (q[0,.3]); rotateX -28→0 (q[.1,.3]) */
-      var a = cl(q / 0.3);
-      var sx = lerp(1.2, 1.5, a), sy = lerp(0.6, 1.5, a);
-      var rot = q < 0.1 ? -28 : lerp(-28, 0, cl((q - 0.1) / 0.2));
-      mbkScreen.style.transform = 'rotateX(' + rot.toFixed(2) + 'deg) scale(' + sx.toFixed(3) + ',' + sy.toFixed(3) + ')';
+
+      /* FAZA 1 — snap-open: ecranul se aplatizează la rotateX(0) scale(1,1) exact la q=0.30 */
+      if(!handed){
+        var e1 = eoc(q / 0.30);
+        mbkScreen.style.transform = 'rotateX(' + lerp(-28, 0, e1).toFixed(2) + 'deg) scale(' +
+          lerp(1.2, 1, e1).toFixed(3) + ',' + lerp(0.6, 1, e1).toFixed(3) + ')';
+      }
       if(mbkHead){
-        mbkHead.style.opacity = (1 - cl(q / 0.2)).toFixed(3);
-        mbkHead.style.transform = 'translateY(' + (100 * a).toFixed(1) + 'px)';
+        var hf = cl(q / 0.16);
+        mbkHead.style.opacity = (1 - hf).toFixed(3);
+        mbkHead.style.transform = 'translateY(' + lerp(0, -60, hf).toFixed(1) + 'px)';
+        mbkHead.style.pointerEvents = q > 0.16 ? 'none' : '';
+      }
+      if(heroPlay) heroPlay.style.opacity = (1 - cl(q / 0.12)).toFixed(2);
+      if(mbkTag) mbkTag.style.opacity = (1 - cl(q / 0.18)).toFixed(2);
+
+      /* HANDOFF cu histereză 0.30 / 0.27 */
+      if(!handed && q >= 0.30) doHandoff();
+      else if(handed && q < 0.27){ undoHandoff(); return; }
+
+      /* FAZA 3 — dolly-in: videoul (overlay plat) umple viewportul; carcasa se retrage cu blur+fade */
+      if(handed){
+        var t = eoc(cl((q - 0.30) / 0.54));
+        var fill = Math.max(innerWidth / popGeom.W, innerHeight / popGeom.H) * 1.02;
+        var dx = innerWidth / 2 - popGeom.cx, dy = innerHeight / 2 - popGeom.cy;
+        mbkPop.style.transform = 'translate(' + (dx * t).toFixed(1) + 'px,' + (dy * t).toFixed(1) +
+          'px) scale(' + (1 + (fill - 1) * t).toFixed(4) + ')';
+        mbkPop.style.borderRadius = lerp(12, 0, cl(t * 1.2)).toFixed(1) + 'px';
+        var er = eoc(cl((q - 0.30) / 0.32)), cs = curScale();
+        mbk.style.transform = 'translateY(' + lerp(0, 34, er).toFixed(1) + 'px) scale(' + (cs * lerp(1, 0.86, er)).toFixed(3) + ')';
+        mbk.style.opacity = (1 - er).toFixed(3);
+        mbk.style.filter = 'blur(' + lerp(0, 8, er).toFixed(1) + 'px)';
+        mbk.style.pointerEvents = er >= 1 ? 'none' : '';
+        if(popTag) popTag.style.opacity = cl((t - 0.6) / 0.4).toFixed(2);
+        if(heroSound){ heroSound.style.opacity = cl((t - 0.8) / 0.2).toFixed(2); heroSound.style.pointerEvents = t > 0.8 ? 'auto' : 'none'; }
       }
     };
 
@@ -291,12 +356,22 @@
     if(mbkOn()){ addEventListener('scroll', onMbkScroll, {passive:true}); mbkScrubFn(); }
     addEventListener('resize', function(){
       fitMbk();
+      if(handed) undoHandoff();                  // remăsoară la următorul scroll (evită popGeom învechit)
       if(mbkOn()){ mbkScrubFn(); }
-      else { mbkScreen.style.transform = '';
-        if(mbkHead){ mbkHead.style.opacity = ''; mbkHead.style.transform = ''; } }
+      else {
+        mbkScreen.style.transform = '';
+        if(mbkHead){ mbkHead.style.opacity = ''; mbkHead.style.transform = ''; mbkHead.style.pointerEvents = ''; }
+        if(heroPlay) heroPlay.style.opacity = '';
+        if(mbkTag) mbkTag.style.opacity = '';
+      }
     });
 
-    /* play → fullscreen cu sunet; la ieșire revine pe mut + loop */
+    /* buton sunet din overlay → unmute pe loc */
+    if(heroSound && heroVideo){
+      heroSound.addEventListener('click', function(){ try{ heroVideo.muted = false; heroVideo.play(); }catch(e){} });
+    }
+
+    /* play (pe ecranul laptopului) → fullscreen nativ cu sunet; la ieșire revine pe mut */
     if(heroPlay && heroVideo){
       heroPlay.addEventListener('click', function(e){
         e.preventDefault();

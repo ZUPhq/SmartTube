@@ -305,8 +305,8 @@ h1,h2,h3,h4{font-weight:600;letter-spacing:-.02em;line-height:1.08;color:var(--i
 .pl-clip.hot{background:var(--g-hot)}
 .pl-head{width:3px;height:32px;background:#fff;border-radius:2px;margin:0 2px;flex:none}
 
-/* ---------- hero: MacBook (port fidel Aceternity), video pe ecran ---------- */
-.mbk-scrub{position:relative;min-height:230vh}
+/* ---------- hero: MacBook „Portalul" — laptopul se deschide, apoi videoul iese spre privitor ---------- */
+.mbk-scrub{position:relative;min-height:150vh}
 .mbk-stage{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;
   align-items:center;justify-content:center;gap:clamp(14px,3vh,32px);
   text-align:center;padding:0 24px;overflow:hidden;perspective:900px}
@@ -338,6 +338,18 @@ h1,h2,h3,h4{font-weight:600;letter-spacing:-.02em;line-height:1.08;color:var(--i
   transition:transform .25s var(--ease),background .2s}
 .mbk-play:hover{background:rgba(255,255,255,.26);transform:translate(-50%,-50%) scale(1.07)}
 .mbk-play svg{width:28px;height:28px;color:#fff;margin-left:4px}
+
+/* overlay plat „pop": videoul desprins din ramă, dolly-in spre privitor (poziția/transformul vin din JS) */
+.mbk-pop{position:absolute;left:0;top:0;z-index:5;overflow:hidden;background:#000;transform-origin:center}
+.mbk-pop>video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:left top}
+.pop-tag{position:absolute;left:18px;bottom:18px;z-index:3;font-size:14px;font-weight:600;color:#fff;
+  background:rgba(0,0,0,.5);padding:6px 13px;border-radius:9px;opacity:0;letter-spacing:-.01em;pointer-events:none}
+.pop-sound{position:absolute;right:20px;bottom:18px;z-index:4;width:48px;height:48px;border-radius:50%;
+  display:grid;place-items:center;background:rgba(255,255,255,.16);border:1.6px solid rgba(255,255,255,.8);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);opacity:0;cursor:pointer;transition:background .2s}
+.pop-sound:hover{background:rgba(255,255,255,.26)}
+.pop-sound svg{width:22px;height:22px;color:#fff}
+.mbk-bezel--ghost{background-image:url(media/video/fondatori-poster.jpg);background-size:cover;background-position:left top}
 
 /* BASE / tastatură + difuzoare + trackpad */
 .mbk-base{position:relative;width:512px;height:352px;border-radius:16px;overflow:hidden;background:#272729;z-index:1}
@@ -373,11 +385,13 @@ h1,h2,h3,h4{font-weight:600;letter-spacing:-.02em;line-height:1.08;color:var(--i
   .mbk-stage{position:static;height:auto;padding:0 12px;gap:24px;overflow:visible;perspective:700px}
   .mbk-screen{transform:rotateX(-4deg) scale(1,1.34)}
   .mbk-play{width:54px;height:54px}.mbk-play svg{width:21px;height:21px}
+  .mbk-pop{display:none!important}
 }
 @media(prefers-reduced-motion:reduce){
   .mbk-scrub{min-height:auto}
   .mbk-stage{position:static;height:auto}
   .mbk-screen{transform:rotateX(-4deg) scale(1,1.34)}
+  .mbk-pop{display:none!important}
 }
 
 /* visual: course screen */
