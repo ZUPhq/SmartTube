@@ -4,6 +4,9 @@
 (function(){
   'use strict';
 
+  /* nivel low-power (detectat în <head>): oglindim flag-ul pe <body> ca selectorii body-scoped din CSS să prindă */
+  if(window.LOWPOWER && document.body) document.body.classList.add('lowpower');
+
   var page = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
   var active = {
     'cursuri.html': 'cursuri', 'curs.html': 'cursuri',

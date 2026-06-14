@@ -2,6 +2,8 @@
 (function(){
   'use strict';
   var reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var LP = !!window.LOWPOWER;                 // nivel low-power detectat în <head>
+  var lowMotion = reduce || LP;               // orice motiv de a opri animațiile costisitoare
   var hasDB = typeof window.DB !== 'undefined';
 
   /* ---- normalizare pentru căutare: litere mici, fără diacritice ---- */
@@ -202,7 +204,7 @@
     es.forEach(function(e){
       if(!e.isIntersecting) return;
       var el = e.target;
-      if(!reduce){
+      if(!lowMotion){
         el.style.transitionDelay = Math.min(batch++ * 60, 420) + 'ms';
         el.addEventListener('transitionend', function h(){
           el.style.transitionDelay = '';
@@ -222,7 +224,7 @@
   /* ---- parallax + scroll-zoom (home) ---- */
   var parEls = [].slice.call(document.querySelectorAll('[data-par]'));
   var scaleEls = [].slice.call(document.querySelectorAll('[data-scale]'));
-  if((parEls.length || scaleEls.length) && !reduce){
+  if((parEls.length || scaleEls.length) && !lowMotion){
     var ticking = false;
     var frame = function(){
       var vh = innerHeight;
@@ -256,14 +258,24 @@
   var heroPlay = document.getElementById('heroPlay');
   if(heroZoom && hzFrame){
     var hzMobile = innerWidth <= 833;
-    var hzMotion = function(){ return innerWidth > 833 && !reduce; };
+    var hzMotion = function(){ return innerWidth > 833 && !reduce && !LP; };
     var clh = function(v){ return v < 0 ? 0 : v > 1 ? 1 : v; };
     var lerph = function(a, b, t){ return a + (b - a) * t; };
     var eoch = function(p){ p = clh(p); return 1 - Math.pow(1 - p, 3); };   // easeOutCubic
     var vidStarted = false;
+    /* construiește <source> abia la nevoie → niciun octet din video nu se descarcă la load (preload=none) */
+    var ensureVidSrc = function(){
+      if(!heroVideo || heroVideo.querySelector('source')) return;
+      var d = heroVideo.dataset || {}, added = false;
+      if(d.webm){ var sw = document.createElement('source'); sw.src = d.webm; sw.type = 'video/webm'; heroVideo.appendChild(sw); added = true; }
+      if(d.mp4){ var sm = document.createElement('source'); sm.src = d.mp4; sm.type = 'video/mp4'; heroVideo.appendChild(sm); added = true; }
+      if(added) heroVideo.load();   // fetch-ul de rețea pornește abia aici
+    };
     var startVid = function(){
       if(vidStarted || !heroVideo) return;
+      if(window.LOWPOWER) return;   // low-power / save-data: rămâne posterul + butonul play (0 octeți video)
       vidStarted = true;
+      ensureVidSrc();
       var pr = heroVideo.play(); if(pr && pr.catch) pr.catch(function(){});
     };
 
@@ -310,6 +322,7 @@
     if(heroPlay && heroVideo){
       heroPlay.addEventListener('click', function(e){
         e.preventDefault();
+        vidStarted = true; ensureVidSrc();   // escape hatch: și pe low-power, tap pe play încarcă videoul
         try{ heroVideo.muted = false; heroVideo.controls = true; }catch(_){}
         var req = heroVideo.requestFullscreen || heroVideo.webkitRequestFullscreen;
         if(req){ try{ var fr = req.call(heroVideo); if(fr && fr.catch) fr.catch(function(){}); }catch(_){} }
@@ -366,13 +379,16 @@
     carView.addEventListener('blur', function(){ carFocus = false; });
 
     var carPos = 0, carVel = 0, carDragging = false, carLastT = null;
-    var carAuto = reduce ? 0 : 0.035;              // px per ms, drifts left
+    var carAuto = lowMotion ? 0 : 0.035;           // px per ms, drifts left
     var carWrap = function(){
       if(carSetW <= 0) return;
       carPos = carPos % carSetW;
       if(carPos > 0) carPos -= carSetW;
     };
     var carRender = function(){ carTrack.style.transform = 'translate3d(' + carPos.toFixed(2) + 'px,0,0)'; };
+    /* bucla rulează doar când e nevoie (drift/inerție/drag) ȘI caruselul e vizibil pe ecran + tab activ */
+    var carRunning = false, carRaf = 0, carOnScreen = true, carPageVisible = !document.hidden;
+    var carBusy = function(){ return carAuto > 0 || carDragging || carVel !== 0; };
     var carTick = function(t){
       var dt = carLastT == null ? 16 : Math.min(64, t - carLastT); carLastT = t;
       if(!carDragging){
@@ -381,15 +397,32 @@
         carVel *= 0.92; if(Math.abs(carVel) < 0.02) carVel = 0;
         carWrap(); carRender();
       }
-      requestAnimationFrame(carTick);
+      if(carBusy() && carOnScreen && carPageVisible){ carRaf = requestAnimationFrame(carTick); }
+      else { carRunning = false; carRaf = 0; }
     };
-    requestAnimationFrame(carTick);
+    var carStart = function(){
+      if(carRunning || !carOnScreen || !carPageVisible || !carBusy()) return;
+      carRunning = true; carLastT = null; carRaf = requestAnimationFrame(carTick);
+    };
+    var carStop = function(){ carRunning = false; if(carRaf){ cancelAnimationFrame(carRaf); carRaf = 0; } };
+    if('IntersectionObserver' in window){
+      new IntersectionObserver(function(es){
+        carOnScreen = es[0].isIntersecting;
+        if(carOnScreen) carStart(); else carStop();
+      }, {threshold:0}).observe(carView);
+    }
+    document.addEventListener('visibilitychange', function(){
+      carPageVisible = !document.hidden;
+      if(carPageVisible) carStart(); else carStop();
+    });
+    carStart();
 
     var carSX = 0, carSP = 0, carLX = 0, carMoved = false;
     carView.addEventListener('pointerdown', function(e){
       carDragging = true; carMoved = false; carSX = carLX = e.clientX; carSP = carPos; carVel = 0;
       try{ carView.setPointerCapture(e.pointerId); }catch(_){}
       carView.classList.add('grabbing');
+      carStart();   // pornește bucla pentru drag + inerția de după (chiar dacă driftul auto e oprit)
     });
     carView.addEventListener('pointermove', function(e){
       if(!carDragging) return;
@@ -414,6 +447,7 @@
         return;
       }
       carVel += e.key === 'ArrowLeft' ? 28 : -28;       // impuls prin inerția existentă ≈ un card
+      carStart();
     });
     var carFillT = null;
     addEventListener('resize', function(){
@@ -501,12 +535,18 @@
         card.style.transition='box-shadow .3s';
       });
       card.addEventListener('mousemove',function(e){
-        var r=card.getBoundingClientRect();
-        var x=((e.clientX-r.left)/r.width-.5)*2;
-        var y=((e.clientY-r.top)/r.height-.5)*2;
-        card.style.transform='perspective(700px) rotateX('+(-y*7)+'deg) rotateY('+(x*7)+'deg) translateY(-4px) scale(1.015)';
+        card._mx=e.clientX; card._my=e.clientY;
+        if(card._raf) return;                            // o singură scriere de transform per frame
+        card._raf=requestAnimationFrame(function(){
+          card._raf=0;
+          var r=card.getBoundingClientRect();
+          var x=((card._mx-r.left)/r.width-.5)*2;
+          var y=((card._my-r.top)/r.height-.5)*2;
+          card.style.transform='perspective(700px) rotateX('+(-y*7)+'deg) rotateY('+(x*7)+'deg) translateY(-4px) scale(1.015)';
+        });
       });
       card.addEventListener('mouseleave',function(){
+        if(card._raf){ cancelAnimationFrame(card._raf); card._raf=0; }
         card.style.transition='transform .5s cubic-bezier(.2,.7,.2,1),box-shadow .3s';
         card.style.transform='';
       });
@@ -518,7 +558,7 @@
   var countUp = function(el, target, fmt){
     fmt = fmt || function(n){ return String(Math.round(n)); };
     if(!el) return;
-    if(reduce || !(target > 0)){ el.textContent = fmt(target); return; }
+    if(lowMotion || !(target > 0)){ el.textContent = fmt(target); return; }
     var t0 = performance.now(), DUR = 800;
     var step = function(t){
       var p = Math.min(1, (t - t0) / DUR);
@@ -1408,6 +1448,7 @@
 (function(){
   var canvas = document.getElementById('lakeFx');
   if(!canvas || !canvas.getContext) return;
+  if(window.LOWPOWER) return;                 // pe device slabe nu creăm deloc canvas-ul „lacul"
   var ctx = canvas.getContext('2d');
   var live = matchMedia('(pointer:fine)').matches && !matchMedia('(prefers-reduced-motion:reduce)').matches;
   var GLYPHS = ['</>','{ }','( )','[ ]',';','#','01','Aa','▶','▷','♪','♫','♩','%','↗','€','★','✓'];

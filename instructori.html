@@ -17,7 +17,17 @@
 <link rel="canonical" href="https://zuphq.github.io/SmartTube/instructori.html" />
 <link rel="icon" type="image/png" href="media/logos/favicon.png" />
 <link rel="stylesheet" href="styles.css" />
-<script>try{if(localStorage.getItem('theme')==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}</script>
+<script>try{
+  if(localStorage.getItem('theme')==='light')document.documentElement.setAttribute('data-theme','light');
+  var n=navigator,c=n.connection||{};
+  var slow=c.saveData===true||/^(slow-2g|2g|3g)$/.test(c.effectiveType||'');
+  var lp=matchMedia('(prefers-reduced-motion:reduce)').matches||slow
+    ||((n.hardwareConcurrency||0)>0&&n.hardwareConcurrency<=2)
+    ||((n.deviceMemory||0)>0&&n.deviceMemory<=2)
+    ||Math.min(screen.width,screen.height)<=360;
+  window.LOWPOWER=!!lp;
+  if(lp){var d=document.documentElement;d.className+=(d.className?' ':'')+'lp-root';}
+}catch(e){}</script>
 </head>
 <body>
 

@@ -20,7 +20,17 @@
 </script>
 <link rel="icon" type="image/png" href="media/logos/favicon.png" />
 <link rel="stylesheet" href="styles.css" />
-<script>try{if(localStorage.getItem('theme')==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}</script>
+<script>try{
+  if(localStorage.getItem('theme')==='light')document.documentElement.setAttribute('data-theme','light');
+  var n=navigator,c=n.connection||{};
+  var slow=c.saveData===true||/^(slow-2g|2g|3g)$/.test(c.effectiveType||'');
+  var lp=matchMedia('(prefers-reduced-motion:reduce)').matches||slow
+    ||((n.hardwareConcurrency||0)>0&&n.hardwareConcurrency<=2)
+    ||((n.deviceMemory||0)>0&&n.deviceMemory<=2)
+    ||Math.min(screen.width,screen.height)<=360;
+  window.LOWPOWER=!!lp;
+  if(lp){var d=document.documentElement;d.className+=(d.className?' ':'')+'lp-root';}
+}catch(e){}</script>
 <!-- userii logați au „acasă" dashboard-ul: orice acces la index.html (inclusiv logo-ul) îi duce acolo.
      Excepție: linkul „Acasă" din meniu folosește ?home și arată homepage-ul fix de data asta, fără sticky. -->
 <script>try{if(location.search.indexOf('home')===-1){for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k&&k.indexOf('sb-')===0&&k.indexOf('-auth-token')>0){location.replace('cont.html');break;}}}}catch(e){}</script>
@@ -48,9 +58,8 @@
       </div>
 
       <div class="hz-frame" id="hzFrame">
-        <video id="heroVideo" class="hz-video" poster="media/video/hero-poster.jpg" preload="metadata" muted loop playsinline>
-          <source src="media/video/hero.mp4" type="video/mp4">
-        </video>
+        <video id="heroVideo" class="hz-video" poster="media/video/hero-poster.jpg" preload="none" muted loop playsinline
+               data-webm="media/video/hero-720.webm" data-mp4="media/video/hero-720.mp4"></video>
         <span class="hz-vtag">Povestea smarttube · Fondatorii</span>
         <button class="hz-play" id="heroPlay" type="button" aria-label="Redă cu sunet, pe tot ecranul"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
       </div>
