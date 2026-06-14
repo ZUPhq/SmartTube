@@ -232,7 +232,6 @@
         el.style.transform = 'translateY(' + (p*parseFloat(el.dataset.par)).toFixed(1) + 'px)';
       });
       scaleEls.forEach(function(el){
-        if(el.id === 'heroVid' && innerWidth > 833){ el.style.transform = ''; return; }  // desktop hero uses its own scrub
         var r = el.getBoundingClientRect();
         var p = (vh - r.top) / (vh*0.9 + r.height);
         p = Math.max(0, Math.min(1, p));
@@ -248,144 +247,93 @@
     frame();
   }
 
-  /* ---- hero MacBook „Portalul": laptopul se deschide la ecran plat, apoi videoul se desprinde
-         din ramă și face dolly-in spre privitor (umple cadrul) iar carcasa se retrage ---- */
-  var mbkScrub = document.getElementById('mbkScrub');
-  var mbk = document.getElementById('mbk');
-  var mbkScreen = document.getElementById('mbkScreen');
-  var mbkHead = document.getElementById('mbkHead');
-  var mbkStage = document.querySelector('.mbk-stage');
-  var mbkPop = document.getElementById('mbkPop');
+  /* ---- hero zoom: cardul video crește pe scroll; fundal interactiv (spotlight mint la cursor) ---- */
+  var heroZoom = document.getElementById('heroZoom');
+  var hzStage = heroZoom && heroZoom.querySelector('.hz-stage');
+  var hzFrame = document.getElementById('hzFrame');
+  var hzHead = document.getElementById('hzHead');
   var heroVideo = document.getElementById('heroVideo');
   var heroPlay = document.getElementById('heroPlay');
-  var heroSound = document.getElementById('heroSound');
-  if(mbkScrub && mbk && mbkScreen){
-    /* pe mobil nu pornim videoul automat — consumă date; posterul + play rămân */
-    if(heroVideo && innerWidth <= 833){ try{ heroVideo.autoplay = false; heroVideo.pause(); }catch(e){} }
-
-    var mbkBezel = heroVideo && heroVideo.parentElement;        // .mbk-bezel (referință fixă)
-    var mbkTag = mbkBezel && mbkBezel.querySelector('.mbk-tag');
-    var popTag = mbkPop && mbkPop.querySelector('.pop-tag');
-
-    var fitMbk = function(){
-      /* 640 = ecranul la lățime maximă (512×1.2 ≈ 614) + margine, ca să nu iasă lateral pe niciun ecran */
-      var s = Math.min((innerWidth - 28) / 640, (innerHeight * 0.6) / 600, 1.12);
-      mbk.style.setProperty('--mbk-scale', Math.max(0.32, s).toFixed(3));
-    };
-    fitMbk();
-    addEventListener('load', fitMbk);   // re-fit după ce se așază layout-ul/fonturile
-
-    var mbkOn = function(){ return innerWidth > 833 && !reduce; };
-    var lerp = function(a, b, t){ return a + (b - a) * t; };
-    var cl = function(v){ return v < 0 ? 0 : v > 1 ? 1 : v; };
-    var eoc = function(p){ p = cl(p); return 1 - Math.pow(1 - p, 3); };     // easeOutCubic
-    var curScale = function(){ return parseFloat(getComputedStyle(mbk).getPropertyValue('--mbk-scale')) || 1; };
-
-    var handed = false, popGeom = null;
-    /* HANDOFF: la ecran perfect plat (q=0.30) mut videoul în overlay-ul plat, măsurat pe bezel */
-    var doHandoff = function(){
-      mbkScreen.style.transform = 'rotateX(0deg) scale(1,1)';
-      var r = mbkBezel.getBoundingClientRect(), s = mbkStage.getBoundingClientRect();
-      var L = r.left - s.left, T = r.top - s.top, W = r.width, H = r.height;
-      mbkPop.style.cssText = 'position:absolute;left:' + L + 'px;top:' + T + 'px;width:' + W + 'px;height:' + H +
-        'px;border-radius:12px;background:#000;overflow:hidden;z-index:5;transform-origin:center;' +
-        'transform:translate(0,0) scale(1);will-change:transform';
-      mbkPop.hidden = false;
-      mbkPop.insertBefore(heroVideo, mbkPop.firstChild);          // appendChild păstrează redarea (fără reload)
-      heroVideo.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:left top';
-      mbkBezel.classList.add('mbk-bezel--ghost');                 // rama rămasă arată posterul, nu negru
-      popGeom = {W:W, H:H, cx:L + W / 2, cy:T + H / 2};
-      handed = true;
-      var pr = heroVideo.play(); if(pr && pr.catch) pr.catch(function(){});
-    };
-    var undoHandoff = function(){
-      mbkBezel.insertBefore(heroVideo, mbkBezel.firstChild);
-      heroVideo.style.cssText = '';
-      mbkPop.hidden = true; mbkPop.style.cssText = '';
-      mbkBezel.classList.remove('mbk-bezel--ghost');
-      mbk.style.transform = ''; mbk.style.opacity = ''; mbk.style.filter = ''; mbk.style.pointerEvents = '';
-      handed = false;
+  if(heroZoom && hzFrame){
+    var hzMobile = innerWidth <= 833;
+    var hzMotion = function(){ return innerWidth > 833 && !reduce; };
+    var clh = function(v){ return v < 0 ? 0 : v > 1 ? 1 : v; };
+    var lerph = function(a, b, t){ return a + (b - a) * t; };
+    var eoch = function(p){ p = clh(p); return 1 - Math.pow(1 - p, 3); };   // easeOutCubic
+    var vidStarted = false;
+    var startVid = function(){
+      if(vidStarted || !heroVideo) return;
+      vidStarted = true;
       var pr = heroVideo.play(); if(pr && pr.catch) pr.catch(function(){});
     };
 
-    var mbkScrubFn = function(){
-      if(!mbkOn()) return;
-      var top = mbkScrub.getBoundingClientRect().top;
-      var span = mbkScrub.offsetHeight - innerHeight;
-      var q = span > 0 ? cl(-top / span) : 0;
-
-      /* FAZA 1 — snap-open: ecranul se aplatizează la rotateX(0) scale(1,1) exact la q=0.30 */
-      if(!handed){
-        var e1 = eoc(q / 0.30);
-        mbkScreen.style.transform = 'rotateX(' + lerp(-28, 0, e1).toFixed(2) + 'deg) scale(' +
-          lerp(1.2, 1, e1).toFixed(3) + ',' + lerp(0.6, 1, e1).toFixed(3) + ')';
+    /* SCRUB în 2 faze (sincronizat cu „curtain"-ul CSS al secțiunii următoare):
+         1) GROW  (q 0 → .42): cardul (ancorat jos, DEASUPRA textului) crește scale .66 → 1 și URCĂ
+            peste text, acoperindu-l; aproape cât tot ecranul. Videoul pornește la primul scroll.
+            Textul rămâne vizibil cât e acoperit, apoi opacity→0 (deja sub video) ca să nu reapară.
+         2) SLIDE (q .42 → 1): cardul alunecă în jos, iar secțiunea următoare
+            (margin-top:-100vh) urcă opac peste el și-l acoperă */
+    var GROW = 0.42;
+    var hzScrub = function(){
+      if(!hzMotion()){ hzFrame.style.transform = ''; if(hzHead){ hzHead.style.opacity = ''; } return; }
+      var top = heroZoom.getBoundingClientRect().top;
+      var span = heroZoom.offsetHeight - innerHeight;
+      var q = span > 0 ? clh(-top / span) : 0;
+      var gT = eoch(q / GROW);                          // creștere .66 → 1 (urcă peste text, aproape tot ecranul)
+      var sT = eoch((q - GROW) / (1 - GROW));           // alunecare în jos
+      var ty = sT * innerHeight * 0.30;
+      hzFrame.style.transform = 'translateY(' + ty.toFixed(1) + 'px) scale(' + lerph(0.66, 1, gT).toFixed(4) + ')';
+      if(hzHead){
+        /* rămâne la opacitate plină cât e acoperit de video, apoi dispare (invizibil, deja sub video) */
+        hzHead.style.opacity = (1 - clh((q - 0.30) / 0.07)).toFixed(3);
       }
-      if(mbkHead){
-        var hf = cl(q / 0.16);
-        mbkHead.style.opacity = (1 - hf).toFixed(3);
-        mbkHead.style.transform = 'translateY(' + lerp(0, -60, hf).toFixed(1) + 'px)';
-        mbkHead.style.pointerEvents = q > 0.16 ? 'none' : '';
-      }
-      if(heroPlay) heroPlay.style.opacity = (1 - cl(q / 0.12)).toFixed(2);
-      if(mbkTag) mbkTag.style.opacity = (1 - cl(q / 0.18)).toFixed(2);
-
-      /* HANDOFF cu histereză 0.30 / 0.27 */
-      if(!handed && q >= 0.30) doHandoff();
-      else if(handed && q < 0.27){ undoHandoff(); return; }
-
-      /* FAZA 3 — dolly-in: videoul (overlay plat) umple viewportul; carcasa se retrage cu blur+fade */
-      if(handed){
-        var t = eoc(cl((q - 0.30) / 0.54));
-        var fill = Math.max(innerWidth / popGeom.W, innerHeight / popGeom.H) * 1.02;
-        var dx = innerWidth / 2 - popGeom.cx, dy = innerHeight / 2 - popGeom.cy;
-        mbkPop.style.transform = 'translate(' + (dx * t).toFixed(1) + 'px,' + (dy * t).toFixed(1) +
-          'px) scale(' + (1 + (fill - 1) * t).toFixed(4) + ')';
-        mbkPop.style.borderRadius = lerp(12, 0, cl(t * 1.2)).toFixed(1) + 'px';
-        var er = eoc(cl((q - 0.30) / 0.32)), cs = curScale();
-        mbk.style.transform = 'translateY(' + lerp(0, 34, er).toFixed(1) + 'px) scale(' + (cs * lerp(1, 0.86, er)).toFixed(3) + ')';
-        mbk.style.opacity = (1 - er).toFixed(3);
-        mbk.style.filter = 'blur(' + lerp(0, 8, er).toFixed(1) + 'px)';
-        mbk.style.pointerEvents = er >= 1 ? 'none' : '';
-        if(popTag) popTag.style.opacity = cl((t - 0.6) / 0.4).toFixed(2);
-        if(heroSound){ heroSound.style.opacity = cl((t - 0.8) / 0.2).toFixed(2); heroSound.style.pointerEvents = t > 0.8 ? 'auto' : 'none'; }
-      }
+      if(q > 0.04) startVid();
     };
 
-    var mbkTick = false;
-    var onMbkScroll = function(){ if(!mbkTick){ mbkTick = true; requestAnimationFrame(function(){ mbkScrubFn(); mbkTick = false; }); } };
-    if(mbkOn()){ addEventListener('scroll', onMbkScroll, {passive:true}); mbkScrubFn(); }
-    addEventListener('resize', function(){
-      fitMbk();
-      if(handed) undoHandoff();                  // remăsoară la următorul scroll (evită popGeom învechit)
-      if(mbkOn()){ mbkScrubFn(); }
-      else {
-        mbkScreen.style.transform = '';
-        if(mbkHead){ mbkHead.style.opacity = ''; mbkHead.style.transform = ''; mbkHead.style.pointerEvents = ''; }
-        if(heroPlay) heroPlay.style.opacity = '';
-        if(mbkTag) mbkTag.style.opacity = '';
-      }
-    });
-
-    /* buton sunet din overlay → unmute pe loc */
-    if(heroSound && heroVideo){
-      heroSound.addEventListener('click', function(){ try{ heroVideo.muted = false; heroVideo.play(); }catch(e){} });
+    /* fundal: haloul mint + grila urmăresc cursorul (doar pointer fin) */
+    if(hzStage && matchMedia('(pointer:fine)').matches && !reduce){
+      var mvTick = false, mvx = 50, mvy = 40;
+      hzStage.addEventListener('pointermove', function(e){
+        var r = hzStage.getBoundingClientRect();
+        mvx = ((e.clientX - r.left) / r.width) * 100;
+        mvy = ((e.clientY - r.top) / r.height) * 100;
+        if(!mvTick){ mvTick = true; requestAnimationFrame(function(){
+          hzStage.style.setProperty('--mx', mvx.toFixed(1) + '%');
+          hzStage.style.setProperty('--my', mvy.toFixed(1) + '%');
+          mvTick = false;
+        }); }
+      });
     }
 
-    /* play (pe ecranul laptopului) → fullscreen nativ cu sunet; la ieșire revine pe mut */
+    if(hzMotion()){
+      var hzTick = false;
+      addEventListener('scroll', function(){ if(!hzTick){ hzTick = true; requestAnimationFrame(function(){ hzScrub(); hzTick = false; }); } }, {passive:true});
+      hzScrub();
+    } else if(!hzMobile){
+      startVid();   // desktop reduced-motion: cardul e deja plin → pornim videoul direct
+    }
+    /* pe mobil rămâne posterul + butonul play (fără autoplay, economie de date) */
+
+    addEventListener('resize', function(){
+      hzMobile = innerWidth <= 833;
+      hzScrub();   // tratează ambele cazuri (scrub pe desktop / reset pe static)
+    });
+
+    /* play (pe card) → fullscreen nativ cu sunet; la ieșire revine pe mut */
     if(heroPlay && heroVideo){
       heroPlay.addEventListener('click', function(e){
         e.preventDefault();
         try{ heroVideo.muted = false; heroVideo.controls = true; }catch(_){}
         var req = heroVideo.requestFullscreen || heroVideo.webkitRequestFullscreen;
-        if(req){ try{ req.call(heroVideo); }catch(_){} }
+        if(req){ try{ var fr = req.call(heroVideo); if(fr && fr.catch) fr.catch(function(){}); }catch(_){} }
         else if(heroVideo.webkitEnterFullscreen){ try{ heroVideo.webkitEnterFullscreen(); }catch(_){} }
         var pr = heroVideo.play();
         if(pr && pr.catch) pr.catch(function(){ try{ heroVideo.muted = true; heroVideo.play(); }catch(e2){} });
       });
-      var mbkRestore = function(){ try{ heroVideo.controls = false; heroVideo.muted = true; }catch(e){} };
-      document.addEventListener('fullscreenchange', function(){ if(!document.fullscreenElement) mbkRestore(); });
-      document.addEventListener('webkitfullscreenchange', function(){ if(!document.webkitFullscreenElement) mbkRestore(); });
-      heroVideo.addEventListener('webkitendfullscreen', mbkRestore);
+      var hzRestore = function(){ try{ heroVideo.controls = false; heroVideo.muted = true; }catch(e){} };
+      document.addEventListener('fullscreenchange', function(){ if(!document.fullscreenElement) hzRestore(); });
+      document.addEventListener('webkitfullscreenchange', function(){ if(!document.webkitFullscreenElement) hzRestore(); });
+      heroVideo.addEventListener('webkitendfullscreen', hzRestore);
     }
   }
 
@@ -541,12 +489,14 @@
     var rate = c.rating != null
       ? '<span class="cc-rate">' + STAR_SVG + DB.fmtRating(c.rating) + ' <em>(' + DB.esc(c.rating_count) + ')</em></span>'
       : '<span class="cc-rate cc-new">Nou</span>';
+    var cov = DB.coverUrl(c);     // prima poză din galerie → copertă; altfel gradientul
     return '<a class="ccard" href="curs.html?id=' + c.id + (src ? '&src=' + src : '') + '"' +
       ' data-cat="' + DB.esc(c.category) + '"' +
       ' data-price="' + (Number(c.price) || 0) + '" data-rating="' + (c.rating == null ? -1 : Number(c.rating)) + '"' +
       ' data-pop="' + (Number(c.rating_count) || 0) + '" data-created="' + DB.esc(c.created_at || '') + '"' +
       ' data-search="' + DB.esc((c.title + ' ' + c.instructor_name + ' ' + (DB.CATS[c.category] || '')).toLowerCase()) + '">' +
-      '<div class="cc-thumb ' + DB.esc(c.thumb_style) + '"><span class="cc-tag">' + DB.esc(DB.CAT_SHORT[c.category] || '') + '</span>' +
+      '<div class="cc-thumb ' + DB.esc(c.thumb_style) + (cov ? ' has-img' : '') + '"' +
+      (cov ? ' style="background-image:url(\'' + cov.replace(/'/g, '%27') + '\')"' : '') + '><span class="cc-tag">' + DB.esc(DB.CAT_SHORT[c.category] || '') + '</span>' +
       '<span class="cc-dur">' + DB.fmtDur(c.total_minutes) + '</span><span class="cc-play">' + PLAY_SVG + '</span></div>' +
       '<div class="cc-body"><div class="cc-cat">' + DB.esc(DB.CATS[c.category] || '') + '</div>' +
       '<h3 class="cc-ttl">' + DB.esc(c.title) + '</h3>' +
@@ -1024,12 +974,50 @@
       var months = ['ianuarie','februarie','martie','aprilie','mai','iunie','iulie','august','septembrie','octombrie','noiembrie','decembrie'];
       document.getElementById('cUpdated').textContent = 'Actualizat ' + months[when.getMonth()] + ' ' + when.getFullYear();
 
-      /* coperta preia gradientul cursului — continuitate cu cardul din catalog */
-      document.querySelectorAll('#coursePage .sc-hero').forEach(function(el){
-        el.classList.add(/^g[123]$/.test(c.thumb_style) ? c.thumb_style : 'g1');
-      });
+      /* coperta cursului: galerie (poze + video) tip eMAG dacă instructorul a adăugat media; altfel gradient */
+      var gThumb = /^g[123]$/.test(c.thumb_style) ? c.thumb_style : 'g1';
+      var sideHero = document.querySelector('#coursePage aside .sc-hero');
+      if(sideHero) sideHero.classList.add(gThumb);   // cardul lateral rămâne pe gradient
       var cover = document.getElementById('cCover');
-      if(cover){
+      var screenEl = cover && cover.parentElement;   // .screen (ramă glass)
+      var media = (c.gallery || []).filter(function(it){ return it && it.p && (it.t === 'img' || it.t === 'vid'); });
+      if(cover && screenEl && media.length){
+        cover.classList.remove('sc-hero');
+        cover.classList.add('cgal-main');
+        var setMain = function(it){
+          if(it.t === 'vid'){
+            cover.innerHTML = '<div class="cgal-vidwrap"><video src="' + DB.esc(DB.mediaUrl(it.p)) + '" playsinline preload="metadata"></video>' +
+              '<button class="cgal-play" type="button" aria-label="Redă videoul">' + PLAY_SVG + '</button></div>';
+            var v = cover.querySelector('video'), pb = cover.querySelector('.cgal-play');
+            pb.addEventListener('click', function(){
+              v.controls = true; pb.style.display = 'none';
+              var pr = v.play(); if(pr && pr.catch) pr.catch(function(){});
+            });
+          }else{
+            cover.innerHTML = '<img class="cgal-img" src="' + DB.esc(DB.mediaUrl(it.p)) + '" alt="' + DB.esc(c.title) + '" />';
+          }
+        };
+        setMain(media[0]);
+        var thumbs = document.createElement('div');
+        thumbs.className = 'cgal-thumbs';
+        media.forEach(function(it, i){
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'cgal-thumb' + (i === 0 ? ' on' : '');
+          b.setAttribute('aria-label', (it.t === 'vid' ? 'Video ' : 'Imagine ') + (i + 1));
+          b.innerHTML = it.t === 'vid'
+            ? '<video src="' + DB.esc(DB.mediaUrl(it.p)) + '" muted playsinline preload="metadata"></video><span class="tvb">' + PLAY_SVG + '</span>'
+            : '<img src="' + DB.esc(DB.mediaUrl(it.p)) + '" alt="" />';
+          b.addEventListener('click', function(){
+            setMain(it);
+            [].forEach.call(thumbs.children, function(x){ x.classList.remove('on'); });
+            b.classList.add('on');
+          });
+          thumbs.appendChild(b);
+        });
+        screenEl.insertAdjacentElement('afterend', thumbs);
+      }else if(cover){
+        cover.classList.add(gThumb);
         cover.innerHTML = '<span class="cc-tag">' + DB.esc(DB.CAT_SHORT[c.category] || '') + '</span>' +
           '<span class="cc-dur">' + DB.fmtDur(c.total_minutes) + '</span>';
       }
@@ -1073,53 +1061,200 @@
         '<div><h3>' + DB.esc(c.instructor_name) + '</h3><div class="role">' + DB.esc(DB.CATS[c.category] || '') + '</div></div></div>' +
         '<p>' + DB.esc(c.description) + '</p>';
 
-      /* recenzii reale din DB + formular doar pentru cumpărători */
+      /* ===== recenzii: sumar + histogramă pe stele, sortare/filtrare/căutare, editare proprie (stil eMAG, temă smarttube) ===== */
       var rvList = document.getElementById('cReviews');
       var rvEmpty = document.getElementById('cReviewsEmpty');
-      var rvForm = document.getElementById('reviewForm');
-      var renderReviews = function(){
-        DB.getReviews(c.id, 6).then(function(rs){
-          if(!rs.length){ rvList.style.display = 'none'; rvEmpty.style.display = 'block'; return; }
-          rvEmpty.style.display = 'none'; rvList.style.display = '';
-          rvList.innerHTML = rs.map(function(r){
-            return '<div class="review"><div class="stars">' + new Array((r.rating || 0) + 1).join('★') + '</div>' +
-              (r.comment ? '<p>„' + DB.esc(r.comment) + '"</p>' : '') +
-              '<div class="who"><span class="av" aria-hidden="true">' + DB.esc(DB.initials(r.author_name)) + '</span>' +
-              '<div><b>' + DB.esc(r.author_name) + '</b><span>Student</span></div></div></div>';
-          }).join('');
-          tiltify(rvList);
-          [].forEach.call(rvList.children, function(el){ el.classList.add('reveal'); });
-          revealify(rvList);
+      var rvSummary = document.getElementById('cRevSummary');
+      var rvControls = document.getElementById('cRevControls');
+      var rvComposer = document.getElementById('cRevComposer');
+      var rvCount = document.getElementById('cRevCount');
+      var RWORD = {5:'Excelent', 4:'Foarte bun', 3:'Bun', 2:'Slab', 1:'Foarte slab'};
+      var RMON = ['ian','feb','mar','apr','mai','iun','iul','aug','sep','oct','noi','dec'];
+      var revDate = function(iso){ var d = new Date(iso); return isNaN(d.getTime()) ? '' : d.getDate() + ' ' + RMON[d.getMonth()] + ' ' + d.getFullYear(); };
+      var starBar = function(val){ return '<span class="rstars" style="--pct:' + (Math.max(0, Math.min(5, val)) / 5 * 100).toFixed(1) + '%"><i></i></span>'; };
+      var dotsSvg = '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.9"/><circle cx="12" cy="12" r="1.9"/><circle cx="19" cy="12" r="1.9"/></svg>';
+      var verSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>';
+      var clampR = function(x){ return Math.max(1, Math.min(5, x | 0)); };
+
+      var allRv = [], myId = null, isBuyer = false, starFilter = 0, sortKey = 'new', searchQ = '', controlsBuilt = false;
+
+      var paintSummary = function(){
+        var n = allRv.length;
+        rvCount.textContent = n ? '(' + n + (n === 1 ? ' recenzie)' : ' recenzii)') : '';
+        if(!n){ rvSummary.style.display = 'none'; return; }
+        var sum = 0, buckets = [0,0,0,0,0];
+        allRv.forEach(function(r){ var k = clampR(r.rating); sum += k; buckets[k - 1]++; });
+        var avg = sum / n, rows = '';
+        for(var s = 5; s >= 1; s--){
+          var cnt = buckets[s - 1], pct = n ? cnt / n * 100 : 0;
+          rows += '<button type="button" class="rv-hrow' + (starFilter === s ? ' on' : '') + '" data-star="' + s + '" aria-pressed="' + (starFilter === s) + '">' +
+            '<span class="rv-hlabel">' + s + ' <em>★</em></span>' +
+            '<span class="rv-htrack"><span class="rv-hfill" style="width:' + pct.toFixed(1) + '%"></span></span>' +
+            '<span class="rv-hcount">' + cnt + '</span></button>';
+        }
+        rvSummary.style.display = '';
+        rvSummary.innerHTML =
+          '<div class="rv-avg"><div class="rv-avgnum">' + DB.fmtRating(Math.round(avg * 100) / 100) + '</div>' +
+          starBar(avg) + '<div class="rv-avgn">' + n + (n === 1 ? ' recenzie' : ' recenzii') + '</div></div>' +
+          '<div class="rv-hist">' + rows + '</div>';
+      };
+
+      var rowHTML = function(r){
+        var mine = !!(myId && r.user_id === myId);
+        var title = (r.title && r.title.trim()) || RWORD[clampR(r.rating)] || '';
+        return '<div class="rv-item' + (mine ? ' mine' : '') + '">' +
+          '<span class="av rv-ava" aria-hidden="true">' + DB.esc(DB.initials(r.author_name)) + '</span>' +
+          '<div class="rv-main">' +
+            '<div class="rv-head"><b class="rv-name">' + DB.esc(r.author_name || 'Student') + '</b>' +
+            (mine ? '<span class="rv-you">recenzia ta</span>' : '') +
+            '<span class="rv-date">' + revDate(r.created_at) + '</span>' +
+            (mine ? '<div class="rv-menu"><button type="button" class="rv-dots" aria-label="Opțiuni recenzie" aria-haspopup="true">' + dotsSvg + '</button>' +
+              '<div class="rv-pop" hidden><button type="button" data-act="edit">Editează</button><button type="button" data-act="del">Șterge</button></div></div>' : '') +
+            '</div>' +
+            '<div class="rv-tline">' + starBar(r.rating) + '<b class="rv-title">' + DB.esc(title) + '</b>' +
+              '<span class="rv-badge">' + verSvg + 'Cumpărător verificat</span></div>' +
+            (r.comment ? '<p class="rv-text">' + DB.esc(r.comment) + '</p>' : '') +
+          '</div></div>';
+      };
+
+      var paintList = function(){
+        var items = allRv.slice();
+        if(starFilter) items = items.filter(function(r){ return clampR(r.rating) === starFilter; });
+        if(searchQ){
+          var q = searchQ.toLowerCase();
+          items = items.filter(function(r){ return ((r.comment || '') + ' ' + (r.title || '') + ' ' + (r.author_name || '')).toLowerCase().indexOf(q) !== -1; });
+        }
+        items.sort(function(a, b){
+          if(sortKey === 'old') return new Date(a.created_at) - new Date(b.created_at);
+          if(sortKey === 'hi') return (b.rating - a.rating) || (new Date(b.created_at) - new Date(a.created_at));
+          if(sortKey === 'lo') return (a.rating - b.rating) || (new Date(b.created_at) - new Date(a.created_at));
+          return new Date(b.created_at) - new Date(a.created_at);
+        });
+        if(myId){   // recenzia proprie sus, pentru vizibilitate
+          var own = items.filter(function(r){ return r.user_id === myId; });
+          if(own.length) items = own.concat(items.filter(function(r){ return r.user_id !== myId; }));
+        }
+        if(!items.length){
+          rvList.innerHTML = '';
+          rvEmpty.style.display = 'block';
+          rvEmpty.textContent = allRv.length ? 'Nicio recenzie nu se potrivește filtrelor.' : 'Încă nicio recenzie pentru acest curs.';
+          return;
+        }
+        rvEmpty.style.display = 'none';
+        rvList.innerHTML = items.map(rowHTML).join('');
+      };
+
+      var updateChip = function(){
+        var chip = document.getElementById('rvChip');
+        if(!chip) return;
+        chip.innerHTML = starFilter ? '<button type="button" class="rv-chip" id="rvClear">Doar ' + starFilter + '★ <span aria-hidden="true">✕</span></button>' : '';
+        var clr = document.getElementById('rvClear');
+        if(clr) clr.addEventListener('click', function(){ starFilter = 0; paintSummary(); updateChip(); paintList(); });
+      };
+
+      var buildControls = function(){
+        controlsBuilt = true;
+        rvControls.style.display = '';
+        rvControls.innerHTML =
+          '<div class="rv-sortwrap"><span class="rv-sortlbl">Sortează</span>' +
+          '<select id="rvSort" class="rv-select" aria-label="Sortează recenziile">' +
+            '<option value="new">Cele mai noi</option><option value="old">Cele mai vechi</option>' +
+            '<option value="hi">Nota: mare → mică</option><option value="lo">Nota: mică → mare</option></select></div>' +
+          '<span class="rv-chipwrap" id="rvChip"></span>' +
+          '<div class="rv-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4" stroke-linecap="round"/></svg>' +
+          '<input type="search" id="rvSearch" placeholder="Caută în recenzii…" aria-label="Caută în recenzii" /></div>';
+        var sel = rvControls.querySelector('#rvSort'); sel.value = sortKey;
+        sel.addEventListener('change', function(){ sortKey = this.value; paintList(); });
+        var srch = rvControls.querySelector('#rvSearch'); srch.value = searchQ;
+        srch.addEventListener('input', function(){ searchQ = this.value.trim(); paintList(); });
+      };
+
+      var buildComposer = function(mine){
+        if(!rvComposer) return;
+        rvComposer.style.display = '';
+        var picked = mine ? clampR(mine.rating) : 0;
+        rvComposer.innerHTML =
+          '<h3 class="rv-ctitle">' + (mine ? 'Editează-ți recenzia' : 'Spune-ți părerea') + '</h3>' +
+          '<div class="rv-pick" id="rvPick">' +
+            [1,2,3,4,5].map(function(i){ return '<button type="button" class="rv-pstar' + (i <= picked ? ' on' : '') + '" data-v="' + i + '" aria-label="' + i + (i === 1 ? ' stea' : ' stele') + '">★</button>'; }).join('') +
+            '<span class="rv-picklbl" id="rvPickLbl">' + (picked ? RWORD[picked] : 'Acordă o notă') + '</span></div>' +
+          '<input type="text" id="rvTitleIn" class="rv-cinput" maxlength="120" placeholder="Titlu (opțional) — ex: Excelent" value="' + (mine ? DB.esc(mine.title || '') : '') + '" />' +
+          '<textarea id="rvCommentIn" class="rv-cinput rv-carea" maxlength="1000" placeholder="Recenzia ta (opțional) — ce ți-a plăcut, cui recomanzi cursul?">' + (mine ? DB.esc(mine.comment || '') : '') + '</textarea>' +
+          '<div class="rv-cfoot"><button type="button" class="btn btn-mint" id="rvSubmit">' + (mine ? 'Actualizează recenzia' : 'Trimite recenzia') + '</button>' +
+          (mine ? '<button type="button" class="btn btn-ghost" id="rvCancel">Renunță</button>' : '') +
+          '<span class="form-note rv-note" id="rvNote" aria-live="polite"></span></div>';
+        var pick = rvComposer.querySelector('#rvPick'), lbl = rvComposer.querySelector('#rvPickLbl');
+        var paint = function(v){ [].forEach.call(pick.querySelectorAll('.rv-pstar'), function(b, i){ b.classList.toggle('on', (i + 1) <= v); }); lbl.textContent = v ? RWORD[v] : 'Acordă o notă'; };
+        [].forEach.call(pick.querySelectorAll('.rv-pstar'), function(b){
+          var v = parseInt(b.dataset.v, 10);
+          b.addEventListener('mouseenter', function(){ paint(v); });
+          b.addEventListener('click', function(){ picked = v; paint(v); });
+        });
+        pick.addEventListener('mouseleave', function(){ paint(picked); });
+        rvComposer.querySelector('#rvSubmit').addEventListener('click', function(){
+          var note = rvComposer.querySelector('#rvNote');
+          if(!picked){ setNote(note, 'Alege o notă (1–5 stele).', 'err'); return; }
+          var btn = this; btn.disabled = true;
+          DB.upsertReview(c.id, picked, rvComposer.querySelector('#rvCommentIn').value.trim(), rvComposer.querySelector('#rvTitleIn').value.trim())
+            .then(function(){ setNote(note, 'Mulțumim! Recenzia ta a fost salvată.', 'ok'); return loadReviews(); })
+            .catch(function(){ setNote(note, 'Nu am putut salva recenzia. Reîncearcă.', 'err'); btn.disabled = false; });
+        });
+        var cancel = rvComposer.querySelector('#rvCancel');
+        if(cancel) cancel.addEventListener('click', function(){ loadReviews(); });
+      };
+
+      var loadReviews = function(){
+        return Promise.all([DB.getUser(), DB.getReviews(c.id)]).then(function(res){
+          myId = res[0] ? res[0].id : null;
+          allRv = res[1] || [];
+          paintSummary();
+          if(allRv.length && !controlsBuilt) buildControls();
+          else if(!allRv.length && rvControls) rvControls.style.display = 'none';
+          updateChip();
+          paintList();
+          var mine = myId ? allRv.filter(function(r){ return r.user_id === myId; })[0] : null;
+          if(isBuyer && !mine) buildComposer(null);
+          else if(rvComposer) rvComposer.style.display = 'none';
         }).catch(function(){});
       };
-      renderReviews();
-      var reviewFormShown = false;
-      var showReviewForm = function(){
-        if(reviewFormShown || !rvForm) return;
-        reviewFormShown = true;
-        rvForm.style.display = '';
-        DB.myReview(c.id).then(function(mine){
-          if(!mine) return;
-          document.getElementById('rvRating').value = String(mine.rating);
-          document.getElementById('rvComment').value = mine.comment || '';
-          rvForm.querySelector('button[type="submit"]').textContent = 'Actualizează recenzia';
-        }).catch(function(){});
-      };
-      if(rvForm) rvForm.addEventListener('submit', function(e){
-        e.preventDefault();
-        var rnote = rvForm.querySelector('.form-note');
-        var rbtn = rvForm.querySelector('button[type="submit"]');
-        rbtn.disabled = true;
-        DB.upsertReview(c.id, parseInt(document.getElementById('rvRating').value, 10),
-          document.getElementById('rvComment').value.trim())
-          .then(function(){
-            setNote(rnote, 'Mulțumim! Recenzia ta a fost salvată.', 'ok');
-            rbtn.textContent = 'Actualizează recenzia';
-            renderReviews();
-          }).catch(function(){
-            setNote(rnote, 'Nu am putut salva recenzia. Reîncearcă.', 'err');
-          }).then(function(){ rbtn.disabled = false; });
+      var rvEnableComposer = function(){ isBuyer = true; loadReviews(); };
+
+      /* histogramă → filtru pe stele */
+      rvSummary.addEventListener('click', function(e){
+        var b = e.target.closest('.rv-hrow');
+        if(!b) return;
+        var s = parseInt(b.dataset.star, 10);
+        starFilter = (starFilter === s ? 0 : s);
+        paintSummary(); updateChip(); paintList();
       });
+      /* meniu ⋯ pe recenzia proprie: editează / șterge */
+      rvList.addEventListener('click', function(e){
+        var dotsBtn = e.target.closest('.rv-dots');
+        if(dotsBtn){
+          e.stopPropagation();
+          var pop = dotsBtn.parentElement.querySelector('.rv-pop');
+          var wasOpen = !pop.hasAttribute('hidden');
+          [].forEach.call(rvList.querySelectorAll('.rv-pop'), function(p){ p.setAttribute('hidden', ''); });
+          if(!wasOpen) pop.removeAttribute('hidden');
+          return;
+        }
+        var act = e.target.closest('.rv-pop button');
+        if(act){
+          var mine = myId ? allRv.filter(function(r){ return r.user_id === myId; })[0] : null;
+          if(act.dataset.act === 'edit' && mine){
+            buildComposer(mine);
+            try{ rvComposer.scrollIntoView({behavior:'smooth', block:'center'}); }catch(_){}
+          }else if(act.dataset.act === 'del'){
+            if(confirm('Ștergi recenzia ta? Acțiunea nu poate fi anulată.')){
+              DB.deleteReview(c.id).then(function(){ loadReviews(); }).catch(function(){});
+            }
+          }
+          [].forEach.call(rvList.querySelectorAll('.rv-pop'), function(p){ p.setAttribute('hidden', ''); });
+        }
+      });
+      document.addEventListener('click', function(){ [].forEach.call(rvList.querySelectorAll('.rv-pop'), function(p){ p.setAttribute('hidden', ''); }); });
+
+      loadReviews();
 
       document.getElementById('cPrice').textContent = DB.fmtPrice(c.price);
       document.getElementById('cLessonsMeta').textContent =
@@ -1146,7 +1281,7 @@
         buyBtn.classList.remove('btn-mint');
         buyBtn.classList.add('btn-ghost');
         buyBtn.onclick = null;
-        showReviewForm();   // cumpărătorii pot lăsa o recenzie
+        rvEnableComposer();   // cumpărătorii pot lăsa / edita o recenzie
       };
       Promise.all([DB.hasPurchase(c.id), DB.getProfile()]).then(function(res){
         if(res[0]) setOwned();

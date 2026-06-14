@@ -142,6 +142,66 @@
     };
     document.getElementById('wAddLearn').addEventListener('click', function(){ addLearn(); });
 
+    /* ---- galerie media: poze + clipuri scurte (carousel pe pagina cursului, ca pe eMAG) ---- */
+    var MAX_IMG = 5 * 1024 * 1024;
+    var IMG_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    var MAX_GAL = 12;
+    var galBox = document.getElementById('wGallery');
+    var galAdd = document.getElementById('wAddMedia');
+    var galFile = document.getElementById('wMediaFile');
+    var galItems = [];        // {t:'img'|'vid', p:<path|null>, file:<File|null>, url:<preview>, _obj:bool}
+    var galDeletes = [];      // path-uri de șters din Storage după salvare
+    var galRender = function(){
+      if(!galBox) return;
+      galBox.innerHTML = '';
+      galItems.forEach(function(it, idx){
+        var cell = document.createElement('div');
+        cell.className = 'wgal-item' + (it.t === 'vid' ? ' is-vid' : '');
+        cell.draggable = true;
+        cell.innerHTML = (it.t === 'vid'
+            ? '<video src="' + it.url + '" muted playsinline preload="metadata"></video><span class="wgal-vbadge">' + camIcon + '</span>'
+            : '<img src="' + it.url + '" alt="" />') +
+          (idx === 0 ? '<span class="wgal-cover">Copertă</span>' : '') +
+          '<button type="button" class="wx wgal-x" aria-label="Șterge">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>';
+        cell.querySelector('.wgal-x').addEventListener('click', function(){
+          if(it.p) galDeletes.push(it.p);
+          if(it._obj){ try{ URL.revokeObjectURL(it.url); }catch(e){} }
+          galItems.splice(idx, 1);
+          galRender(); markDirty();
+        });
+        cell.addEventListener('dragstart', function(e){ e.dataTransfer.setData('text/plain', idx); cell.classList.add('drag'); });
+        cell.addEventListener('dragend', function(){ cell.classList.remove('drag'); });
+        cell.addEventListener('dragover', function(e){ e.preventDefault(); });
+        cell.addEventListener('drop', function(e){
+          e.preventDefault();
+          var from = parseInt(e.dataTransfer.getData('text/plain'), 10);
+          if(isNaN(from) || from === idx) return;
+          var moved = galItems.splice(from, 1)[0];
+          galItems.splice(idx, 0, moved);
+          galRender(); markDirty();
+        });
+        galBox.appendChild(cell);
+      });
+    };
+    var galAddFiles = function(files){
+      [].slice.call(files).forEach(function(f){
+        if(galItems.length >= MAX_GAL){ err('Galeria poate avea maxim ' + MAX_GAL + ' elemente.'); return; }
+        var isImg = IMG_TYPES.indexOf(f.type) !== -1;
+        var isVid = ['video/mp4', 'video/webm', 'video/quicktime'].indexOf(f.type) !== -1;
+        if(!isImg && !isVid){ err('„' + f.name + '": format neacceptat (poze jpg/png/webp sau video mp4/webm/mov).'); return; }
+        if(isImg && f.size > MAX_IMG){ err('Imaginea „' + f.name + '" depășește 5MB.'); return; }
+        if(isVid && f.size > MAX_VIDEO){ err('Videoul „' + f.name + '" depășește 50MB.'); return; }
+        note.textContent = '';
+        galItems.push({t:isImg ? 'img' : 'vid', p:null, file:f, url:URL.createObjectURL(f), _obj:true});
+      });
+      galRender(); markDirty();
+    };
+    if(galAdd && galFile){
+      galAdd.addEventListener('click', function(){ galFile.click(); });
+      galFile.addEventListener('change', function(){ if(galFile.files.length){ galAddFiles(galFile.files); galFile.value = ''; } });
+    }
+
     /* ---- draft local: contra pierderii muncii (doar la curs nou) ---- */
     var DRAFT_KEY = 'wizardDraft';
     var dirty = false;
@@ -219,6 +279,10 @@
         if(thumb) thumb.checked = true;
         (c.what_you_learn || []).forEach(addLearn);
         if(!(c.what_you_learn || []).length) addLearn();
+        (c.gallery || []).forEach(function(it){
+          if(it && it.p) galItems.push({t:it.t === 'vid' ? 'vid' : 'img', p:it.p, file:null, url:DB.mediaUrl(it.p), _obj:false});
+        });
+        galRender();
         (c.course_modules || []).forEach(function(m){ addModule(m.title, m.lessons || []); });
         if(!(c.course_modules || []).length) addModule();
       }).catch(function(){
@@ -375,19 +439,36 @@
           });
         };
         return uploadNext(0).then(function(){
+          /* upload media galerie (poze + clipuri), pe rând */
+          var pend = galItems.filter(function(it){ return it.file; });
+          var galNext = function(i){
+            if(i >= pend.length) return Promise.resolve();
+            setNote('Se încarcă media galeriei… ' + (i + 1) + ' din ' + pend.length);
+            return DB.uploadCourseMedia(course.id, pend[i].file).then(function(path){
+              pend[i].p = path; pend[i].file = null;
+              return galNext(i + 1);
+            });
+          };
+          return galNext(0);
+        }).then(function(){
+          /* salvează lista galeriei (în ordinea din UI) pe coloana gallery */
+          var gallery = galItems.filter(function(it){ return it.p; }).map(function(it){ return {t:it.t, p:it.p}; });
+          return DB.saveCourse(course.id, {gallery:gallery});
+        }).then(function(){
           phase = 'curriculum';
           setNote('Se salvează curriculum-ul…');
           return DB.saveCurriculum(course.id, mods);
         });
       }).then(function(){
         pendingDeletes.forEach(function(p){ DB.removeVideo(p); });
+        if(galDeletes.length) DB.removeCourseMedia(galDeletes);
         dirty = false;
         try{ localStorage.removeItem(DRAFT_KEY); }catch(e){}
         location.href = 'dashboard.html';
       }).catch(function(e){
         nextBtn.disabled = false; draftBtn.disabled = false;
         var msg = phase === 'upload'
-          ? 'Un video nu s-a putut încărca — verifică-ți conexiunea și apasă din nou. Videourile deja încărcate nu se reîncarcă.'
+          ? 'Un fișier nu s-a putut încărca (video sau imagine) — verifică-ți conexiunea și apasă din nou. Fișierele deja încărcate nu se reîncarcă.'
           : 'Nu am putut salva cursul. Reîncearcă.';
         err(msg + (e && e.message ? ' (' + e.message + ')' : ''));
       });

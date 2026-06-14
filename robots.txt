@@ -1,7 +1,8 @@
 User-agent: *
 Allow: /
-Disallow: /dashboard.html
-Disallow: /curs-nou.html
 
-# Actualizează adresa dacă site-ul se mută pe un domeniu propriu
-Sitemap: https://zuphq.github.io/SmartTube/sitemap.xml
+# Paginile sensibile (dashboard.html, curs-nou.html) sunt deja noindex prin
+# <meta name="robots" content="noindex"> și protejate de autentificare + RLS.
+# Nu le mai listăm aici cu Disallow — ar fi un indicator inutil al țintelor.
+# TODO: după fixarea domeniului de producție adaugă:
+#   Sitemap: https://DOMENIUL-TĂU/sitemap.xml

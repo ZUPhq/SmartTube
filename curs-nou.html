@@ -89,7 +89,13 @@
           <div id="wLearn"></div>
           <button type="button" class="wadd" id="wAddLearn">+ Adaugă punct</button>
         </div>
-        <div class="field"><label>Stil de copertă</label>
+        <div class="field"><label>Galerie — poze &amp; video</label>
+          <p class="whint" style="margin:0 0 12px">Adaugă poze și clipuri scurte cu cursul — apar într-un carusel pe pagina cursului, ca pe eMAG/Altex. <b>Prima poză devine coperta cursului</b> (în catalog și pe pagina cursului). Trage de elemente ca să le reordonezi. Imagini jpg/png/webp (max 5MB), video mp4/webm/mov (max 50MB).</p>
+          <div class="wgal" id="wGallery"></div>
+          <button type="button" class="wadd" id="wAddMedia">+ Adaugă poze / video</button>
+          <input type="file" id="wMediaFile" accept="image/jpeg,image/png,image/webp,image/gif,video/mp4,video/webm,video/quicktime" multiple hidden />
+        </div>
+        <div class="field"><label>Stil de copertă <span style="font-weight:400;color:var(--ink-2)">— folosit dacă nu adaugi nicio poză</span></label>
           <div class="thumb-pick">
             <label><input type="radio" name="wThumb" value="g1" aria-label="Stil de copertă 1" checked /><span class="tp g1"></span></label>
             <label><input type="radio" name="wThumb" value="g2" aria-label="Stil de copertă 2" /><span class="tp g2"></span></label>
@@ -118,7 +124,7 @@
 </section>
 
 
-<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.1/dist/umd/supabase.js" integrity="sha384-EjUdIVmzWliPzdzhxZ9ZoO0etXLKWuUPUftAGxP6qH6Lm4oLwoLaJR0Ba4pIDiDL" crossorigin="anonymous"></script>
 <script defer src="db.js"></script>
 <script defer src="partials.js"></script>
 <script defer src="app.js"></script>

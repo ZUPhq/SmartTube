@@ -305,93 +305,80 @@ h1,h2,h3,h4{font-weight:600;letter-spacing:-.02em;line-height:1.08;color:var(--i
 .pl-clip.hot{background:var(--g-hot)}
 .pl-head{width:3px;height:32px;background:#fff;border-radius:2px;margin:0 2px;flex:none}
 
-/* ---------- hero: MacBook „Portalul" — laptopul se deschide, apoi videoul iese spre privitor ---------- */
-.mbk-scrub{position:relative;min-height:150vh}
-.mbk-stage{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;gap:clamp(14px,3vh,32px);
-  text-align:center;padding:0 24px;overflow:hidden;perspective:900px}
-.mbk-head{position:relative;z-index:6;max-width:680px;will-change:transform,opacity}
-.mbk{position:relative;display:flex;flex-direction:column;align-items:center;
-  transform-origin:center;transform:scale(var(--mbk-scale,1));will-change:transform}
+/* ---------- hero zoom: cardul video crește pe scroll + fundal interactiv (spotlight mint) ---------- */
+.hero-zoom{position:relative;min-height:250vh}
+.hz-stage{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;
+  align-items:center;justify-content:flex-end;gap:0;
+  text-align:center;padding:0 24px;overflow:hidden;isolation:isolate}
 
-/* LID: spate aluminiu (static) + ecran (animat) — deasupra bazei, ca ecranul deschis s-o acopere */
-.mbk-lidwrap{position:relative;perspective:900px;z-index:2}
-.mbk-lidback{position:relative;width:512px;height:192px;border-radius:16px;background:#010101;padding:8px;
-  transform:perspective(900px) rotateX(-25deg);transform-origin:bottom;transform-style:preserve-3d}
-.mbk-lidback-in{position:absolute;inset:0;border-radius:12px;background:#010101;display:grid;place-items:center;
-  box-shadow:0 2px 0 2px #171717 inset}
-.mbk-logo{font-size:19px;font-weight:700;letter-spacing:-.03em;opacity:.4}
-.mbk-logo .s{color:#cfd3da}.mbk-logo .t{color:var(--mint-2)}
-.mbk-screen{position:absolute;inset:0;width:512px;height:384px;border-radius:16px;background:#010101;padding:8px;
-  transform-origin:top;transform-style:preserve-3d;transform:rotateX(-28deg) scale(1.2,.6);
-  box-shadow:0 30px 60px -24px rgba(0,0,0,.7);will-change:transform}
-.mbk-bezel{position:absolute;inset:8px;border-radius:12px;overflow:hidden;background:#000}
-.mbk-cam{position:absolute;top:7px;left:50%;transform:translateX(-50%);z-index:3;
-  width:5px;height:5px;border-radius:50%;background:#15171c;box-shadow:0 0 0 1.5px rgba(255,255,255,.05)}
-.mbk-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:left top;display:block;background:#0b0e13}
-.mbk-tag{position:absolute;left:12px;bottom:12px;z-index:3;font-size:12px;font-weight:600;
-  color:#fff;background:rgba(0,0,0,.5);padding:5px 11px;border-radius:8px;letter-spacing:-.01em}
-.mbk-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:4;
+/* --- fundal interactiv: grilă fină dezvăluită de spotlight + halou mint la cursor + orbi --- */
+.hz-bg{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.hz-grid{position:absolute;inset:-2px;
+  background-image:
+    linear-gradient(rgba(46,201,171,.32) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(46,201,171,.32) 1px,transparent 1px);
+  background-size:48px 48px;
+  -webkit-mask:radial-gradient(circle 320px at var(--mx,50%) var(--my,40%),#000 0%,rgba(0,0,0,.3) 46%,transparent 72%);
+  mask:radial-gradient(circle 320px at var(--mx,50%) var(--my,40%),#000 0%,rgba(0,0,0,.3) 46%,transparent 72%)}
+.hz-glow{position:absolute;inset:0;
+  background:radial-gradient(440px 440px at var(--mx,50%) var(--my,40%),rgba(46,201,171,.16),transparent 68%)}
+.hz-orb{position:absolute;border-radius:50%;filter:blur(72px);will-change:transform}
+.hz-orb.a{width:440px;height:440px;left:-90px;top:-70px;
+  background:radial-gradient(closest-side,rgba(26,170,143,.5),transparent 70%);
+  animation:hzdrift1 22s ease-in-out infinite}
+.hz-orb.b{width:380px;height:380px;right:-80px;bottom:-50px;
+  background:radial-gradient(closest-side,rgba(54,183,214,.36),transparent 70%);
+  animation:hzdrift2 28s ease-in-out infinite}
+@keyframes hzdrift1{0%,100%{transform:translate(0,0)}50%{transform:translate(62px,42px)}}
+@keyframes hzdrift2{0%,100%{transform:translate(0,0)}50%{transform:translate(-52px,-32px)}}
+
+/* --- text (sus, SUB video în z-index: videoul crește și-l acoperă) --- */
+.hz-head{position:absolute;left:0;right:0;top:clamp(44px,7vh,96px);z-index:2;
+  max-width:760px;margin:0 auto;padding:0 24px;will-change:opacity}
+.hz-head .eyebrow{margin-bottom:10px}
+
+/* --- cardul video (DEASUPRA textului): pornește sub text, crește în sus și-l acoperă, până aproape de tot ecranul --- */
+.hz-frame{position:relative;z-index:3;width:min(96vw,1600px);aspect-ratio:16/9;height:auto;
+  max-height:94vh;border-radius:var(--r-3xl);overflow:hidden;
+  background:rgba(14,18,28,.6);border:1px solid rgba(255,255,255,.16);
+  box-shadow:var(--elev-5);transform-origin:bottom center;transform:scale(.66);will-change:transform}
+.hz-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;background:#0b0e13}
+.hz-frame::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(120% 120% at 50% 0%,transparent 52%,rgba(0,0,0,.34))}
+.hz-vtag{position:absolute;left:16px;bottom:15px;z-index:3;font-size:13px;font-weight:600;color:#fff;
+  background:rgba(0,0,0,.5);padding:6px 12px;border-radius:9px;letter-spacing:-.01em}
+.hz-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:4;
   width:74px;height:74px;border-radius:50%;display:grid;place-items:center;
   background:rgba(255,255,255,.16);border:1.6px solid rgba(255,255,255,.8);
   -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
   transition:transform .25s var(--ease),background .2s}
-.mbk-play:hover{background:rgba(255,255,255,.26);transform:translate(-50%,-50%) scale(1.07)}
-.mbk-play svg{width:28px;height:28px;color:#fff;margin-left:4px}
+.hz-play:hover{background:rgba(255,255,255,.26);transform:translate(-50%,-50%) scale(1.07)}
+.hz-play svg{width:28px;height:28px;color:#fff;margin-left:4px}
 
-/* overlay plat „pop": videoul desprins din ramă, dolly-in spre privitor (poziția/transformul vin din JS) */
-.mbk-pop{position:absolute;left:0;top:0;z-index:5;overflow:hidden;background:#000;transform-origin:center}
-.mbk-pop>video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:left top}
-.pop-tag{position:absolute;left:18px;bottom:18px;z-index:3;font-size:14px;font-weight:600;color:#fff;
-  background:rgba(0,0,0,.5);padding:6px 13px;border-radius:9px;opacity:0;letter-spacing:-.01em;pointer-events:none}
-.pop-sound{position:absolute;right:20px;bottom:18px;z-index:4;width:48px;height:48px;border-radius:50%;
-  display:grid;place-items:center;background:rgba(255,255,255,.16);border:1.6px solid rgba(255,255,255,.8);
-  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);opacity:0;cursor:pointer;transition:background .2s}
-.pop-sound:hover{background:rgba(255,255,255,.26)}
-.pop-sound svg{width:22px;height:22px;color:#fff}
-.mbk-bezel--ghost{background-image:url(media/video/fondatori-poster.jpg);background-size:cover;background-position:left top}
-
-/* BASE / tastatură + difuzoare + trackpad */
-.mbk-base{position:relative;width:512px;height:352px;border-radius:16px;overflow:hidden;background:#272729;z-index:1}
-.mbk-bar{position:relative;height:40px}
-.mbk-bar::after{content:"";position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);
-  margin:0 auto;width:80%;height:16px;background:#050505}
-.mbk-mid{display:flex}
-.mbk-speak{width:10%;align-self:stretch;
-  background-image:radial-gradient(circle,#08080A .5px,transparent .5px);background-size:3px 3px}
-.mbk-keypad{width:80%;margin:0 4px;padding:4px;border-radius:6px;background:#050505}
-.kbrow{display:flex;gap:2px;margin-bottom:2px}
-.kbrow:last-child{margin-bottom:0}
-.kc{flex:none;width:24px;height:24px;border-radius:4px;background:#0A090D;color:#e8e8ea;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:6px;line-height:1.15;
-  box-shadow:inset 0 -.5px 2px #0D0D0F,inset -.5px 0 2px #0D0D0F,0 0 4px rgba(255,255,255,.2),0 1px 2px rgba(0,0,0,.5)}
-.kc.dual i{font-style:normal;display:block}
-.kc.lt{align-items:flex-start;justify-content:flex-end;padding:0 0 2px 4px}
-.kc.rt{align-items:flex-end;justify-content:flex-end;padding:0 4px 2px 0}
-.kc.w10{width:40px}.kc.w11{width:46px}.kc.w14{width:58px}.kc.w8{width:32px}
-.kc.space{width:124px}
-.kc-pwr{width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 50% 30%,#222,#000)}
-.kc-arrows{flex:none;width:74px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:2px}
-.kc-arrows .ar{height:11px;width:24px;font-size:6px}
-.kc-arrows .ar-row{display:flex;gap:2px}
-.mbk-trackpad{width:40%;height:128px;margin:6px auto 0;border-radius:12px;
-  box-shadow:0 0 1px 1px rgba(0,0,0,.13) inset,0 1px 3px rgba(0,0,0,.3) inset}
-.mbk-notch{position:absolute;left:0;right:0;bottom:0;margin:0 auto;width:80px;height:8px;
-  border-radius:12px 12px 0 0;background:linear-gradient(180deg,#272729,#050505)}
+/* curtain: secțiunea care urmează imediat după hero urcă opac peste el și acoperă videoul (care alunecă în jos).
+   Restrâns la selectorul adiacent ca să NU afecteze alte secțiuni „featured" de pe alte pagini. */
+.hero-zoom + .tile.featured{background:var(--bg);margin-top:-100vh;z-index:4}
 
 @media(max-width:833px){
-  /* mobil: fără scroll-scrub — laptop static, aproape deschis, scalat să încapă */
-  .mbk-scrub{min-height:auto;padding:34px 0 22px}
-  .mbk-stage{position:static;height:auto;padding:0 12px;gap:24px;overflow:visible;perspective:700px}
-  .mbk-screen{transform:rotateX(-4deg) scale(1,1.34)}
-  .mbk-play{width:54px;height:54px}.mbk-play svg{width:21px;height:21px}
-  .mbk-pop{display:none!important}
+  /* mobil: fără scroll-scrub — hero static, cardul video la mărime plină */
+  .hero-zoom{min-height:auto}
+  .hz-stage{position:static;height:auto;justify-content:flex-start;padding:34px 18px 6px;gap:30px}
+  .hz-head{position:static;top:auto}
+  .hz-frame{transform:none;height:auto;width:min(560px,100%)}
+  .hz-grid{-webkit-mask:radial-gradient(circle 62vw at 50% 30%,#000,transparent 72%);
+    mask:radial-gradient(circle 62vw at 50% 30%,#000,transparent 72%)}
+  .hz-glow{background:radial-gradient(62vw 52vw at 50% 26%,rgba(46,201,171,.14),transparent 70%)}
+  .hz-play{width:58px;height:58px}.hz-play svg{width:22px;height:22px}
+  .hero-zoom + .tile.featured{margin-top:0}   /* fără curtain pe mobil — stivuire normală */
 }
 @media(prefers-reduced-motion:reduce){
-  .mbk-scrub{min-height:auto}
-  .mbk-stage{position:static;height:auto}
-  .mbk-screen{transform:rotateX(-4deg) scale(1,1.34)}
-  .mbk-pop{display:none!important}
+  /* fără scrub — hero static, stivuit, cardul la mărime plină */
+  .hero-zoom{min-height:auto}
+  .hz-stage{position:static;height:auto;justify-content:flex-start;gap:34px;padding:48px 24px 8px}
+  .hz-head{position:static;top:auto}
+  .hz-frame{transform:none;height:auto;width:min(960px,94vw)}
+  .hz-orb{animation:none}
+  .hero-zoom + .tile.featured{margin-top:0}
 }
 
 /* visual: course screen */
@@ -414,17 +401,18 @@ h1,h2,h3,h4{font-weight:600;letter-spacing:-.02em;line-height:1.08;color:var(--i
 .eq i:nth-child(6){animation-delay:1.1s}.eq i:nth-child(7){animation-delay:.35s}
 
 /* ---------- carduri 3D (homepage: „pe viață" + „panou instructor") ---------- */
-.tile.split{flex-direction:row;align-items:center;text-align:left;
-  gap:clamp(34px,6vw,80px);
-  padding-left:max(24px,calc((100% - var(--maxw))/2 + 24px));
-  padding-right:max(24px,calc((100% - var(--maxw))/2 + 24px))}
-.tile.split .tile-copy{max-width:520px;flex:0 1 520px}
+/* bandă mai îngustă + centrată: aduce textul și cardul mai aproape de mijlocul paginii (textul rămâne la stânga) */
+.tile.split{flex-direction:row;align-items:center;justify-content:center;text-align:left;
+  gap:clamp(28px,4.5vw,56px);
+  padding-left:max(24px,calc((100% - 1080px)/2 + 24px));
+  padding-right:max(24px,calc((100% - 1080px)/2 + 24px))}
+.tile.split .tile-copy{max-width:500px;flex:0 1 500px}
 .tile.split .tile-cta,.tile.split .promise{justify-content:flex-start}
 .tile.split .home-stats{margin-left:0}
-.tile.split .tile-visual{margin-top:0;flex:1 1 auto}
+.tile.split .tile-visual{margin-top:0;flex:0 1 auto}
 
-.d3-stage{width:min(380px,84vw)}
-.d3-stage.wide{width:min(440px,88vw)}
+.d3-stage{width:min(440px,86vw)}
+.d3-stage.wide{width:min(520px,90vw)}
 .d3-float{animation:d3float 6s ease-in-out infinite}
 @keyframes d3float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
 .d3-card{position:relative;border-radius:var(--r-3xl);overflow:hidden;
@@ -434,7 +422,7 @@ h1,h2,h3,h4{font-weight:600;letter-spacing:-.02em;line-height:1.08;color:var(--i
   background:radial-gradient(120% 90% at 12% 0%,rgba(255,255,255,.14),transparent 46%)}
 
 /* card „pass pe viață" (secțiunea studenți) */
-.d3-card.pass{padding:28px 26px 14px;
+.d3-card.pass{padding:34px 32px 18px;
   background:linear-gradient(158deg,rgba(46,201,171,.20),transparent 56%),var(--surface);
   transform:perspective(1500px) rotateX(7deg) rotateY(-17deg)}
 .d3-stage:hover .d3-card.pass{transform:perspective(1500px) rotateX(3deg) rotateY(-7deg)}
@@ -445,12 +433,12 @@ h1,h2,h3,h4{font-weight:600;letter-spacing:-.02em;line-height:1.08;color:var(--i
 .pass-kicker{font-size:12px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2)}
 .pass-title{font-size:clamp(34px,5vw,46px);font-weight:700;letter-spacing:-.03em;line-height:1;margin:5px 0 18px;color:var(--ink)}
 .pass-rows div{display:flex;justify-content:space-between;align-items:center;
-  padding:13px 0;border-top:1px solid var(--line);font-size:14.5px}
+  padding:15px 0;border-top:1px solid var(--line);font-size:15.5px}
 .pass-rows span{color:var(--ink-2)}
 .pass-rows b{color:var(--ink);font-weight:600}
 
 /* card „panou instructor" (secțiunea creatori) */
-.d3-card.panel{padding:22px 22px 24px;
+.d3-card.panel{padding:26px 26px 28px;
   background:linear-gradient(158deg,rgba(46,201,171,.16),transparent 54%),var(--surface);
   transform:perspective(1500px) rotateX(7deg) rotateY(16deg)}
 .d3-stage:hover .d3-card.panel{transform:perspective(1500px) rotateX(3deg) rotateY(7deg)}
@@ -459,7 +447,7 @@ h1,h2,h3,h4{font-weight:600;letter-spacing:-.02em;line-height:1.08;color:var(--i
   color:var(--mint-2);background:rgba(26,170,143,.16);padding:4px 11px;border-radius:var(--r-pill)}
 .panel-live i{width:7px;height:7px;border-radius:50%;background:var(--mint-2);animation:pulseDot 1.8s ease-in-out infinite}
 @keyframes pulseDot{0%,100%{opacity:1}50%{opacity:.25}}
-.panel-chart{display:flex;align-items:flex-end;gap:7px;height:116px;margin:20px 0 18px}
+.panel-chart{display:flex;align-items:flex-end;gap:8px;height:132px;margin:24px 0 20px}
 .panel-chart i{flex:1;background:var(--g-mint);border-radius:4px 4px 0 0;height:var(--h,40%);min-height:6px;
   transform-origin:bottom;opacity:.92;animation:barGrow .6s var(--ease-out) backwards;animation-delay:calc(var(--i,0)*70ms)}
 .panel-foot{display:flex;align-items:center;gap:12px;padding-top:16px;border-top:1px solid var(--line)}
@@ -527,6 +515,36 @@ h1,h2,h3,h4{font-weight:600;letter-spacing:-.02em;line-height:1.08;color:var(--i
 .cc-rate svg{width:14px;height:14px;color:var(--mint)}
 .cc-rate em{font-style:normal;color:var(--ink-2);font-weight:400}
 .cc-price{font-size:18px;font-weight:600;letter-spacing:-.01em;color:var(--ink)}
+
+/* coperta din galerie (prima poză) acoperă gradientul pe card */
+.cc-thumb.has-img{background-size:cover;background-position:center}
+
+/* ---------- galerie curs (pagina cursului): viewer principal + thumbnails, tip eMAG/Altex ---------- */
+.cgal-main{position:relative;width:100%;height:100%;overflow:hidden;background:#0b0e13}
+.cgal-img{width:100%;height:100%;object-fit:cover;display:block}
+.cgal-vidwrap{position:absolute;inset:0}
+.cgal-vidwrap video{width:100%;height:100%;object-fit:cover;display:block;background:#0b0e13}
+.cgal-play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;
+  width:72px;height:72px;border-radius:50%;display:grid;place-items:center;cursor:pointer;
+  background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.8);
+  -webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  transition:transform .2s var(--ease),background .2s}
+.cgal-play:hover{background:rgba(255,255,255,.28);transform:translate(-50%,-50%) scale(1.07)}
+.cgal-play svg{width:26px;height:26px;color:#fff;margin-left:3px}
+.cgal-thumbs{display:flex;gap:10px;margin-top:12px;overflow-x:auto;padding-bottom:4px;
+  scrollbar-width:thin;scrollbar-color:var(--surface-2) transparent}
+.cgal-thumbs::-webkit-scrollbar{height:7px}
+.cgal-thumbs::-webkit-scrollbar-thumb{background:var(--surface-2);border-radius:10px}
+.cgal-thumb{position:relative;flex:0 0 94px;aspect-ratio:16/10;border-radius:10px;overflow:hidden;
+  border:2px solid transparent;background:var(--bg-2);padding:0;cursor:pointer;
+  transition:border-color .2s var(--ease),transform .2s var(--ease)}
+.cgal-thumb:hover{transform:translateY(-2px)}
+.cgal-thumb.on{border-color:var(--mint)}
+.cgal-thumb img,.cgal-thumb video{width:100%;height:100%;object-fit:cover;display:block}
+.cgal-thumb .tvb{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:rgba(0,0,0,.5)}
+.cgal-thumb .tvb svg{width:12px;height:12px;color:#fff;margin-left:1px}
+@media(max-width:600px){.cgal-thumb{flex-basis:74px}}
 
 /* carousel */
 .car{padding:72px 0 34px}
@@ -681,6 +699,99 @@ a.card{display:block}
 .review .who b{font-size:14px;color:var(--ink);display:block}
 .review .who span{font-size:12.5px;color:var(--ink-2)}
 .review .link{font-size:14px;margin-top:14px}
+
+/* ---------- recenzii pagina cursului (sumar + histogramă + listă, stil eMAG adaptat) ---------- */
+/* steluțe cu umplere parțială (pentru medii) — mint pe fundal mut */
+.rstars{position:relative;display:inline-block;font-size:15px;letter-spacing:2px;line-height:1;
+  color:var(--surface-2);white-space:nowrap;flex:none}
+.rstars::before{content:"★★★★★"}
+.rstars>i{position:absolute;left:0;top:0;width:var(--pct,0%);overflow:hidden;color:var(--mint)}
+.rstars>i::before{content:"★★★★★"}
+
+/* sumar: medie + histogramă */
+.rev-summary{display:grid;grid-template-columns:auto 1fr;gap:clamp(20px,4vw,52px);align-items:center;
+  padding:22px 24px;border-radius:var(--r-xl);background:var(--card-bg);border:1px solid var(--card-line);
+  -webkit-backdrop-filter:var(--card-blur);backdrop-filter:var(--card-blur);margin-bottom:22px}
+.rev-avg{text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;padding-right:6px}
+.rev-avgnum{font-size:clamp(40px,6vw,56px);font-weight:700;letter-spacing:-.03em;line-height:1;color:var(--ink)}
+.rev-avg .rstars{font-size:18px}
+.rev-avgn{font-size:13px;color:var(--ink-2)}
+.rev-hist{display:flex;flex-direction:column;gap:6px;min-width:0}
+.rv-hrow{display:flex;align-items:center;gap:12px;width:100%;padding:3px 8px;border-radius:8px;
+  background:none;cursor:pointer;transition:background .15s}
+.rv-hrow:hover{background:var(--glass)}
+.rv-hrow.on{background:rgba(26,170,143,.14)}
+.rv-hlabel{flex:none;width:34px;font-size:13px;font-weight:600;color:var(--ink-2);text-align:left}
+.rv-hlabel em{font-style:normal;color:var(--mint)}
+.rv-htrack{flex:1;height:9px;border-radius:6px;background:var(--surface-2);overflow:hidden}
+.rv-hfill{display:block;height:100%;border-radius:6px;background:var(--g-mint)}
+.rv-hcount{flex:none;width:34px;text-align:right;font-size:13px;font-weight:600;color:var(--ink-2)}
+
+/* compozitor: star-picker + titlu + comentariu */
+.rev-composer{padding:22px 24px;border-radius:var(--r-xl);background:var(--card-bg);
+  border:1px solid var(--card-line);-webkit-backdrop-filter:var(--card-blur);backdrop-filter:var(--card-blur);margin-bottom:22px}
+.rv-ctitle{font-size:18px;font-weight:600;color:var(--ink);margin-bottom:14px}
+.rv-pick{display:flex;align-items:center;gap:4px;margin-bottom:14px}
+.rv-pstar{font-size:30px;line-height:1;color:var(--surface-2);background:none;padding:0 2px;cursor:pointer;transition:color .12s,transform .12s}
+.rv-pstar:hover{transform:scale(1.12)}
+.rv-pstar.on{color:var(--mint)}
+.rv-picklbl{margin-left:12px;font-size:14px;font-weight:600;color:var(--ink-2)}
+.rv-cinput{width:100%;margin-bottom:12px;padding:12px 14px;border-radius:var(--r-md);
+  background:var(--bg-2);border:1px solid var(--line);color:var(--ink);font-family:inherit;font-size:15px}
+.rv-cinput:focus{outline:none;border-color:var(--mint)}
+.rv-carea{min-height:96px;resize:vertical;line-height:1.5}
+.rv-cfoot{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.rv-note{margin:0}
+
+/* controale: sortare + filtru activ + căutare */
+.rev-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.rv-sortwrap{display:flex;align-items:center;gap:8px}
+.rv-sortlbl{font-size:13px;color:var(--ink-2)}
+.rv-select{padding:9px 12px;border-radius:var(--r-md);background:var(--bg-2);border:1px solid var(--line);
+  color:var(--ink);font-family:inherit;font-size:14px;cursor:pointer}
+.rv-select:focus{outline:none;border-color:var(--mint)}
+.rv-chip{display:inline-flex;align-items:center;gap:7px;padding:8px 13px;border-radius:var(--r-pill);
+  background:rgba(26,170,143,.16);border:1px solid var(--mint);color:var(--mint-2);font-size:13.5px;font-weight:600;cursor:pointer}
+.rv-search{position:relative;margin-left:auto;display:flex;align-items:center}
+.rv-search svg{position:absolute;left:12px;width:16px;height:16px;color:var(--ink-2);pointer-events:none}
+.rv-search input{width:min(280px,46vw);padding:9px 14px 9px 36px;border-radius:var(--r-pill);
+  background:var(--bg-2);border:1px solid var(--line);color:var(--ink);font-family:inherit;font-size:14px}
+.rv-search input:focus{outline:none;border-color:var(--mint)}
+
+/* listă recenzii */
+.rev-list{display:flex;flex-direction:column}
+.rv-item{display:flex;gap:16px;padding:22px 0;border-top:1px solid var(--line)}
+.rv-item:first-child{border-top:0}
+.rv-item.mine{background:rgba(26,170,143,.05);border-radius:var(--r-lg);padding:18px 16px;margin:6px 0;border-top:0}
+.rv-ava{width:44px;height:44px;font-size:15px;flex:none}
+.rv-main{flex:1;min-width:0}
+.rv-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.rv-name{font-size:15px;font-weight:600;color:var(--ink)}
+.rv-you{font-size:11px;font-weight:600;color:var(--on-mint);background:var(--mint);padding:2px 8px;border-radius:var(--r-pill)}
+.rv-date{font-size:13px;color:var(--ink-2)}
+.rv-menu{position:relative;margin-left:auto}
+.rv-dots{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:var(--ink-2);cursor:pointer;transition:background .15s,color .15s}
+.rv-dots:hover{background:var(--glass);color:var(--ink)}
+.rv-dots svg{width:18px;height:18px}
+.rv-pop{position:absolute;right:0;top:34px;z-index:6;min-width:140px;padding:6px;
+  background:var(--bg-2);border:1px solid var(--glass-line);border-radius:var(--r-md);box-shadow:var(--elev-3)}
+.rv-pop[hidden]{display:none}
+.rv-pop button{display:block;width:100%;text-align:left;padding:9px 12px;border-radius:8px;
+  font-size:14px;color:var(--ink);cursor:pointer;background:none}
+.rv-pop button:hover{background:var(--glass)}
+.rv-pop button[data-act="del"]{color:var(--danger)}
+.rv-tline{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:8px 0 6px}
+.rv-tline .rstars{font-size:14px}
+.rv-title{font-size:15px;font-weight:600;color:var(--ink)}
+.rv-badge{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--mint-2)}
+.rv-badge svg{width:13px;height:13px}
+.rv-text{font-size:15px;color:var(--ink);line-height:1.55;margin-top:2px}
+@media(max-width:600px){
+  .rev-summary{grid-template-columns:1fr;gap:18px}
+  .rev-avg{flex-direction:row;justify-content:flex-start;gap:14px;padding:0}
+  .rv-search{margin-left:0;width:100%}
+  .rv-search input{width:100%}
+}
 
 /* faq */
 .faq-item{border-bottom:1px solid var(--line)}
@@ -1016,6 +1127,21 @@ a.card{display:block}
 .thumb-pick .tp.g2{background:var(--g-thumb-2)}
 .thumb-pick .tp.g3{background:var(--g-thumb-3)}
 .thumb-pick input:checked + .tp{border-color:var(--mint);transform:scale(1.03)}
+
+/* uploader galerie (wizard, pasul 3) */
+.wgal{display:grid;grid-template-columns:repeat(auto-fill,minmax(108px,1fr));gap:10px;margin-bottom:12px}
+.wgal:empty{display:none}
+.wgal-item{position:relative;aspect-ratio:16/10;border-radius:var(--r-md);overflow:hidden;
+  border:1px solid var(--line);background:var(--bg-2);cursor:grab}
+.wgal-item.drag{opacity:.45}
+.wgal-item img,.wgal-item video{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.wgal-vbadge{position:absolute;left:7px;bottom:7px;width:26px;height:26px;border-radius:50%;
+  display:grid;place-items:center;background:rgba(0,0,0,.58);color:#fff}
+.wgal-vbadge svg{width:15px;height:15px}
+.wgal-cover{position:absolute;left:7px;top:7px;font-size:10.5px;font-weight:600;
+  color:var(--on-mint);background:var(--mint);padding:3px 8px;border-radius:6px}
+.wgal-x{position:absolute;top:6px;right:6px;width:26px;height:26px;
+  background:rgba(8,10,14,.66);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
 .recap{margin-top:18px}
 .wnav{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:24px}
 

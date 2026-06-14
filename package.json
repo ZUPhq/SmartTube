@@ -1,0 +1,8 @@
+{
+  "name": "smarttube",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SmartTube — marketplace de cursuri online. Site static (HTML + vanilla JS), fără build step; backend pe Supabase. Nu există dependențe runtime (supabase-js e încărcat prin CDN cu SRI).",
+  "scripts": {},
+  "dependencies": {}
+}

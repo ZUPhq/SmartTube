@@ -60,28 +60,14 @@
         <h2 class="h3 sec-title reveal">Instructorul tău</h2>
         <div class="inst-card reveal" id="cInstCard"></div>
 
-        <!-- recenzii reale, din DB -->
+        <!-- recenzii reale, din DB: sumar + histogramă pe stele + sortare/filtrare/căutare + editare proprie -->
         <div id="cReviewsWrap">
-          <h2 class="h3 sec-title reveal">Ce spun studenții</h2>
-          <div class="grid-3 reveal" id="cReviews"></div>
-          <p class="empty" id="cReviewsEmpty" style="padding:18px 0;text-align:left">Nicio recenzie scrisă încă pentru acest curs.</p>
-          <form class="auth-card" id="reviewForm" style="display:none;max-width:540px;margin-top:22px">
-            <h3 style="margin-bottom:12px">Evaluează cursul</h3>
-            <div class="field"><label for="rvRating">Nota ta</label>
-              <select id="rvRating">
-                <option value="5">★★★★★ — Excelent</option>
-                <option value="4">★★★★ — Foarte bun</option>
-                <option value="3">★★★ — Bun</option>
-                <option value="2">★★ — Slab</option>
-                <option value="1">★ — Foarte slab</option>
-              </select>
-            </div>
-            <div class="field"><label for="rvComment">Recenzia ta (opțional)</label>
-              <textarea id="rvComment" maxlength="1000" placeholder="Ce ți-a plăcut? Cui i-l recomanzi?"></textarea>
-            </div>
-            <button type="submit" class="btn btn-mint">Trimite recenzia</button>
-            <p class="form-note auth-alt" aria-live="polite"></p>
-          </form>
+          <h2 class="h3 sec-title reveal">Recenzii <span class="rate-n" id="cRevCount"></span></h2>
+          <div class="rev-summary reveal" id="cRevSummary" style="display:none"></div>
+          <div class="rev-composer reveal" id="cRevComposer" style="display:none"></div>
+          <div class="rev-controls reveal" id="cRevControls" style="display:none"></div>
+          <div class="rev-list reveal" id="cReviews"></div>
+          <p class="empty" id="cReviewsEmpty" style="text-align:left">Încă nicio recenzie pentru acest curs.</p>
         </div>
       </div>
 
@@ -139,9 +125,10 @@
 </div>
 
 
-<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.1/dist/umd/supabase.js" integrity="sha384-EjUdIVmzWliPzdzhxZ9ZoO0etXLKWuUPUftAGxP6qH6Lm4oLwoLaJR0Ba4pIDiDL" crossorigin="anonymous"></script>
 <script defer src="db.js"></script>
 <script defer src="partials.js"></script>
 <script defer src="app.js"></script>
+<script defer src="protect.js"></script>
 </body>
 </html>

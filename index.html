@@ -25,10 +25,18 @@
 
 <main>
 
-  <!-- flagship: MacBook scroll — ecranul se deschide pe scroll și apare videoul fondatorilor -->
-  <section class="mbk-scrub" id="mbkScrub">
-    <div class="mbk-stage">
-      <div class="mbk-head" id="mbkHead">
+  <!-- flagship: hero cu zoom pe scroll — cardul video crește, fundal interactiv (spotlight mint) -->
+  <section class="hero-zoom" id="heroZoom">
+    <div class="hz-stage">
+      <div class="hz-bg" id="hzBg" aria-hidden="true">
+        <span class="hz-grid"></span>
+        <span class="hz-glow"></span>
+        <span class="hz-orb a"></span>
+        <span class="hz-orb b"></span>
+      </div>
+
+      <div class="hz-head" id="hzHead">
+        <p class="eyebrow">Cursuri online · pentru oricine</p>
         <h1 class="h-flag">Învață orice.</h1>
         <p class="t-sub">Mii de cursuri online, predate de oameni care chiar se pricep.<br>Pentru oricine, despre orice.</p>
         <div class="tile-cta">
@@ -37,58 +45,12 @@
         </div>
       </div>
 
-      <div class="mbk" id="mbk">
-        <!-- LID -->
-        <div class="mbk-lidwrap">
-          <div class="mbk-lidback"><div class="mbk-lidback-in"><span class="mbk-logo"><span class="s">smart</span><span class="t">tube</span></span></div></div>
-          <div class="mbk-screen" id="mbkScreen">
-            <div class="mbk-bezel">
-              <span class="mbk-cam"></span>
-              <video id="heroVideo" class="mbk-video" poster="media/video/fondatori-poster.jpg" preload="metadata" autoplay muted loop playsinline>
-                <source src="media/video/fondatori.mp4" type="video/mp4">
-              </video>
-              <span class="mbk-tag">Povestea smarttube · Fondatorii</span>
-              <button class="mbk-play" id="heroPlay" type="button" aria-label="Redă cu sunet, pe tot ecranul"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
-            </div>
-          </div>
-        </div>
-        <!-- BASE -->
-        <div class="mbk-base">
-          <div class="mbk-bar"></div>
-          <div class="mbk-mid">
-            <div class="mbk-speak"></div>
-            <div class="mbk-keypad" aria-hidden="true">
-              <div class="kbrow">
-                <span class="kc w10 lbl">esc</span><span class="kc">F1</span><span class="kc">F2</span><span class="kc">F3</span><span class="kc">F4</span><span class="kc">F5</span><span class="kc">F6</span><span class="kc">F7</span><span class="kc">F8</span><span class="kc">F9</span><span class="kc">F10</span><span class="kc">F11</span><span class="kc">F12</span><span class="kc"><span class="kc-pwr"></span></span>
-              </div>
-              <div class="kbrow">
-                <span class="kc dual"><i>~</i><i>`</i></span><span class="kc dual"><i>!</i><i>1</i></span><span class="kc dual"><i>@</i><i>2</i></span><span class="kc dual"><i>#</i><i>3</i></span><span class="kc dual"><i>$</i><i>4</i></span><span class="kc dual"><i>%</i><i>5</i></span><span class="kc dual"><i>^</i><i>6</i></span><span class="kc dual"><i>&amp;</i><i>7</i></span><span class="kc dual"><i>*</i><i>8</i></span><span class="kc dual"><i>(</i><i>9</i></span><span class="kc dual"><i>)</i><i>0</i></span><span class="kc dual"><i>_</i><i>-</i></span><span class="kc dual"><i>+</i><i>=</i></span><span class="kc w10 lbl rt">delete</span>
-              </div>
-              <div class="kbrow">
-                <span class="kc w10 lbl lt">tab</span><span class="kc">Q</span><span class="kc">W</span><span class="kc">E</span><span class="kc">R</span><span class="kc">T</span><span class="kc">Y</span><span class="kc">U</span><span class="kc">I</span><span class="kc">O</span><span class="kc">P</span><span class="kc dual"><i>{</i><i>[</i></span><span class="kc dual"><i>}</i><i>]</i></span><span class="kc dual"><i>|</i><i>\</i></span>
-              </div>
-              <div class="kbrow">
-                <span class="kc w11 lbl lt">caps</span><span class="kc">A</span><span class="kc">S</span><span class="kc">D</span><span class="kc">F</span><span class="kc">G</span><span class="kc">H</span><span class="kc">J</span><span class="kc">K</span><span class="kc">L</span><span class="kc dual"><i>:</i><i>;</i></span><span class="kc dual"><i>"</i><i>'</i></span><span class="kc w11 lbl rt">return</span>
-              </div>
-              <div class="kbrow">
-                <span class="kc w14 lbl lt">shift</span><span class="kc">Z</span><span class="kc">X</span><span class="kc">C</span><span class="kc">V</span><span class="kc">B</span><span class="kc">N</span><span class="kc">M</span><span class="kc dual"><i>&lt;</i><i>,</i></span><span class="kc dual"><i>&gt;</i><i>.</i></span><span class="kc dual"><i>?</i><i>/</i></span><span class="kc w14 lbl rt">shift</span>
-              </div>
-              <div class="kbrow">
-                <span class="kc lbl">fn</span><span class="kc">⌃</span><span class="kc">⌥</span><span class="kc w8 lbl rt">⌘</span><span class="kc space"></span><span class="kc w8 lbl lt">⌘</span><span class="kc">⌥</span>
-                <span class="kc-arrows"><span class="kc ar">▲</span><span class="ar-row"><span class="kc ar">◀</span><span class="kc ar">▼</span><span class="kc ar">▶</span></span></span>
-              </div>
-            </div>
-            <div class="mbk-speak"></div>
-          </div>
-          <div class="mbk-trackpad"></div>
-          <div class="mbk-notch"></div>
-        </div>
-      </div>
-
-      <!-- overlay plat: videoul se desprinde din ramă și face dolly-in spre privitor -->
-      <div class="mbk-pop" id="mbkPop" hidden>
-        <div class="pop-tag">Povestea smarttube · Fondatorii</div>
-        <button class="pop-sound" id="heroSound" type="button" aria-label="Activează sunetul"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 10v4h4l5 5V5L7 10H3zm13.5 2a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4z"/></svg></button>
+      <div class="hz-frame" id="hzFrame">
+        <video id="heroVideo" class="hz-video" poster="media/video/fondatori-poster.jpg" preload="metadata" muted loop playsinline>
+          <source src="media/video/fondatori.mp4" type="video/mp4">
+        </video>
+        <span class="hz-vtag">Povestea smarttube · Fondatorii</span>
+        <button class="hz-play" id="heroPlay" type="button" aria-label="Redă cu sunet, pe tot ecranul"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button>
       </div>
     </div>
   </section>
@@ -230,7 +192,7 @@
 </main>
 
 
-<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.1/dist/umd/supabase.js" integrity="sha384-EjUdIVmzWliPzdzhxZ9ZoO0etXLKWuUPUftAGxP6qH6Lm4oLwoLaJR0Ba4pIDiDL" crossorigin="anonymous"></script>
 <script defer src="db.js"></script>
 <script defer src="partials.js"></script>
 <script defer src="app.js"></script>

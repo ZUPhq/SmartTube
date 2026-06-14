@@ -33,8 +33,8 @@ var DB = (function(){
     return (w[0][0] + (w[1] ? w[1][0] : '')).toUpperCase();
   };
   var esc = function(s){
-    return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){
-      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
     });
   };
 
@@ -223,10 +223,42 @@ var DB = (function(){
       });
   };
 
+  /* ---- galerie curs (poze + clipuri promo, bucket PUBLIC course-media) ---- */
+  var mediaUrl = function(path){
+    if(!path) return '';
+    return sb.storage.from('course-media').getPublicUrl(path).data.publicUrl;
+  };
+  /* prima imagine din galerie = coperta cursului (carduri + pagina cursului); null => gradient */
+  var coverUrl = function(c){
+    var g = (c && c.gallery) || [];
+    for(var i = 0; i < g.length; i++){
+      if(g[i] && g[i].t === 'img' && g[i].p) return mediaUrl(g[i].p);
+    }
+    return null;
+  };
+  var uploadCourseMedia = function(courseId, file){
+    return getUser().then(function(u){
+      if(!u) throw new Error('Nu ești autentificat.');
+      var ext = (file.name.split('.').pop() || 'bin').toLowerCase().replace(/[^a-z0-9]/g, '') || 'bin';
+      var path = u.id + '/' + courseId + '/' + Date.now() + '-' + Math.random().toString(36).slice(2, 8) + '.' + ext;
+      return sb.storage.from('course-media')
+        .upload(path, file, {contentType:file.type || 'application/octet-stream'})
+        .then(function(r){
+          if(r.error) throw r.error;
+          return path;
+        });
+    });
+  };
+  var removeCourseMedia = function(paths){
+    paths = [].concat(paths || []).filter(Boolean);
+    if(!paths.length) return Promise.resolve();
+    return sb.storage.from('course-media').remove(paths);
+  };
+
   /* ---- recenzii (doar cumpărătorii pot scrie; agregarea pe curs o face un trigger) ---- */
   var getReviews = function(courseId, n){
     return sb.from('reviews').select('*').eq('course_id', courseId)
-      .order('created_at', {ascending:false}).limit(n || 6)
+      .order('created_at', {ascending:false}).limit(n || 500)
       .then(function(r){ return r.data || []; });
   };
   var myReview = function(courseId){
@@ -236,16 +268,24 @@ var DB = (function(){
         .maybeSingle().then(function(r){ return r.data; });
     });
   };
-  var upsertReview = function(courseId, rating, comment){
+  var upsertReview = function(courseId, rating, comment, title){
     return getProfile().then(function(p){
       if(!p) throw new Error('Nu ești autentificat.');
       return sb.from('reviews').upsert({
         course_id:courseId, user_id:p.id, rating:rating,
         comment:(comment || '').slice(0, 1000) || null,
+        title:(title || '').slice(0, 120) || null,
         author_name:p.name || 'Student'
       }, {onConflict:'course_id,user_id'}).then(function(r){
         if(r.error) throw r.error;
       });
+    });
+  };
+  var deleteReview = function(courseId){
+    return getUser().then(function(u){
+      if(!u) throw new Error('Nu ești autentificat.');
+      return sb.from('reviews').delete().eq('course_id', courseId).eq('user_id', u.id)
+        .then(function(r){ if(r.error) throw r.error; });
     });
   };
 
@@ -278,11 +318,12 @@ var DB = (function(){
     publishedCourses:publishedCourses, popularCourses:popularCourses, getCourse:getCourse,
     myPurchases:myPurchases, hasPurchase:hasPurchase, buyCourse:buyCourse,
     logView:logView,
-    getReviews:getReviews, myReview:myReview, upsertReview:upsertReview, recentReviews:recentReviews,
+    getReviews:getReviews, myReview:myReview, upsertReview:upsertReview, deleteReview:deleteReview, recentReviews:recentReviews,
     instructorStats:instructorStats,
     myCourses:myCourses, courseViews:courseViews, courseSales:courseSales,
     setCourseStatus:setCourseStatus, saveCourse:saveCourse, saveCurriculum:saveCurriculum,
     uploadLessonVideo:uploadLessonVideo, removeVideo:removeVideo, videoUrl:videoUrl,
+    mediaUrl:mediaUrl, coverUrl:coverUrl, uploadCourseMedia:uploadCourseMedia, removeCourseMedia:removeCourseMedia,
     sendContact:sendContact
   };
 })();
