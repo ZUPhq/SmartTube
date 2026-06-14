@@ -4,5 +4,7 @@ Allow: /
 # Paginile sensibile (dashboard.html, curs-nou.html) sunt deja noindex prin
 # <meta name="robots" content="noindex"> și protejate de autentificare + RLS.
 # Nu le mai listăm aici cu Disallow — ar fi un indicator inutil al țintelor.
-# TODO: după fixarea domeniului de producție adaugă:
-#   Sitemap: https://DOMENIUL-TĂU/sitemap.xml
+
+# Actualizează baza URL aici + în sitemap.xml + în canonical-urile din <head>
+# când site-ul se mută pe un domeniu propriu.
+Sitemap: https://zuphq.github.io/SmartTube/sitemap.xml
