@@ -17,7 +17,7 @@
   var NAV_HTML =
 '<nav class="nav">\n' +
 '  <div class="nav-in">\n' +
-'    <a href="index.html" class="brand"><img class="brand-logo brand-logo-dark" src="media/logos/logo%20smartube%20alb.svg" alt="smarttube"><img class="brand-logo brand-logo-light" src="media/logos/smarttube-logo.png" alt="smarttube"></a>\n' +
+'    <a href="cursuri.html" class="brand" aria-label="smarttube — vezi cursurile"><img class="brand-logo brand-logo-dark" src="media/logos/logo%20smartube%20alb.svg" alt="smarttube"><img class="brand-logo brand-logo-light" src="media/logos/smarttube-logo.png" alt="smarttube"></a>\n' +
 '    <div class="nav-search" id="navSearchBar">\n' +
 '      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-5-5" stroke-linecap="round"/></svg>\n' +
 '      <input type="text" id="navSearchInput" placeholder="Caută cursuri, instructori, pagini…" autocomplete="off" aria-label="Caută pe smarttube" />\n' +

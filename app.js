@@ -1400,50 +1400,95 @@
   window.App = { courseCardHTML:courseCardHTML, tiltify:tiltify, authMsg:authMsg, revealify:revealify, countUp:countUp };
 })();
 
-/* ---- „lacul cunoașterii": câmp GLOBAL de simboluri care plutesc, descoperit cu lanterna cursorului ----
-   Canvas fix (#lakeFx) în spatele întregului conținut, pe toate paginile. Simbolurile (cod, design,
-   foto/video, muzică, business, dezvoltare) sunt aproape invizibile, aprinse doar în jurul cursorului.
-   Secțiunile cu fundal solid (.sect-alt, footer, tile „featured", modale) acoperă canvas-ul → rămân la fel. */
+/* ---- „lacul cunoașterii" PER-SECȚIUNE: fiecare secțiune are propriul câmp de simboluri ----
+   Canvas fix (#lakeFx) în spatele întregului conținut. Simbolurile sunt ancorate pe DOCUMENT, în banda
+   secțiunii lor (cu margine față de liniile de delimitare), și se mișcă odată cu pagina la scroll —
+   nu trec peste linie; la trecerea dintr-o secțiune în alta apar simboluri noi. Lanterna le dezvăluie.
+   Hero-ul e exclus (are propriile orbe). Rebuild la resize + conținut async (catalog/carusel). */
 (function(){
   var canvas = document.getElementById('lakeFx');
   if(!canvas || !canvas.getContext) return;
   var ctx = canvas.getContext('2d');
   var live = matchMedia('(pointer:fine)').matches && !matchMedia('(prefers-reduced-motion:reduce)').matches;
-  /* simboluri legate de categoriile site-ului: cod, design, foto/video, muzică, business, dezvoltare */
   var GLYPHS = ['</>','{ }','( )','[ ]',';','#','01','Aa','▶','▷','♪','♫','♩','%','↗','€','★','✓'];
   var FONT = 'ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace';
   var dpr = Math.min(window.devicePixelRatio || 1, 2);
-  var W = 0, H = 0, syms = [], R = 200;
-  function rnd(n){ var x = Math.sin(n * 12.9898) * 43758.5453; return x - Math.floor(x); }   // determinist (stabil între resize)
-  function build(){
-    var r = canvas.getBoundingClientRect();   // dimensiunea CSS reală (corectă pe orice DPR)
-    W = r.width; H = r.height;
-    if(!W || !H) return;
-    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    R = Math.max(170, Math.min(260, W * 0.15));
-    syms = [];
-    var cell = 84, cols = Math.ceil(W / cell), rows = Math.ceil(H / cell), k = 0;
+  var W = 0, H = 0, bands = [], R = 200;
+  function rnd(n){ var x = Math.sin(n * 12.9898) * 43758.5453; return x - Math.floor(x); }   // determinist
+  function genBand(top, h, seed){
+    var arr = [], cell = 86, cols = Math.ceil(W / cell), m = 28;   // m = margine sus/jos față de linia secțiunii
+    var inner = h - m * 2;
+    if(inner < 24) return arr;
+    var rows = Math.max(1, Math.round(inner / cell)), k = seed;
     for(var iy = 0; iy < rows; iy++) for(var ix = 0; ix < cols; ix++){
       k++;
-      syms.push({
+      var ly2 = m + (iy + 0.5) * (inner / rows) + (rnd(k * 3.7) - 0.5) * (inner / rows) * 0.55;
+      if(ly2 < m * 0.6) ly2 = m * 0.6;
+      if(ly2 > h - m * 0.6) ly2 = h - m * 0.6;
+      arr.push({
+        x: ix * cell + cell * 0.5 + (rnd(k * 2.1) - 0.5) * cell * 0.7,
+        docY: top + ly2,
+        g: GLYPHS[Math.floor(rnd(k * 5.3) * GLYPHS.length) % GLYPHS.length],
+        s: 12 + Math.floor(rnd(k * 7.1) * 9),
+        a0: 0.022 + rnd(k * 9.7) * 0.04,
+        tw: rnd(k * 11.3) * 6.283,
+        ax: 4 + rnd(k * 13.1) * 6,
+        ay: 3 + rnd(k * 17.3) * 5,
+        p1: rnd(k * 19.7) * 6.283,
+        p2: rnd(k * 23.9) * 6.283
+      });
+    }
+    return arr;
+  }
+  function genViewportSyms(){   // hero: simboluri ancorate pe VIEWPORT (plutesc pe loc cât hero-ul e fixat)
+    var arr = [], cell = 86, cols = Math.ceil(W / cell), rows = Math.ceil(H / cell), k = 5;
+    for(var iy = 0; iy < rows; iy++) for(var ix = 0; ix < cols; ix++){
+      k++;
+      arr.push({
         x: ix * cell + cell * 0.5 + (rnd(k * 2.1) - 0.5) * cell * 0.7,
         y: iy * cell + cell * 0.5 + (rnd(k * 3.7) - 0.5) * cell * 0.7,
         g: GLYPHS[Math.floor(rnd(k * 5.3) * GLYPHS.length) % GLYPHS.length],
         s: 12 + Math.floor(rnd(k * 7.1) * 9),
         a0: 0.022 + rnd(k * 9.7) * 0.04,
         tw: rnd(k * 11.3) * 6.283,
-        ax: 4 + rnd(k * 13.1) * 7,      // amplitudine plutire orizontală
-        ay: 6 + rnd(k * 17.3) * 8,      // amplitudine bob vertical (val pe lac)
+        ax: 4 + rnd(k * 13.1) * 7,
+        ay: 5 + rnd(k * 17.3) * 8,
         p1: rnd(k * 19.7) * 6.283,
         p2: rnd(k * 23.9) * 6.283
       });
+    }
+    return arr;
+  }
+  function build(){
+    var r = canvas.getBoundingClientRect();
+    W = r.width; H = r.height;
+    if(!W || !H) return;
+    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    R = Math.max(170, Math.min(260, W * 0.15));
+    var sy = window.pageYOffset || 0;
+    var all = [].slice.call(document.querySelectorAll('section,.tile,.car,header.phead'));
+    var tops = all.filter(function(el){
+      if(el.classList.contains('hero-zoom') || el.classList.contains('sect-alt') || el.classList.contains('featured')) return false;   // secțiuni opace (orbe proprii) — fără lac dedesubt
+      if(el.offsetHeight < 90) return false;
+      return !all.some(function(o){ return o !== el && o.contains(el); });   // doar blocurile de nivel-secțiune
+    });
+    bands = tops.map(function(el, i){
+      var rr = el.getBoundingClientRect();
+      var top = rr.top + sy;
+      return { top: top, bot: top + rr.height, syms: genBand(top, rr.height, Math.floor(top) + i * 131 + 7) };
+    });
+    var hero = document.querySelector('.hero-zoom');   // hero (sticky) → bandă FIXĂ: simbolurile plutesc pe loc cât e fixat
+    if(hero && hero.offsetHeight > 90){
+      var hrr = hero.getBoundingClientRect();
+      bands.push({ fixed: true, top: hrr.top + sy, bot: hrr.top + sy + hrr.height, syms: genViewportSyms() });
     }
   }
   var tx = -1e4, ty = -1e4, lx = -1e4, ly = -1e4, raf = 0, running = false;
   function frame(t){
     raf = 0;
     lx += (tx - lx) * 0.14; ly += (ty - ly) * 0.14;
+    var sy = window.pageYOffset || 0;
     ctx.clearRect(0, 0, W, H);
     if(lx > -9e3){
       var gg = ctx.createRadialGradient(lx, ly, 0, lx, ly, R * 1.15);
@@ -1452,26 +1497,30 @@
       gg.addColorStop(1, 'rgba(46,201,171,0)');
       ctx.fillStyle = gg; ctx.fillRect(0, 0, W, H);
     }
-    var sc = (window.pageYOffset || 0) * 0.6;   // parallax: simbolurile urcă la scroll (60% din viteză)
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    for(var i = 0; i < syms.length; i++){
-      var s = syms[i];
-      /* plutire pe „lacul cunoașterii": undă lentă pe x + bob vertical, faze proprii (organic) */
-      var fx = s.x + Math.sin(t * 0.0005 + s.p2) * s.ax;
-      var fy = (s.y + Math.sin(t * 0.0007 + s.x * 0.010 + s.p1) * s.ay - sc) % H;
-      if(fy < 0) fy += H;                        // wrap vertical → câmp infinit la scroll
-      var prox = 0;
-      if(lx > -9e3){
-        var dx = fx - lx, dy = fy - ly, d = Math.sqrt(dx * dx + dy * dy);
-        if(d < R){ prox = 1 - d / R; prox = prox * prox * (3 - 2 * prox); }
+    for(var b = 0; b < bands.length; b++){
+      var band = bands[b];
+      if(band.fixed){ if(sy >= band.bot - H + 40) continue; }                         // hero: doar cât e fixat (apoi îl acoperă „featured")
+      else if(band.bot - sy < -30 || band.top - sy > H + 30) continue;                // sare benzile din afara viewportului
+      var syms = band.syms, fixed = band.fixed;
+      for(var i = 0; i < syms.length; i++){
+        var s = syms[i];
+        var fy = (fixed ? s.y : (s.docY - sy)) + Math.sin(t * 0.0007 + s.p1) * s.ay;   // hero = viewport; restul = ancorat pe document
+        if(fy < -30 || fy > H + 30) continue;
+        var fx = s.x + Math.sin(t * 0.0005 + s.p2) * s.ax;
+        var prox = 0;
+        if(lx > -9e3){
+          var dx = fx - lx, dy = fy - ly, d = Math.sqrt(dx * dx + dy * dy);
+          if(d < R){ prox = 1 - d / R; prox = prox * prox * (3 - 2 * prox); }
+        }
+        var base = s.a0 * (0.6 + 0.4 * Math.sin(t * 0.001 + s.tw));
+        var a = base + (0.55 - base) * prox;
+        if(prox > 0.5){ ctx.shadowColor = 'rgba(46,201,171,.5)'; ctx.shadowBlur = 4 * prox; }
+        else { ctx.shadowBlur = 0; }
+        ctx.font = '500 ' + (s.s * (1 + 0.16 * prox)).toFixed(1) + 'px ' + FONT;
+        ctx.fillStyle = 'rgba(46,201,171,' + a.toFixed(3) + ')';
+        ctx.fillText(s.g, fx, fy);
       }
-      var base = s.a0 * (0.6 + 0.4 * Math.sin(t * 0.001 + s.tw));
-      var a = base + (0.55 - base) * prox;                         // vârf discret la cursor (era .92)
-      if(prox > 0.5){ ctx.shadowColor = 'rgba(46,201,171,.5)'; ctx.shadowBlur = 4 * prox; }  // glow subtil, doar pe cele mai apropiate
-      else { ctx.shadowBlur = 0; }
-      ctx.font = '500 ' + (s.s * (1 + 0.16 * prox)).toFixed(1) + 'px ' + FONT;
-      ctx.fillStyle = 'rgba(46,201,171,' + a.toFixed(3) + ')';     // mint constant, doar alpha (fără shift spre alb)
-      ctx.fillText(s.g, fx, fy);
     }
     ctx.shadowBlur = 0;
     if(running) raf = requestAnimationFrame(frame);
@@ -1480,29 +1529,39 @@
   function stop(){ running = false; if(raf){ cancelAnimationFrame(raf); raf = 0; } }
   function drawStatic(){
     if(!W) return;
+    var sy = window.pageYOffset || 0;
     ctx.clearRect(0, 0, W, H);
     ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.shadowBlur = 0;
-    for(var i = 0; i < syms.length; i++){ var s = syms[i];
-      ctx.font = '500 ' + s.s + 'px ' + FONT;
-      ctx.fillStyle = 'rgba(46,201,171,' + s.a0.toFixed(3) + ')';
-      ctx.fillText(s.g, s.x, s.y);
+    for(var b = 0; b < bands.length; b++){
+      var band = bands[b];
+      if(band.fixed){ if(sy >= band.bot - H + 40) continue; }
+      else if(band.bot - sy < -30 || band.top - sy > H + 30) continue;
+      var syms = band.syms, fixed = band.fixed;
+      for(var i = 0; i < syms.length; i++){ var s = syms[i];
+        var fy = fixed ? s.y : (s.docY - sy);
+        if(fy < -30 || fy > H + 30) continue;
+        ctx.font = '500 ' + s.s + 'px ' + FONT;
+        ctx.fillStyle = 'rgba(46,201,171,' + s.a0.toFixed(3) + ')';
+        ctx.fillText(s.g, s.x, fy);
+      }
     }
   }
   build();
   if(live){
     addEventListener('pointermove', function(e){
       if(e.pointerType === 'touch') return;
-      tx = e.clientX; ty = e.clientY;   // canvas fix = coordonate viewport
+      tx = e.clientX; ty = e.clientY;
     }, {passive: true});
     document.addEventListener('mouseleave', function(){ tx = -1e4; ty = -1e4; }, {passive: true});
     document.addEventListener('visibilitychange', function(){ if(document.hidden){ stop(); } else { start(); } });
     start();
   } else {
     drawStatic();
+    var stick = false;
+    addEventListener('scroll', function(){ if(!stick){ stick = true; requestAnimationFrame(function(){ drawStatic(); stick = false; }); } }, {passive: true});
   }
   var rz;
-  addEventListener('resize', function(){
-    clearTimeout(rz);
-    rz = setTimeout(function(){ build(); if(!live) drawStatic(); }, 200);
-  });
+  function rebuild(){ clearTimeout(rz); rz = setTimeout(function(){ build(); if(!live) drawStatic(); }, 180); }
+  addEventListener('resize', rebuild);
+  if('ResizeObserver' in window){ new ResizeObserver(rebuild).observe(document.body); }   // conținut async schimbă înălțimile
 })();
