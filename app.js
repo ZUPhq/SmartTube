@@ -267,43 +267,30 @@
       var pr = heroVideo.play(); if(pr && pr.catch) pr.catch(function(){});
     };
 
-    /* SCRUB în 2 faze (sincronizat cu „curtain"-ul CSS al secțiunii următoare):
-         1) GROW  (q 0 → .42): cardul (ancorat jos, DEASUPRA textului) crește scale .66 → 1 și URCĂ
-            peste text, acoperindu-l; aproape cât tot ecranul. Videoul pornește la primul scroll.
-            Textul rămâne vizibil cât e acoperit, apoi opacity→0 (deja sub video) ca să nu reapară.
-         2) SLIDE (q .42 → 1): cardul alunecă în jos, iar secțiunea următoare
-            (margin-top:-100vh) urcă opac peste el și-l acoperă */
-    var GROW = 0.42;
+    /* SCRUB în 3 faze (sincronizat cu „curtain"-ul CSS = ultimii 100vh de scroll):
+         1) GROW  (q 0 → .30): cardul (ancorat jos, DEASUPRA textului) crește scale .66 → 1 și URCĂ
+            peste text, acoperindu-l. Videoul pornește la primul scroll; textul dispare după ce e acoperit.
+         2) HOLD  (q .30 → .50): cardul rămâne BLOCAT la full size (sticky + fără translate) — pauza cerută.
+         3) SLIDE (q .50 → 1): cardul alunecă în jos, iar secțiunea următoare (margin-top:-100vh)
+            urcă opac peste el. Înălțimea hero-ului (300vh) e aleasă ca HOLD-ul să fie ÎNAINTE de zona curtain. */
+    var GROW = 0.30, HOLD = 0.50;
     var hzScrub = function(){
       if(!hzMotion()){ hzFrame.style.transform = ''; if(hzHead){ hzHead.style.opacity = ''; } return; }
       var top = heroZoom.getBoundingClientRect().top;
       var span = heroZoom.offsetHeight - innerHeight;
       var q = span > 0 ? clh(-top / span) : 0;
-      var gT = eoch(q / GROW);                          // creștere .66 → 1 (urcă peste text, aproape tot ecranul)
-      var sT = eoch((q - GROW) / (1 - GROW));           // alunecare în jos
+      var gT = eoch(q / GROW);                          // creștere .66 → 1 (urcă peste text); gT=1 și pe HOLD
+      var sT = eoch((q - HOLD) / (1 - HOLD));           // alunecare în jos — abia DUPĂ pauză (q > HOLD)
       var ty = sT * innerHeight * 0.30;
       hzFrame.style.transform = 'translateY(' + ty.toFixed(1) + 'px) scale(' + lerph(0.66, 1, gT).toFixed(4) + ')';
       if(hzHead){
         /* rămâne la opacitate plină cât e acoperit de video, apoi dispare (invizibil, deja sub video) */
-        hzHead.style.opacity = (1 - clh((q - 0.30) / 0.07)).toFixed(3);
+        hzHead.style.opacity = (1 - clh((q - 0.21) / 0.05)).toFixed(3);
       }
       if(q > 0.04) startVid();
     };
 
-    /* fundal: haloul mint + grila urmăresc cursorul (doar pointer fin) */
-    if(hzStage && matchMedia('(pointer:fine)').matches && !reduce){
-      var mvTick = false, mvx = 50, mvy = 40;
-      hzStage.addEventListener('pointermove', function(e){
-        var r = hzStage.getBoundingClientRect();
-        mvx = ((e.clientX - r.left) / r.width) * 100;
-        mvy = ((e.clientY - r.top) / r.height) * 100;
-        if(!mvTick){ mvTick = true; requestAnimationFrame(function(){
-          hzStage.style.setProperty('--mx', mvx.toFixed(1) + '%');
-          hzStage.style.setProperty('--my', mvy.toFixed(1) + '%');
-          mvTick = false;
-        }); }
-      });
-    }
+    /* fundalul hero e acum stratul GLOBAL „lacul cunoașterii" (#lakeFx) din spatele întregului site — vezi modulul de la finalul fișierului */
 
     if(hzMotion()){
       var hzTick = false;
@@ -1411,4 +1398,111 @@
 
   /* expune helperi pentru paginile cu script propriu (dashboard, wizard) */
   window.App = { courseCardHTML:courseCardHTML, tiltify:tiltify, authMsg:authMsg, revealify:revealify, countUp:countUp };
+})();
+
+/* ---- „lacul cunoașterii": câmp GLOBAL de simboluri care plutesc, descoperit cu lanterna cursorului ----
+   Canvas fix (#lakeFx) în spatele întregului conținut, pe toate paginile. Simbolurile (cod, design,
+   foto/video, muzică, business, dezvoltare) sunt aproape invizibile, aprinse doar în jurul cursorului.
+   Secțiunile cu fundal solid (.sect-alt, footer, tile „featured", modale) acoperă canvas-ul → rămân la fel. */
+(function(){
+  var canvas = document.getElementById('lakeFx');
+  if(!canvas || !canvas.getContext) return;
+  var ctx = canvas.getContext('2d');
+  var live = matchMedia('(pointer:fine)').matches && !matchMedia('(prefers-reduced-motion:reduce)').matches;
+  /* simboluri legate de categoriile site-ului: cod, design, foto/video, muzică, business, dezvoltare */
+  var GLYPHS = ['</>','{ }','( )','[ ]',';','#','01','Aa','▶','▷','♪','♫','♩','%','↗','€','★','✓'];
+  var FONT = 'ui-monospace,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace';
+  var dpr = Math.min(window.devicePixelRatio || 1, 2);
+  var W = 0, H = 0, syms = [], R = 200;
+  function rnd(n){ var x = Math.sin(n * 12.9898) * 43758.5453; return x - Math.floor(x); }   // determinist (stabil între resize)
+  function build(){
+    var r = canvas.getBoundingClientRect();   // dimensiunea CSS reală (corectă pe orice DPR)
+    W = r.width; H = r.height;
+    if(!W || !H) return;
+    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    R = Math.max(170, Math.min(260, W * 0.15));
+    syms = [];
+    var cell = 84, cols = Math.ceil(W / cell), rows = Math.ceil(H / cell), k = 0;
+    for(var iy = 0; iy < rows; iy++) for(var ix = 0; ix < cols; ix++){
+      k++;
+      syms.push({
+        x: ix * cell + cell * 0.5 + (rnd(k * 2.1) - 0.5) * cell * 0.7,
+        y: iy * cell + cell * 0.5 + (rnd(k * 3.7) - 0.5) * cell * 0.7,
+        g: GLYPHS[Math.floor(rnd(k * 5.3) * GLYPHS.length) % GLYPHS.length],
+        s: 12 + Math.floor(rnd(k * 7.1) * 9),
+        a0: 0.022 + rnd(k * 9.7) * 0.04,
+        tw: rnd(k * 11.3) * 6.283,
+        ax: 4 + rnd(k * 13.1) * 7,      // amplitudine plutire orizontală
+        ay: 6 + rnd(k * 17.3) * 8,      // amplitudine bob vertical (val pe lac)
+        p1: rnd(k * 19.7) * 6.283,
+        p2: rnd(k * 23.9) * 6.283
+      });
+    }
+  }
+  var tx = -1e4, ty = -1e4, lx = -1e4, ly = -1e4, raf = 0, running = false;
+  function frame(t){
+    raf = 0;
+    lx += (tx - lx) * 0.14; ly += (ty - ly) * 0.14;
+    ctx.clearRect(0, 0, W, H);
+    if(lx > -9e3){
+      var gg = ctx.createRadialGradient(lx, ly, 0, lx, ly, R * 1.15);
+      gg.addColorStop(0, 'rgba(46,201,171,.07)');
+      gg.addColorStop(.6, 'rgba(46,201,171,.02)');
+      gg.addColorStop(1, 'rgba(46,201,171,0)');
+      ctx.fillStyle = gg; ctx.fillRect(0, 0, W, H);
+    }
+    var sc = (window.pageYOffset || 0) * 0.6;   // parallax: simbolurile urcă la scroll (60% din viteză)
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for(var i = 0; i < syms.length; i++){
+      var s = syms[i];
+      /* plutire pe „lacul cunoașterii": undă lentă pe x + bob vertical, faze proprii (organic) */
+      var fx = s.x + Math.sin(t * 0.0005 + s.p2) * s.ax;
+      var fy = (s.y + Math.sin(t * 0.0007 + s.x * 0.010 + s.p1) * s.ay - sc) % H;
+      if(fy < 0) fy += H;                        // wrap vertical → câmp infinit la scroll
+      var prox = 0;
+      if(lx > -9e3){
+        var dx = fx - lx, dy = fy - ly, d = Math.sqrt(dx * dx + dy * dy);
+        if(d < R){ prox = 1 - d / R; prox = prox * prox * (3 - 2 * prox); }
+      }
+      var base = s.a0 * (0.6 + 0.4 * Math.sin(t * 0.001 + s.tw));
+      var a = base + (0.55 - base) * prox;                         // vârf discret la cursor (era .92)
+      if(prox > 0.5){ ctx.shadowColor = 'rgba(46,201,171,.5)'; ctx.shadowBlur = 4 * prox; }  // glow subtil, doar pe cele mai apropiate
+      else { ctx.shadowBlur = 0; }
+      ctx.font = '500 ' + (s.s * (1 + 0.16 * prox)).toFixed(1) + 'px ' + FONT;
+      ctx.fillStyle = 'rgba(46,201,171,' + a.toFixed(3) + ')';     // mint constant, doar alpha (fără shift spre alb)
+      ctx.fillText(s.g, fx, fy);
+    }
+    ctx.shadowBlur = 0;
+    if(running) raf = requestAnimationFrame(frame);
+  }
+  function start(){ if(running || !live) return; running = true; raf = requestAnimationFrame(frame); }
+  function stop(){ running = false; if(raf){ cancelAnimationFrame(raf); raf = 0; } }
+  function drawStatic(){
+    if(!W) return;
+    ctx.clearRect(0, 0, W, H);
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.shadowBlur = 0;
+    for(var i = 0; i < syms.length; i++){ var s = syms[i];
+      ctx.font = '500 ' + s.s + 'px ' + FONT;
+      ctx.fillStyle = 'rgba(46,201,171,' + s.a0.toFixed(3) + ')';
+      ctx.fillText(s.g, s.x, s.y);
+    }
+  }
+  build();
+  if(live){
+    addEventListener('pointermove', function(e){
+      if(e.pointerType === 'touch') return;
+      tx = e.clientX; ty = e.clientY;   // canvas fix = coordonate viewport
+    }, {passive: true});
+    document.addEventListener('mouseleave', function(){ tx = -1e4; ty = -1e4; }, {passive: true});
+    document.addEventListener('visibilitychange', function(){ if(document.hidden){ stop(); } else { start(); } });
+    start();
+  } else {
+    drawStatic();
+  }
+  var rz;
+  addEventListener('resize', function(){
+    clearTimeout(rz);
+    rz = setTimeout(function(){ build(); if(!live) drawStatic(); }, 200);
+  });
 })();

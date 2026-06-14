@@ -98,7 +98,7 @@
 '  </div>\n' +
 '</footer>';
 
-  document.body.insertAdjacentHTML('afterbegin', NAV_HTML);
+  document.body.insertAdjacentHTML('afterbegin', '<canvas id="lakeFx" aria-hidden="true"></canvas>' + NAV_HTML);
   /* footer-ul intră chiar înaintea blocului de scripturi (tag-ul curent) */
   var here = document.currentScript;
   if(here) here.insertAdjacentHTML('beforebegin', FOOTER_HTML);
